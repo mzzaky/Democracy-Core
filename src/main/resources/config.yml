@@ -1,0 +1,162 @@
+# DemocracyCore Configuration
+# Version 1.0.0
+
+# General Settings
+general:
+  prefix: "&6[DemocracyCore]&r"
+  language: "en"
+
+# President Settings
+president:
+  term-length-days: 30
+  max-consecutive-terms: 2
+  cooldown-after-max-terms: 1 # terms to wait before running again
+  
+  # Requirements to run
+  requirements:
+    min-level: 100
+    min-playtime-hours: 100
+    min-vault-balance: 500000
+    min-endorsements: 10
+    no-punishment-days: 30
+  
+  # Buffs
+  buffs:
+    damage-multiplier: 1.15 # +15%
+    defense-multiplier: 1.12 # +12%
+    vault-multiplier: 1.20 # +20%
+    xp-multiplier: 1.10 # +10%
+    extra-hearts: 2
+    hunger-immunity: true
+    night-vision: true
+  
+  # Daily Rewards
+  daily-rewards:
+    vault-points: 50000
+    diamond-blocks: 5
+    netherite-ingots: 3
+    enchanted-golden-apples: 10
+
+# Cabinet Settings
+cabinet:
+  appointment-cooldown-days: 3
+  daily-salary: 20000
+  
+  # Minister of Defense
+  defense:
+    prefix: "&4[MoD]"
+    damage-multiplier: 1.12
+    defense-multiplier: 1.10
+    vault-multiplier: 1.15
+    extra-hearts: 1.5
+    daily-vault: 30000
+    decision-cooldown-hours: 48
+  
+  # Minister of Treasury
+  treasury-minister:
+    prefix: "&2[MoT]"
+    vault-multiplier: 1.25
+    sell-bonus: 1.10
+    buy-discount: 0.90
+    daily-vault: 50000
+    decision-cooldown-hours: 48
+  
+  # Minister of Commerce
+  commerce:
+    prefix: "&9[MoC]"
+    vault-multiplier: 1.20
+    rare-drop-bonus: 1.15
+    daily-vault: 35000
+    decision-cooldown-hours: 48
+  
+  # Minister of Infrastructure
+  infrastructure:
+    prefix: "&7[MoI]"
+    vault-multiplier: 1.20
+    claim-block-multiplier: 2.0
+    daily-vault: 30000
+    decision-cooldown-hours: 48
+  
+  # Minister of Culture
+  culture:
+    prefix: "&d[MoK]"
+    xp-multiplier: 1.15
+    vault-multiplier: 1.10
+    afk-bypass: true
+    daily-vault: 30000
+    decision-cooldown-hours: 48
+
+# Election Settings
+election:
+  registration-days: 3
+  campaign-days: 7
+  voting-days: 3
+  inauguration-days: 1
+  
+  registration-fee: 500000
+  registration-refund-winner: 1.0 # 100%
+  registration-refund-loser: 0.5 # 50%
+  
+  campaign:
+    broadcast-cooldown-hours: 6
+    broadcast-cost: 10000
+    endorsement-points: 10
+  
+  vote-weights:
+    base: 1.0
+    playtime-bonus: 0.5
+    playtime-threshold-hours: 200
+    level-bonus: 0.5
+    level-threshold: 75
+    balance-bonus: 0.5
+    balance-threshold: 1000000
+    max-weight: 2.5
+  
+  voter-rewards:
+    participation: 10000
+    lottery-bonus: 50000
+    lottery-winners: 10
+
+# Executive Orders
+executive-orders:
+  cooldown-days: 7
+  cost: 1000000
+
+# Presidential Games
+presidential-games:
+  cost: 100000
+  max-per-term: 2
+  duration-days: 7
+  death-penalty: 5000
+  safe-zone-immunity-seconds: 10
+  afk-kick-minutes: 3
+  
+  killstreak-rewards:
+    5: 10000
+    10: 25000
+    25: 100000
+    50: 250000
+
+# Treasury Settings
+treasury:
+  starting-fund: 5000000
+  transaction-tax: 0.05 # 5%
+
+# Recall Settings
+recall:
+  signature-threshold: 0.30 # 30% of active players
+  signature-deposit: 50000
+  collection-days: 7
+  removal-threshold: 0.60 # 60% to remove
+  cooldown-after-failure-days: 15
+
+# Approval Rating
+approval:
+  rating-cooldown-days: 7
+  high-approval-threshold: 4.0
+  low-approval-threshold: 2.0
+
+# Auto-removal
+auto-removal:
+  inactive-days: 7
+

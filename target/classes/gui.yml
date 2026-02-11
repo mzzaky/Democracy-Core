@@ -1,0 +1,394 @@
+# GUI Configuration for Democracy Core Plugin
+# This file controls the appearance and behavior of GUI elements in MainMenuGUI.java
+# Supports placeholders: {player_name}, {level}, {playtime}, {balance}, {president_name}, {term}, {remaining_time}, {rating}, etc.
+
+gui:
+  # Main Menu GUI Configuration
+  main_menu:
+    title: "§6§l⚜ DEMOCRACY CORE ⚜"
+    items:
+      # Player Head (Slot 4)
+      player_head:
+        material: PLAYER_HEAD
+        custom_model_data: 0
+        display_name: "§b§l👤 {player_name}"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Level: §f{level}"
+          - "§7Playtime: §f{playtime}"
+          - "§7Balance: §6{balance}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "{status_lines}"
+          - ""
+          - "§aClick for detailed statistics"
+        click_sound: "entity.player.levelup"
+
+      # President Info (Slot 10)
+      president_item:
+        # When president exists
+        default:
+          material: GOLDEN_HELMET
+          custom_model_data: 0
+          display_name: "§6§l👑 PRESIDENT"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7Name: §f{president_name}"
+            - "§7Term §f{term}"
+            - "§7Time remaining: §f{remaining_time}"
+            - "§7Rating: §e{rating} ⭐"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§aClick for government details"
+          click_sound: "block.anvil.use"
+        # When no president
+        no_president:
+          material: BARRIER
+          custom_model_data: 0
+          display_name: "§c§l👑 NO PRESIDENT"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7President position is empty"
+            - "§7Election is in progress"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§eClick for election info"
+          click_sound: "block.anvil.break"
+
+      # Cabinet Info (Slot 12)
+      cabinet_item:
+        material: LECTERN
+        custom_model_data: 0
+        display_name: "§e§l📋 CABINET"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "{cabinet_members}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Filled: §f{filled}/{total}"
+          - ""
+          - "§aClick for cabinet details"
+        click_sound: "item.book.page_turn"
+
+      # Treasury Info (Slot 14)
+      treasury_item:
+        material: GOLD_BLOCK
+        custom_model_data: 0
+        display_name: "§6§l💰 TREASURY"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Balance: §6{balance}"
+          - "§7Income: §a+{income}"
+          - "§7Expenses: §c-{expenses}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick for treasury details"
+        click_sound: "block.note_block.pling"
+
+      # Active Effects (Slot 16)
+      active_effects_item:
+        # When no effects
+        inactive:
+          material: GLASS
+          custom_model_data: 0
+          display_name: "§a§l✨ ACTIVE EFFECTS: {total}"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7No active effects"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          click_sound: "block.glass.break"
+        # When effects active
+        active:
+          material: BEACON
+          custom_model_data: 0
+          display_name: "§a§l✨ ACTIVE EFFECTS: {total}"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "{executive_orders}"
+            - "{cabinet_decisions}"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          click_sound: "block.beacon.activate"
+
+      # Election (Slot 19)
+      election_item:
+        material: PAPER
+        custom_model_data: 0
+        display_name: "§b§l🗳 ELECTION"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Phase: §f{phase}"
+          - "{election_details}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick to open voting GUI"
+        click_sound: "item.book.page_turn"
+
+      # Executive Orders (Slot 21)
+      executive_orders_item:
+        material: WRITABLE_BOOK
+        custom_model_data: 0
+        display_name: "§c§l📜 EXECUTIVE ORDERS"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Active: §f{active_count} orders"
+          - "§7Cost: §6{cost}"
+          - "§7Cooldown: §f{cooldown}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "{president_permission}"
+          - ""
+          - "§aClick to view orders"
+        click_sound: "item.book.page_turn"
+
+      # Presidential Arena (Slot 23)
+      arena_item:
+        # When inactive
+        inactive:
+          material: IRON_SWORD
+          custom_model_data: 0
+          display_name: "§4§l⚔ PRESIDENTIAL ARENA"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7Status: §cInactive"
+            - ""
+            - "§7§lYour Statistics:"
+            - "§7Kills: §a{kills}"
+            - "§7Deaths: §c{deaths}"
+            - "§7Best Streak: §6{streak}"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§aClick for arena info"
+          click_sound: "entity.player.attack.sweep"
+        # When active
+        active:
+          material: DIAMOND_SWORD
+          custom_model_data: 0
+          display_name: "§4§l⚔ PRESIDENTIAL ARENA"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§a§lACTIVE SESSION!"
+            - "§7Players in arena: §f{players}"
+            - ""
+            - "§7§lYour Statistics:"
+            - "§7Kills: §a{kills}"
+            - "§7Deaths: §c{deaths}"
+            - "§7Best Streak: §6{streak}"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§aClick for arena info"
+          click_sound: "entity.player.attack.crit"
+
+      # Recall System (Slot 25)
+      recall_item:
+        # When inactive
+        inactive:
+          material: TORCH
+          custom_model_data: 0
+          display_name: "§c§l⚠ RECALL SYSTEM"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7No active petition"
+            - ""
+            - "§7Start petition to"
+            - "§7recall president"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7Deposit: §6{deposit}"
+            - "§7Threshold: §f{threshold}"
+            - ""
+            - "§eClick for recall info"
+          click_sound: "block.torch.extinguish"
+        # When active
+        active:
+          material: REDSTONE_TORCH
+          custom_model_data: 0
+          display_name: "§c§l⚠ RECALL SYSTEM"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§c§lACTIVE PETITION!"
+            - "§7Phase: §f{phase}"
+            - "§7Signatures: §f{signatures}"
+            - "{voting_details}"
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7Deposit: §6{deposit}"
+            - "§7Threshold: §f{threshold}"
+            - ""
+            - "§eClick for recall info"
+          click_sound: "block.redstone_torch.burnout"
+
+      # History (Slot 28)
+      history_item:
+        material: BOOK
+        custom_model_data: 0
+        display_name: "§5§l📚 PRESIDENTIAL HISTORY"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Total presidents: §f{total}"
+          - "{recent_presidents}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick to view history"
+        click_sound: "item.book.page_turn"
+
+      # My Stats (Slot 30)
+      my_stats_item:
+        material: COMPASS
+        custom_model_data: 0
+        display_name: "§b§l📊 MY STATISTICS"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Votes Cast: §f{votes_cast}"
+          - "§7Endorsements: §f{endorsements}"
+          - "§7Times President: §f{president_times}x"
+          - "§7Times Minister: §f{minister_times}x"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick for full details"
+        click_sound: "item.spyglass.use"
+
+      # Leaderboard (Slot 32)
+      leaderboard_item:
+        material: GOLDEN_APPLE
+        custom_model_data: 0
+        display_name: "§6§l🏆 LEADERBOARD"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7View top players:"
+          - "§7- Arena Kills"
+          - "§7- Playtime"
+          - "§7- Best Presidents"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick to view leaderboard"
+        click_sound: "entity.player.levelup"
+
+      # Help (Slot 34)
+      help_item:
+        material: KNOWLEDGE_BOOK
+        custom_model_data: 0
+        display_name: "§a§l❓ GUIDE & HELP"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Learn how to play:"
+          - "§7- Election System"
+          - "§7- Becoming President"
+          - "§7- Cabinet & Ministers"
+          - "§7- Executive Orders"
+          - "§7- And more!"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick to open guide"
+        click_sound: "item.book.page_turn"
+
+      # Quick Actions
+      register_candidate:
+        material: EMERALD
+        custom_model_data: 0
+        display_name: "§a§l📝 REGISTER CANDIDATE"
+        lore:
+          - "§7Register yourself as a"
+          - "§7presidential candidate!"
+          - ""
+          - "§eCost: §6{cost}"
+          - ""
+          - "§aClick to register!"
+        click_sound: "entity.experience_orb.pickup"
+
+      vote_now:
+        material: LIME_CONCRETE
+        custom_model_data: 0
+        display_name: "§a§l🗳 VOTE NOW!"
+        lore:
+          - "§7Cast your vote for"
+          - "§7your chosen candidate!"
+          - ""
+          - "§c⚠ Cannot be undone!"
+          - ""
+          - "§aClick to vote!"
+        click_sound: "ui.button.click"
+
+      rate_president:
+        material: NETHER_STAR
+        custom_model_data: 0
+        display_name: "§e§l⭐ RATE PRESIDENT"
+        lore:
+          - "§7Rate the current"
+          - "§7president's performance"
+          - ""
+          - "§7Current rating: §e{current_rating}/5.0"
+          - ""
+          - "§eClick to rate!"
+        click_sound: "entity.firework_rocket.launch"
+
+      # Close Button (Slot 49)
+      close_button:
+        material: BARRIER
+        custom_model_data: 0
+        display_name: "§c§lClose Menu"
+        lore:
+          - "§7Click to close"
+        click_sound: "block.chest.close"
+
+      # Glass Pane Filler
+      glass_pane:
+        material: GRAY_STAINED_GLASS_PANE
+        custom_model_data: 0
+        display_name: " "
+
+      # Corner Decorations
+      corner_decoration:
+        material: ORANGE_STAINED_GLASS_PANE
+        custom_model_data: 0
+        display_name: " "
+
+  # Quick Actions Menu Configuration
+  quick_actions:
+    title: "§e§l⚡ QUICK ACTIONS ⚡"
+    items:
+      register_candidate_qa:
+        material: EMERALD
+        custom_model_data: 0
+        display_name: "§a§lRegister Candidate"
+        lore:
+          - "§7Cost: §6{cost}"
+          - "§aClick to register!"
+        click_sound: "entity.experience_orb.pickup"
+
+      vote_candidate:
+        material: LIME_WOOL
+        custom_model_data: 0
+        display_name: "§a§lVote Candidate"
+        lore:
+          - "§7Choose presidential candidate"
+          - "§aClick to vote!"
+        click_sound: "ui.button.click"
+
+      endorse_candidate:
+        material: GOLDEN_APPLE
+        custom_model_data: 0
+        display_name: "§6§lEndorse Candidate"
+        lore:
+          - "§7Support your chosen candidate"
+          - "§eClick to endorse!"
+        click_sound: "entity.villager.yes"
+
+      rate_president_qa:
+        material: NETHER_STAR
+        custom_model_data: 0
+        display_name: "§e§lRate President"
+        lore:
+          - "§7Rate the president"
+          - "§eClick to rate!"
+        click_sound: "entity.firework_rocket.launch"
+
+      donate_treasury:
+        material: GOLD_INGOT
+        custom_model_data: 0
+        display_name: "§6§lDonate Treasury"
+        lore:
+          - "§7Donate to national treasury"
+          - "§eClick for donation info!"
+        click_sound: "block.note_block.pling"
+
+      join_arena:
+        material: IRON_SWORD
+        custom_model_data: 0
+        display_name: "§c§lJoin Arena"
+        lore:
+          - "§7Presidential Games active!"
+          - "§aClick to join!"
+        click_sound: "entity.player.attack.sweep"
+
+      back_button:
+        material: ARROW
+        custom_model_data: 0
+        display_name: "§7§lBack"
+        lore:
+          - "§7Back to main menu"
+        click_sound: "item.flintandsteel.use"

@@ -1,0 +1,535 @@
+package id.democracycore.managers;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+import id.democracycore.DemocracyCore;
+import id.democracycore.models.Election;
+import id.democracycore.models.Election.Candidate;
+import id.democracycore.models.Election.ElectionPhase;
+import id.democracycore.models.Election.Vote;
+import id.democracycore.models.PlayerData;
+import id.democracycore.utils.MessageUtils;
+
+public class ElectionManager {
+    
+    private final DemocracyCore plugin;
+    
+    public ElectionManager(DemocracyCore plugin) {
+        this.plugin = plugin;
+    }
+    
+    public Election getElection() {
+        return plugin.getDataManager().getElection();
+    }
+    
+    public boolean isElectionActive() {
+        return getElection().isActive();
+    }
+    
+    public void startElection() {
+        Election election = getElection();
+        if (election.isActive()) return;
+        
+        election.startElection();
+        
+        MessageUtils.broadcastAnnouncement("ELECTION BEGINS",
+            "<yellow>A new presidential election has begun!</yellow>\n" +
+            "<gray>Registration phase: " + getPhaseDuration(ElectionPhase.REGISTRATION) + " days</gray>\n" +
+            "<green>Use </green><gold>/dc register [slogan]</gold><green> to run for president!</green>");
+        
+        MessageUtils.broadcastTitle("<gold>🗳️ ELECTION TIME 🗳️</gold>", 
+            "<yellow>Registration is now open!</yellow>", 20, 100, 20);
+    }
+    
+    public void startEmergencyElection() {
+        MessageUtils.broadcast("<red>An emergency election has been called!</red>");
+        startElection();
+    }
+    
+    public void checkPhaseTransitions() {
+        Election election = getElection();
+        if (!election.isActive()) {
+            // Check if it's time for a new election
+            checkAutoElectionStart();
+            return;
+        }
+        
+        long elapsed = System.currentTimeMillis() - election.getPhaseStartTime();
+        long phaseDuration = getPhaseDuration(election.getCurrentPhase()) * 24L * 60 * 60 * 1000;
+        
+        if (elapsed >= phaseDuration) {
+            advancePhase();
+        }
+    }
+    
+    private void checkAutoElectionStart() {
+        // Start election 5 days before term ends
+        long remaining = plugin.getGovernmentManager().getTermRemainingTime();
+        int daysBeforeTermEnd = 5;
+        long threshold = daysBeforeTermEnd * 24L * 60 * 60 * 1000;
+        
+        if (remaining > 0 && remaining <= threshold && !getElection().isActive()) {
+            startElection();
+        }
+        
+        // Start election if no president
+        if (!plugin.getGovernmentManager().getGovernment().hasPresident() && !getElection().isActive()) {
+            startElection();
+        }
+    }
+    
+    private void advancePhase() {
+        Election election = getElection();
+        ElectionPhase previousPhase = election.getCurrentPhase();
+        
+        switch (previousPhase) {
+            case REGISTRATION -> {
+                if (election.getCandidates().isEmpty()) {
+                    MessageUtils.broadcast("<red>No candidates registered. Election cancelled.</red>");
+                    election.endElection();
+                    return;
+                }
+                election.nextPhase();
+                MessageUtils.broadcastAnnouncement("CAMPAIGN PHASE",
+                    "<yellow>Campaign phase has begun!</yellow>\n" +
+                    "<gray>Duration: " + getPhaseDuration(ElectionPhase.CAMPAIGN) + " days</gray>\n" +
+                    "<green>Candidates can now campaign for votes!</green>");
+            }
+            case CAMPAIGN -> {
+                election.nextPhase();
+                MessageUtils.broadcastAnnouncement("VOTING PHASE",
+                    "<yellow>Voting has begun!</yellow>\n" +
+                    "<gray>Duration: " + getPhaseDuration(ElectionPhase.VOTING) + " days</gray>\n" +
+                    "<green>Use </green><gold>/dc vote</gold><green> to cast your vote!</green>");
+                MessageUtils.broadcastTitle("<gold>🗳️ VOTE NOW 🗳️</gold>", 
+                    "<yellow>Make your voice heard!</yellow>", 20, 100, 20);
+            }
+            case VOTING -> {
+                election.nextPhase();
+                concludeVoting();
+            }
+            case INAUGURATION -> {
+                election.endElection();
+                // Clear player election data
+                for (PlayerData data : plugin.getDataManager().getAllPlayerData()) {
+                    data.clearElectionData();
+                }
+            }
+            default -> {}
+        }
+    }
+    
+    private void concludeVoting() {
+        Election election = getElection();
+        Candidate winner = election.getWinner();
+        
+        if (winner == null) {
+            MessageUtils.broadcast("<red>No valid votes were cast. Election inconclusive.</red>");
+            election.endElection();
+            return;
+        }
+        
+        // Announce results
+        StringBuilder results = new StringBuilder();
+        results.append("<yellow>Election Results:</yellow>\n");
+        
+        List<Candidate> sortedCandidates = new ArrayList<>(election.getCandidates().values());
+        sortedCandidates.sort((a, b) -> Double.compare(
+            election.getCandidateVotes(b.getUuid()),
+            election.getCandidateVotes(a.getUuid())
+        ));
+        
+        int rank = 1;
+        for (Candidate candidate : sortedCandidates) {
+            double votes = election.getCandidateVotes(candidate.getUuid());
+            results.append("<gray>").append(rank).append(". </gray>");
+            results.append(rank == 1 ? "<gold>" : "<white>");
+            results.append(candidate.getName());
+            results.append(rank == 1 ? "</gold>" : "</white>");
+            results.append(" <gray>- ").append(String.format("%.1f", votes)).append(" votes</gray>\n");
+            rank++;
+        }
+        
+        MessageUtils.broadcastAnnouncement("ELECTION RESULTS", results.toString());
+        
+        // Refund deposits
+        for (Candidate candidate : election.getCandidates().values()) {
+            double refundRate = candidate.getUuid().equals(winner.getUuid()) ? 
+                plugin.getConfig().getDouble("election.registration-refund-winner", 1.0) :
+                plugin.getConfig().getDouble("election.registration-refund-loser", 0.5);
+            
+            double refund = candidate.getDepositPaid() * refundRate;
+            if (refund > 0) {
+                plugin.getVaultHook().deposit(candidate.getUuid(), refund);
+                Player player = Bukkit.getPlayer(candidate.getUuid());
+                if (player != null) {
+                    MessageUtils.send(player, "managers.election.refund", "amount", plugin.getVaultHook().format(refund));
+                }
+            }
+        }
+        
+        // Give voter rewards
+        giveVoterRewards();
+        
+        // Inaugurate winner
+        MessageUtils.broadcastTitle("<gold>🎉 WINNER 🎉</gold>", 
+            "<yellow>" + winner.getName() + "</yellow>", 20, 100, 20);
+        MessageUtils.broadcastSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
+        
+        // Schedule inauguration
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            plugin.getGovernmentManager().setPresident(winner.getUuid(), winner.getName(), true);
+        }, 20L * 5); // 5 seconds delay for dramatic effect
+    }
+    
+    private void giveVoterRewards() {
+        Election election = getElection();
+        double participationReward = plugin.getConfig().getDouble("election.voter-rewards.participation", 10000);
+        double lotteryBonus = plugin.getConfig().getDouble("election.voter-rewards.lottery-bonus", 50000);
+        int lotteryWinners = plugin.getConfig().getInt("election.voter-rewards.lottery-winners", 10);
+        
+        List<UUID> voters = new ArrayList<>(election.getVotes().keySet());
+        
+        // Participation reward
+        for (UUID voterUUID : voters) {
+            if (!election.getVoterRewardsClaimed().contains(voterUUID)) {
+                plugin.getVaultHook().deposit(voterUUID, participationReward);
+                election.getVoterRewardsClaimed().add(voterUUID);
+                
+                Player player = Bukkit.getPlayer(voterUUID);
+                if (player != null) {
+                    MessageUtils.send(player, "<green>Thank you for voting! You received <gold>" + 
+                        plugin.getVaultHook().format(participationReward) + "</gold>!</green>");
+                }
+            }
+        }
+        
+        // Lottery winners
+        Collections.shuffle(voters);
+        int winnersCount = Math.min(lotteryWinners, voters.size());
+        for (int i = 0; i < winnersCount; i++) {
+            UUID winnerUUID = voters.get(i);
+            plugin.getVaultHook().deposit(winnerUUID, lotteryBonus);
+            election.getLotteryWinners().add(winnerUUID);
+            
+            Player player = Bukkit.getPlayer(winnerUUID);
+            if (player != null) {
+                MessageUtils.send(player, "managers.election.lottery_win", "amount", plugin.getVaultHook().format(lotteryBonus));
+                MessageUtils.playSound(player, Sound.ENTITY_PLAYER_LEVELUP);
+            }
+        }
+        
+        if (winnersCount > 0) {
+            MessageUtils.broadcast("<yellow>" + winnersCount + " lucky voters won the bonus lottery!</yellow>");
+        }
+    }
+    
+    public boolean registerCandidate(Player player, String slogan) {
+        Election election = getElection();
+        UUID uuid = player.getUniqueId();
+        
+        // Check phase
+        if (election.getCurrentPhase() != ElectionPhase.REGISTRATION) {
+            MessageUtils.send(player, "register.not_open");
+            return false;
+        }
+        
+        // Check already registered
+        if (election.getCandidates().containsKey(uuid)) {
+            MessageUtils.send(player, "<red>You are already registered as a candidate.</red>");
+            return false;
+        }
+        
+        // Check requirements
+        if (!meetsRequirements(player)) {
+            return false;
+        }
+        
+        // Check consecutive terms
+        if (!plugin.getGovernmentManager().canRunForPresident(uuid)) {
+            MessageUtils.send(player, "<red>You have reached the maximum consecutive terms. Wait one term before running again.</red>");
+            return false;
+        }
+        
+        // Check fee
+        double registrationFee = plugin.getConfig().getDouble("election.registration-fee", 500000);
+        if (!plugin.getVaultHook().has(uuid, registrationFee)) {
+            MessageUtils.send(player, "<red>You need <gold>" + plugin.getVaultHook().format(registrationFee) + 
+                "</gold> to register as a candidate.</red>");
+            return false;
+        }
+        
+        // Withdraw fee
+        plugin.getVaultHook().withdraw(uuid, registrationFee);
+        
+        // Register candidate
+        Candidate candidate = new Candidate(uuid, player.getName(), slogan, registrationFee);
+        election.registerCandidate(candidate);
+        
+        // Update player data
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(uuid, player.getName());
+        data.setTimesRanForPresident(data.getTimesRanForPresident() + 1);
+        
+        MessageUtils.broadcast("<yellow><gold>" + player.getName() + 
+            "</gold> has registered as a presidential candidate!</yellow>");
+        MessageUtils.send(player, "register.success", "slogan", slogan);
+        
+        return true;
+    }
+    
+    public boolean meetsRequirements(Player player) {
+        UUID uuid = player.getUniqueId();
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(uuid, player.getName());
+        
+        // Level requirement
+        int minLevel = plugin.getConfig().getInt("president.requirements.min-level", 100);
+        if (player.getLevel() < minLevel) {
+            MessageUtils.send(player, "<red>You need level " + minLevel + " to run for president. (Current: " + player.getLevel() + ")</red>");
+            return false;
+        }
+        
+        // Playtime requirement
+        double minPlaytime = plugin.getConfig().getDouble("president.requirements.min-playtime-hours", 100);
+        if (data.getPlaytimeHours() < minPlaytime) {
+            MessageUtils.send(player, "<red>You need " + minPlaytime + " hours of playtime. (Current: " + 
+                String.format("%.1f", data.getPlaytimeHours()) + ")</red>");
+            return false;
+        }
+        
+        // Balance requirement
+        double minBalance = plugin.getConfig().getDouble("president.requirements.min-vault-balance", 500000);
+        if (!plugin.getVaultHook().has(uuid, minBalance)) {
+            MessageUtils.send(player, "<red>You need " + plugin.getVaultHook().format(minBalance) + 
+                " balance to run.</red>");
+            return false;
+        }
+        
+        // Endorsement requirement (check if already in campaign phase)
+        int minEndorsements = plugin.getConfig().getInt("president.requirements.min-endorsements", 10);
+        Candidate existing = getElection().getCandidate(uuid);
+        if (existing != null && existing.getEndorsementCount() < minEndorsements) {
+            // This is checked during campaign phase
+        }
+        
+        // Punishment check
+        int noPunishmentDays = plugin.getConfig().getInt("president.requirements.no-punishment-days", 30);
+        if (data.hasRecentPunishment(noPunishmentDays)) {
+            MessageUtils.send(player, "<red>You have a recent punishment record. Wait " + 
+                noPunishmentDays + " days.</red>");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public boolean endorseCandidate(Player endorser, UUID candidateUUID) {
+        Election election = getElection();
+        UUID endorserUUID = endorser.getUniqueId();
+        
+        // Check phase
+        if (election.getCurrentPhase() != ElectionPhase.REGISTRATION && 
+            election.getCurrentPhase() != ElectionPhase.CAMPAIGN) {
+            MessageUtils.send(endorser, "<red>Endorsements are not currently accepted.</red>");
+            return false;
+        }
+        
+        // Check candidate exists
+        Candidate candidate = election.getCandidate(candidateUUID);
+        if (candidate == null) {
+            MessageUtils.send(endorser, "<red>Candidate not found.</red>");
+            return false;
+        }
+        
+        // Check not endorsing self
+        if (endorserUUID.equals(candidateUUID)) {
+            MessageUtils.send(endorser, "<red>You cannot endorse yourself.</red>");
+            return false;
+        }
+        
+        // Check player data
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(endorserUUID, endorser.getName());
+        
+        // Check if already endorsed this candidate
+        if (candidate.getEndorsements().contains(endorserUUID)) {
+            MessageUtils.send(endorser, "<red>You have already endorsed this candidate.</red>");
+            return false;
+        }
+        
+        // Add endorsement
+        candidate.addEndorsement(endorserUUID);
+        data.addEndorsement(candidateUUID);
+        
+        // Update candidate's player data
+        PlayerData candidateData = plugin.getDataManager().getPlayerData(candidateUUID);
+        if (candidateData != null) {
+            candidateData.setEndorsementsReceived(candidateData.getEndorsementsReceived() + 1);
+        }
+        
+        MessageUtils.send(endorser, "<green>You endorsed <gold>" + candidate.getName() + 
+            "</gold>! (+10 campaign points)</green>");
+        
+        Player candidatePlayer = Bukkit.getPlayer(candidateUUID);
+        if (candidatePlayer != null) {
+            MessageUtils.send(candidatePlayer, "<green><gold>" + endorser.getName() + 
+                "</gold> endorsed you! (+10 campaign points)</green>");
+        }
+        
+        return true;
+    }
+    
+    public boolean castVote(Player voter, UUID candidateUUID) {
+        Election election = getElection();
+        UUID voterUUID = voter.getUniqueId();
+        
+        // Check phase
+        if (election.getCurrentPhase() != ElectionPhase.VOTING) {
+            MessageUtils.send(voter, "<red>Voting is not currently open.</red>");
+            return false;
+        }
+        
+        // Check already voted
+        if (election.hasVoted(voterUUID)) {
+            MessageUtils.send(voter, "<red>You have already voted.</red>");
+            return false;
+        }
+        
+        // Check candidate exists
+        Candidate candidate = election.getCandidate(candidateUUID);
+        if (candidate == null) {
+            MessageUtils.send(voter, "<red>Invalid candidate.</red>");
+            return false;
+        }
+        
+        // Calculate vote weight
+        double weight = calculateVoteWeight(voter);
+        
+        // Cast vote
+        Vote vote = new Vote(voterUUID, candidateUUID, weight);
+        election.castVote(vote);
+        
+        // Update player data
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(voterUUID, voter.getName());
+        data.setTotalVotesCast(data.getTotalVotesCast() + 1);
+        
+        MessageUtils.send(voter, "<green>You voted for <gold>" + candidate.getName() + 
+            "</gold>! (Vote weight: " + String.format("%.1f", weight) + ")</green>");
+        MessageUtils.playSound(voter, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        
+        return true;
+    }
+    
+    public double calculateVoteWeight(Player player) {
+        double weight = plugin.getConfig().getDouble("election.vote-weights.base", 1.0);
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(player.getUniqueId(), player.getName());
+        
+        // Playtime bonus
+        double playtimeThreshold = plugin.getConfig().getDouble("election.vote-weights.playtime-threshold-hours", 200);
+        if (data.getPlaytimeHours() >= playtimeThreshold) {
+            weight += plugin.getConfig().getDouble("election.vote-weights.playtime-bonus", 0.5);
+        }
+        
+        // Level bonus
+        int levelThreshold = plugin.getConfig().getInt("election.vote-weights.level-threshold", 75);
+        if (player.getLevel() >= levelThreshold) {
+            weight += plugin.getConfig().getDouble("election.vote-weights.level-bonus", 0.5);
+        }
+        
+        // Balance bonus
+        double balanceThreshold = plugin.getConfig().getDouble("election.vote-weights.balance-threshold", 1000000);
+        if (plugin.getVaultHook().getBalance(player.getUniqueId()) >= balanceThreshold) {
+            weight += plugin.getConfig().getDouble("election.vote-weights.balance-bonus", 0.5);
+        }
+        
+        // Cap at max weight
+        double maxWeight = plugin.getConfig().getDouble("election.vote-weights.max-weight", 2.5);
+        return Math.min(weight, maxWeight);
+    }
+    
+    public boolean setCampaignMessage(Player player, String message) {
+        Election election = getElection();
+        Candidate candidate = election.getCandidate(player.getUniqueId());
+        
+        if (candidate == null) {
+            MessageUtils.send(player, "<red>You are not a registered candidate.</red>");
+            return false;
+        }
+        
+        if (election.getCurrentPhase() != ElectionPhase.CAMPAIGN) {
+            MessageUtils.send(player, "<red>Campaign messages can only be set during campaign phase.</red>");
+            return false;
+        }
+        
+        // Check cooldown
+        long cooldownHours = plugin.getConfig().getLong("election.campaign.broadcast-cooldown-hours", 6);
+        long cooldownMillis = cooldownHours * 60 * 60 * 1000;
+        if (System.currentTimeMillis() - candidate.getLastCampaignBroadcast() < cooldownMillis) {
+            long remaining = cooldownMillis - (System.currentTimeMillis() - candidate.getLastCampaignBroadcast());
+            MessageUtils.send(player, "<red>Campaign broadcast on cooldown. Remaining: " + 
+                MessageUtils.formatTime(remaining) + "</red>");
+            return false;
+        }
+        
+        // Check fee
+        double cost = plugin.getConfig().getDouble("election.campaign.broadcast-cost", 10000);
+        if (!plugin.getVaultHook().has(player.getUniqueId(), cost)) {
+            MessageUtils.send(player, "<red>Campaign broadcast costs " + plugin.getVaultHook().format(cost) + "</red>");
+            return false;
+        }
+        
+        plugin.getVaultHook().withdraw(player.getUniqueId(), cost);
+        candidate.setCampaignMessage(message);
+        candidate.setLastCampaignBroadcast(System.currentTimeMillis());
+        
+        MessageUtils.send(player, "<green>Campaign message set! It will be broadcast periodically.</green>");
+        return true;
+    }
+    
+    public void broadcastCampaignMessages() {
+        Election election = getElection();
+        if (election.getCurrentPhase() != ElectionPhase.CAMPAIGN) return;
+        
+        for (Candidate candidate : election.getCandidates().values()) {
+            if (candidate.getCampaignMessage() != null && !candidate.getCampaignMessage().isEmpty()) {
+                MessageUtils.broadcastRaw("<gold>[Campaign]</gold> <yellow>" + candidate.getName() + 
+                    ":</yellow> <white>" + candidate.getCampaignMessage() + "</white>");
+            }
+        }
+    }
+    
+    private int getPhaseDuration(ElectionPhase phase) {
+        return switch (phase) {
+            case REGISTRATION -> plugin.getConfig().getInt("election.registration-days", 3);
+            case CAMPAIGN -> plugin.getConfig().getInt("election.campaign-days", 7);
+            case VOTING -> plugin.getConfig().getInt("election.voting-days", 3);
+            case INAUGURATION -> plugin.getConfig().getInt("election.inauguration-days", 1);
+            default -> 0;
+        };
+    }
+    
+    public long getPhaseRemainingTime() {
+        Election election = getElection();
+        if (!election.isActive()) return 0;
+        
+        long phaseDuration = getPhaseDuration(election.getCurrentPhase()) * 24L * 60 * 60 * 1000;
+        long elapsed = System.currentTimeMillis() - election.getPhaseStartTime();
+        
+        return Math.max(0, phaseDuration - elapsed);
+    }
+    
+    public void forceStartElection() {
+        getElection().endElection();
+        startElection();
+    }
+
+    // Additional method for DemocracyCommand
+    public void endElection() {
+        getElection().endElection();
+    }
+}

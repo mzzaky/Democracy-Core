@@ -1,0 +1,374 @@
+package id.democracycore.managers;
+
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import id.democracycore.DemocracyCore;
+import id.democracycore.models.Government;
+import id.democracycore.models.Government.CabinetMember;
+import id.democracycore.models.Government.CabinetPosition;
+import id.democracycore.models.PlayerData;
+import id.democracycore.models.PresidentHistory.PresidentRecord;
+import id.democracycore.models.Treasury.TransactionType;
+import id.democracycore.utils.MessageUtils;
+
+public class GovernmentManager {
+    
+    private final DemocracyCore plugin;
+    
+    public GovernmentManager(DemocracyCore plugin) {
+        this.plugin = plugin;
+    }
+    
+    public Government getGovernment() {
+        return plugin.getDataManager().getGovernment();
+    }
+    
+    public boolean isPresident(UUID uuid) {
+        Government gov = getGovernment();
+        return gov.hasPresident() && gov.getPresidentUUID().equals(uuid);
+    }
+    
+    public boolean isCabinetMember(UUID uuid) {
+        Government gov = getGovernment();
+        return gov.getCabinetMemberByUUID(uuid) != null;
+    }
+    
+    public CabinetPosition getCabinetPosition(UUID uuid) {
+        return getGovernment().getPositionByUUID(uuid);
+    }
+    
+    public void setPresident(UUID uuid, String name, boolean isNewTerm) {
+        Government gov = getGovernment();
+        
+        // End previous president's term if exists
+        if (gov.hasPresident()) {
+            endPresidency("TERM_END");
+        }
+        
+        // Set new president
+        gov.setPresidentUUID(uuid);
+        gov.setPresidentName(name);
+        gov.setTermStartTime(System.currentTimeMillis());
+        gov.setLastPresidentActivity(System.currentTimeMillis());
+        gov.setLastDailyReward(0);
+        gov.getApprovalRatings().clear();
+        gov.getCabinet().clear();
+        
+        // Track consecutive terms
+        if (isNewTerm) {
+            PresidentRecord lastRecord = plugin.getDataManager().getPresidentHistory().getLatestRecord();
+            if (lastRecord != null && lastRecord.getUuid().equals(uuid)) {
+                gov.setConsecutiveTerms(gov.getConsecutiveTerms() + 1);
+            } else {
+                gov.setConsecutiveTerms(1);
+            }
+        }
+        
+        // Update player data
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(uuid, name);
+        data.setTimesServedAsPresident(data.getTimesServedAsPresident() + 1);
+        
+        // Reset term counters
+        plugin.getDataManager().setLastExecutiveOrderTime(0);
+        plugin.getDataManager().setGamesThisTerm(0);
+        
+        // Add starting fund to treasury
+        double startingFund = plugin.getConfig().getDouble("treasury.starting-fund", 5000000);
+        plugin.getTreasuryManager().deposit(TransactionType.TERM_START_FUND, startingFund, 
+            "Presidential term starting fund", uuid);
+        
+        // Create history record
+        PresidentRecord record = new PresidentRecord(uuid, name, System.currentTimeMillis());
+        plugin.getDataManager().getPresidentHistory().addRecord(record);
+        
+        // Broadcast inauguration
+        MessageUtils.broadcastAnnouncement("PRESIDENTIAL INAUGURATION",
+            "<gold>" + name + "</gold> <yellow>has been inaugurated as the new President!</yellow>");
+        MessageUtils.broadcastTitle("<gold>🏛️ NEW PRESIDENT 🏛️</gold>", 
+            "<yellow>" + name + "</yellow>", 20, 100, 20);
+        MessageUtils.broadcastSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
+        
+        // Apply buffs to president if online
+        Player president = Bukkit.getPlayer(uuid);
+        if (president != null) {
+            plugin.getBuffManager().applyPresidentBuffs(president);
+        }
+    }
+    
+    public void endPresidency(String reason) {
+        Government gov = getGovernment();
+        if (!gov.hasPresident()) return;
+        
+        // Update history record
+        PresidentRecord record = plugin.getDataManager().getPresidentHistory().getLatestRecord();
+        if (record != null && record.getUuid().equals(gov.getPresidentUUID())) {
+            record.setTermEnd(System.currentTimeMillis());
+            record.setFinalApprovalRating(gov.getCurrentApprovalRating());
+            record.setEndReason(reason);
+            
+            // Save cabinet members to record
+            for (var entry : gov.getCabinet().entrySet()) {
+                record.getCabinetMembers().put(entry.getKey(), entry.getValue().getName());
+            }
+        }
+        
+        // Remove buffs from president if online
+        Player president = Bukkit.getPlayer(gov.getPresidentUUID());
+        if (president != null) {
+            plugin.getBuffManager().removePresidentBuffs(president);
+        }
+        
+        // Remove buffs from cabinet
+        for (CabinetMember member : gov.getCabinet().values()) {
+            Player cabinetPlayer = Bukkit.getPlayer(member.getUuid());
+            if (cabinetPlayer != null) {
+                plugin.getBuffManager().removeCabinetBuffs(cabinetPlayer);
+            }
+        }
+        
+        // Clear government
+        String presidentName = gov.getPresidentName();
+        gov.setPresidentUUID(null);
+        gov.setPresidentName(null);
+        gov.getCabinet().clear();
+        
+        MessageUtils.broadcast("<yellow>President <gold>" + presidentName + 
+            "</gold>'s term has ended. Reason: <white>" + reason + "</white></yellow>");
+    }
+    
+    public void appointCabinet(CabinetPosition position, UUID uuid, String name) {
+        Government gov = getGovernment();
+        
+        // Remove existing member from position
+        CabinetMember existing = gov.getCabinetMemberObject(position);
+        if (existing != null) {
+            Player existingPlayer = Bukkit.getPlayer(existing.getUuid());
+            if (existingPlayer != null) {
+                plugin.getBuffManager().removeCabinetBuffs(existingPlayer);
+                MessageUtils.send(existingPlayer, "managers.government.removed");
+            }
+        }
+        
+        // Check if player already has a cabinet position
+        CabinetPosition currentPos = gov.getPositionByUUID(uuid);
+        if (currentPos != null) {
+            gov.removeCabinet(currentPos);
+        }
+        
+        // Appoint new member
+        CabinetMember member = new CabinetMember(uuid, name, position);
+        gov.appointCabinet(position, member);
+        
+        // Update player data
+        PlayerData data = plugin.getDataManager().getOrCreatePlayerData(uuid, name);
+        data.setTimesServedAsCabinet(data.getTimesServedAsCabinet() + 1);
+        
+        // Apply buffs if online
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            plugin.getBuffManager().applyCabinetBuffs(player, position);
+            MessageUtils.send(player, "managers.government.appointed", "position", position.getDisplayName());
+        }
+        
+        MessageUtils.broadcast("<yellow><gold>" + name + "</gold> has been appointed as <gold>" + 
+            position.getDisplayName() + "</gold>!</yellow>");
+    }
+    
+    public void removeCabinet(CabinetPosition position) {
+        Government gov = getGovernment();
+        CabinetMember member = gov.getCabinetMemberObject(position);
+        if (member == null) return;
+
+        Player player = Bukkit.getPlayer(member.getUuid());
+        if (player != null) {
+            plugin.getBuffManager().removeCabinetBuffs(player);
+            MessageUtils.send(player, "<red>You have been removed from your cabinet position.</red>");
+        }
+
+        gov.removeCabinet(position);
+        MessageUtils.broadcast("<yellow><gold>" + member.getName() +
+            "</gold> has been removed from the cabinet.</yellow>");
+    }
+    
+    public void checkDailyRewards() {
+        Government gov = getGovernment();
+        if (!gov.hasPresident()) return;
+        
+        long now = System.currentTimeMillis();
+        long dayMillis = 24 * 60 * 60 * 1000L;
+        
+        // President daily rewards
+        if (now - gov.getLastDailyReward() >= dayMillis) {
+            Player president = Bukkit.getPlayer(gov.getPresidentUUID());
+            if (president != null) {
+                givePresidentDailyRewards(president);
+                gov.setLastDailyReward(now);
+            }
+        }
+        
+        // Cabinet daily rewards and salary
+        for (CabinetMember member : gov.getCabinet().values()) {
+            if (now - member.getLastDailyReward() >= dayMillis) {
+                Player cabinetPlayer = Bukkit.getPlayer(member.getUuid());
+                if (cabinetPlayer != null) {
+                    giveCabinetDailyRewards(cabinetPlayer, member.getPosition());
+                    member.setLastDailyReward(now);
+                }
+                
+                // Pay cabinet salary from treasury
+                double salary = plugin.getConfig().getDouble("cabinet.daily-salary", 20000);
+                if (plugin.getTreasuryManager().canAfford(salary)) {
+                    plugin.getTreasuryManager().withdraw(TransactionType.CABINET_SALARY, salary,
+                        "Daily salary for " + member.getPosition().getDisplayName(), member.getUuid());
+                    plugin.getVaultHook().deposit(member.getUuid(), salary);
+                }
+            }
+        }
+    }
+    
+    private void givePresidentDailyRewards(Player president) {
+        double vaultPoints = plugin.getConfig().getDouble("president.daily-rewards.vault-points", 50000);
+        int diamondBlocks = plugin.getConfig().getInt("president.daily-rewards.diamond-blocks", 5);
+        int netheriteIngots = plugin.getConfig().getInt("president.daily-rewards.netherite-ingots", 3);
+        int goldenApples = plugin.getConfig().getInt("president.daily-rewards.enchanted-golden-apples", 10);
+        
+        plugin.getVaultHook().deposit(president.getUniqueId(), vaultPoints);
+        president.getInventory().addItem(new ItemStack(Material.DIAMOND_BLOCK, diamondBlocks));
+        president.getInventory().addItem(new ItemStack(Material.NETHERITE_INGOT, netheriteIngots));
+        president.getInventory().addItem(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, goldenApples));
+        
+        MessageUtils.send(president, "managers.government.daily_reward");
+        MessageUtils.playSound(president, Sound.ENTITY_PLAYER_LEVELUP);
+    }
+    
+    private void giveCabinetDailyRewards(Player player, CabinetPosition position) {
+        String configPath = switch (position) {
+            case DEFENSE -> "cabinet.defense.daily-vault";
+            case TREASURY -> "cabinet.treasury-minister.daily-vault";
+            case COMMERCE -> "cabinet.commerce.daily-vault";
+            case INFRASTRUCTURE -> "cabinet.infrastructure.daily-vault";
+            case CULTURE -> "cabinet.culture.daily-vault";
+        };
+        
+        double vaultPoints = plugin.getConfig().getDouble(configPath, 30000);
+        plugin.getVaultHook().deposit(player.getUniqueId(), vaultPoints);
+        
+        // Additional rewards based on position
+        switch (position) {
+            case DEFENSE -> {
+                player.getInventory().addItem(new ItemStack(Material.DIAMOND, 3));
+                player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 5));
+            }
+            case TREASURY -> player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 10));
+            case COMMERCE -> {
+                player.getInventory().addItem(new ItemStack(Material.DIAMOND, 5));
+            }
+            case INFRASTRUCTURE -> {
+                player.getInventory().addItem(new ItemStack(Material.REDSTONE_BLOCK, 10));
+            }
+            case CULTURE -> {
+                player.getInventory().addItem(new ItemStack(Material.EXPERIENCE_BOTTLE, 5));
+                player.getInventory().addItem(new ItemStack(Material.NAME_TAG, 3));
+            }
+        }
+        
+        MessageUtils.send(player, "managers.government.cabinet_daily");
+    }
+    
+    public void checkPresidentActivity() {
+        Government gov = getGovernment();
+        if (!gov.hasPresident()) return;
+        
+        int inactiveDays = plugin.getConfig().getInt("auto-removal.inactive-days", 7);
+        long threshold = inactiveDays * 24L * 60 * 60 * 1000;
+        
+        if (System.currentTimeMillis() - gov.getLastPresidentActivity() > threshold) {
+            MessageUtils.broadcast("<red>President <gold>" + gov.getPresidentName() + 
+                "</gold> has been removed for inactivity!</red>");
+            endPresidency("INACTIVE");
+            plugin.getElectionManager().startEmergencyElection();
+        }
+    }
+    
+    public void updatePresidentActivity(UUID uuid) {
+        Government gov = getGovernment();
+        if (gov.hasPresident() && gov.getPresidentUUID().equals(uuid)) {
+            gov.setLastPresidentActivity(System.currentTimeMillis());
+        }
+    }
+    
+    public long getTermRemainingTime() {
+        Government gov = getGovernment();
+        if (!gov.hasPresident()) return 0;
+        
+        int termLengthDays = plugin.getConfig().getInt("president.term-length-days", 30);
+        long termLengthMillis = termLengthDays * 24L * 60 * 60 * 1000;
+        long termEnd = gov.getTermStartTime() + termLengthMillis;
+        
+        return Math.max(0, termEnd - System.currentTimeMillis());
+    }
+    
+    public boolean canRunForPresident(UUID uuid) {
+        Government gov = getGovernment();
+
+        // Check max consecutive terms
+        int maxTerms = plugin.getConfig().getInt("president.max-consecutive-terms", 2);
+        if (gov.getPresidentUUID() != null && gov.getPresidentUUID().equals(uuid) && gov.getConsecutiveTerms() >= maxTerms) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    public void rateApproval(UUID voterUUID, int rating) {
+        Government gov = getGovernment();
+        if (!gov.hasPresident()) return;
+        
+        // Find existing rating
+        Government.ApprovalRating existingRating = null;
+        for (Government.ApprovalRating r : gov.getApprovalRatings()) {
+            if (r.getVoterUUID().equals(voterUUID)) {
+                existingRating = r;
+                break;
+            }
+        }
+        
+        if (existingRating != null) {
+            existingRating.setRating(rating);
+        } else {
+            gov.getApprovalRatings().add(new Government.ApprovalRating(voterUUID, rating));
+        }
+        
+        gov.calculateApprovalRating();
+    }
+    
+    public String getPresidentPrefix() {
+        return "<gold>[President]</gold> ";
+    }
+    
+    public String getCabinetPrefix(CabinetPosition position) {
+        return position.getPrefix() + " ";
+    }
+
+    // Additional methods for DemocracyCommand
+    public void appointCabinetMember(CabinetPosition position, UUID uuid) {
+        String name = Bukkit.getOfflinePlayer(uuid).getName();
+        if (name != null) {
+            appointCabinet(position, uuid, name);
+        }
+    }
+
+    public void removeCabinetMember(CabinetPosition position) {
+        removeCabinet(position);
+    }
+
+    public void endTerm(String reason) {
+        endPresidency(reason);
+    }
+}
