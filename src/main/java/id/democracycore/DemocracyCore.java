@@ -28,7 +28,7 @@ import id.democracycore.utils.VaultHook;
 public class DemocracyCore extends JavaPlugin {
 
     private static DemocracyCore instance;
-    
+
     private DataManager dataManager;
     private GovernmentManager governmentManager;
     private ElectionManager electionManager;
@@ -48,13 +48,18 @@ public class DemocracyCore extends JavaPlugin {
         instance = this;
 
         saveDefaultConfig();
-        saveResource("language.yml", false);
+        if (!new File(getDataFolder(), "language.yml").exists()) {
+            saveResource("language.yml", false);
+        }
         languageConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "language.yml"));
-        saveResource("gui.yml", false);
+
+        if (!new File(getDataFolder(), "gui.yml").exists()) {
+            saveResource("gui.yml", false);
+        }
         MessageUtils.loadLanguage();
         guiConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "gui.yml"));
         id.democracycore.gui.MainMenuGUI.loadGUITitles(this);
-        
+
         // Initialize Vault
         vaultHook = new VaultHook(this);
         if (!vaultHook.setupEconomy()) {
@@ -62,7 +67,7 @@ public class DemocracyCore extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        
+
         // Initialize managers
         dataManager = new DataManager(this);
         treasuryManager = new TreasuryManager(this);
@@ -73,20 +78,20 @@ public class DemocracyCore extends JavaPlugin {
         cabinetManager = new CabinetManager(this);
         arenaManager = new ArenaManager(this);
         recallManager = new RecallManager(this);
-        
+
         // Load data
         dataManager.loadAll();
-        
+
         // Register commands
         getCommand("democracycore").setExecutor(new DemocracyCommand(this));
         getCommand("democracycore").setTabCompleter(new DemocracyCommand(this));
-        
+
         // Register listeners
         registerListeners();
-        
+
         // Start scheduled tasks
         startScheduledTasks();
-        
+
         getLogger().info("DemocracyCore has been enabled!");
     }
 
@@ -97,7 +102,7 @@ public class DemocracyCore extends JavaPlugin {
         }
         getLogger().info("DemocracyCore has been disabled!");
     }
-    
+
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new DamageListener(this), this);
@@ -107,43 +112,43 @@ public class DemocracyCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(guiListener, this);
         getServer().getPluginManager().registerEvents(new ArenaListener(this), this);
     }
-    
+
     private void startScheduledTasks() {
         // Check election phases every minute
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             electionManager.checkPhaseTransitions();
         }, 20L * 60, 20L * 60);
-        
+
         // Apply buffs every 30 seconds
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             buffManager.refreshAllBuffs();
         }, 20L * 30, 20L * 30);
-        
-        // Check daily rewards every hour
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            governmentManager.checkDailyRewards();
-        }, 20L * 60 * 60, 20L * 60 * 60);
-        
+
+        // Check daily rewards - Moved to Manual Claim in GUI
+        // Bukkit.getScheduler().runTaskTimer(this, () -> {
+        // governmentManager.checkDailyRewards();
+        // }, 20L * 60 * 60, 20L * 60 * 60);
+
         // Check president activity every hour
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             governmentManager.checkPresidentActivity();
         }, 20L * 60 * 60, 20L * 60 * 60);
-        
+
         // Broadcast campaign messages every 5 minutes during campaign phase
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             electionManager.broadcastCampaignMessages();
         }, 20L * 60 * 5, 20L * 60 * 5);
-        
+
         // Check executive order expirations every minute
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             executiveOrderManager.checkExpirations();
         }, 20L * 60, 20L * 60);
-        
+
         // Check cabinet decision expirations every minute
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             cabinetManager.checkExpiredDecisions();
         }, 20L * 60, 20L * 60);
-        
+
         // Save data every 5 minutes
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             dataManager.saveAll();

@@ -1,0 +1,22 @@
+1. menerjemahkan semua teks pada gui menjadi berbahasa inggris.
+2. menambahkan logika, jika tidak ada kandidat yang mendaftar maka fase registrasi di ulang.
+3. menambahkan batas kandidat yang dapat mendaftar menjadi 3 secara default, nilai dapat dirubah di file config.yml
+4. menambahkan custom gui untuk sistem petisi recall.
+5. memperbaiki bug pesan dimana sistem mengirim pesan/kode mentah ke pemain bukan teks yang ada pada file language.yml
+
+
+6. mengganti command admin "/dc admin setpresident <player>" menjadi "/dc admin set president <player>".
+7. menambahkan logika sinkronisasi phase automatis saat admin memilih president secara manual.
+8. menambahkan command konfirmasi saat admin ingin mengubah president secara manual.
+
+9. mengganti command "/dc admin removepresident <player>" menjadi "/dc admin remove president <player>".
+10. menambahkan command konfirmasi saat admin ingin menghapus president secara manual.
+11. menambahkan sinkronisasi phase automatis saat admin menghapus president secara manual, dan phase pemilihan presiden baru akan automatis dimulai.
+
+12. mengubah source gaji presiden dan menteri, sekarang gaji akan diambil dari sistem treasury.
+13. menambahkan mekanisme log pada aktivitas donasi ke treasury, pengambilan gaji oleh presiden dan menteri, dan aksi executive order.
+14. menambahkan sub gui baru "treasury transaction" yang akan menampilkan log aktivitas pemasukan dan pengeluaran treasury.
+15. menghapus sistem log transaction lama yang ditampilkan menggunakan RED_DYE pada gui Treasury.
+
+16. menambahkan sub gui "Goverment Salary", gui ini berisi informasi total jumlah gaji yang telah diterima oleh presiden dan menteri, dan informasi kapan gaji akan tersedia lagi.
+17. mengubah sistem gaji presiden dan menteri dari automatis menjadi klaim manual yang tersedia pada gui "Goverment Salary"

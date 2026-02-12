@@ -29,11 +29,11 @@ import id.democracycore.models.RecallPetition;
 import id.democracycore.models.Treasury;
 
 public class DataManager {
-    
+
     private final DemocracyCore plugin;
     private final Gson gson;
     private final File dataFolder;
-    
+
     private Government government;
     private Election election;
     private Treasury treasury;
@@ -45,7 +45,7 @@ public class DataManager {
     private RecallPetition recallPetition;
     private long lastExecutiveOrderTime;
     private int gamesThisTerm;
-    
+
     public DataManager(DemocracyCore plugin) {
         this.plugin = plugin;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -53,7 +53,7 @@ public class DataManager {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
-        
+
         this.government = new Government();
         this.election = new Election();
         this.treasury = new Treasury();
@@ -62,7 +62,7 @@ public class DataManager {
         this.activeOrders = new ArrayList<>();
         this.activeDecisions = new ArrayList<>();
     }
-    
+
     public void loadAll() {
         loadGovernment();
         loadElection();
@@ -75,7 +75,7 @@ public class DataManager {
         loadRecallPetition();
         loadMiscData();
     }
-    
+
     public void saveAll() {
         saveGovernment();
         saveElection();
@@ -88,21 +88,22 @@ public class DataManager {
         saveRecallPetition();
         saveMiscData();
     }
-    
+
     // Government
     private void loadGovernment() {
         File file = new File(dataFolder, "government.json");
         if (file.exists()) {
             try (Reader reader = new FileReader(file)) {
                 government = gson.fromJson(reader, Government.class);
-                if (government == null) government = new Government();
+                if (government == null)
+                    government = new Government();
             } catch (IOException e) {
                 plugin.getLogger().warning("Failed to load government data: " + e.getMessage());
                 government = new Government();
             }
         }
     }
-    
+
     public void saveGovernment() {
         File file = new File(dataFolder, "government.json");
         try (Writer writer = new FileWriter(file)) {
@@ -111,22 +112,23 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save government data: " + e.getMessage());
         }
     }
-    
+
     // Election
     private void loadElection() {
         File file = new File(dataFolder, "election.json");
         if (file.exists()) {
             try (Reader reader = new FileReader(file)) {
                 election = gson.fromJson(reader, Election.class);
-                if (election == null) election = new Election();
+                if (election == null)
+                    election = new Election();
             } catch (IOException e) {
                 plugin.getLogger().warning("Failed to load election data: " + e.getMessage());
                 election = new Election();
             }
         }
     }
-    
-    private void saveElection() {
+
+    public void saveElection() {
         File file = new File(dataFolder, "election.json");
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(election, writer);
@@ -134,21 +136,22 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save election data: " + e.getMessage());
         }
     }
-    
+
     // Treasury
     private void loadTreasury() {
         File file = new File(dataFolder, "treasury.json");
         if (file.exists()) {
             try (Reader reader = new FileReader(file)) {
                 treasury = gson.fromJson(reader, Treasury.class);
-                if (treasury == null) treasury = new Treasury();
+                if (treasury == null)
+                    treasury = new Treasury();
             } catch (IOException e) {
                 plugin.getLogger().warning("Failed to load treasury data: " + e.getMessage());
                 treasury = new Treasury();
             }
         }
     }
-    
+
     private void saveTreasury() {
         File file = new File(dataFolder, "treasury.json");
         try (Writer writer = new FileWriter(file)) {
@@ -157,21 +160,22 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save treasury data: " + e.getMessage());
         }
     }
-    
+
     // President History
     private void loadPresidentHistory() {
         File file = new File(dataFolder, "history.json");
         if (file.exists()) {
             try (Reader reader = new FileReader(file)) {
                 presidentHistory = gson.fromJson(reader, PresidentHistory.class);
-                if (presidentHistory == null) presidentHistory = new PresidentHistory();
+                if (presidentHistory == null)
+                    presidentHistory = new PresidentHistory();
             } catch (IOException e) {
                 plugin.getLogger().warning("Failed to load president history: " + e.getMessage());
                 presidentHistory = new PresidentHistory();
             }
         }
     }
-    
+
     private void savePresidentHistory() {
         File file = new File(dataFolder, "history.json");
         try (Writer writer = new FileWriter(file)) {
@@ -180,7 +184,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save president history: " + e.getMessage());
         }
     }
-    
+
     // Player Data
     private void loadPlayerData() {
         File file = new File(dataFolder, "players.json");
@@ -197,7 +201,7 @@ public class DataManager {
             }
         }
     }
-    
+
     private void savePlayerData() {
         File file = new File(dataFolder, "players.json");
         try (Writer writer = new FileWriter(file)) {
@@ -206,7 +210,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save player data: " + e.getMessage());
         }
     }
-    
+
     // Active Orders
     private void loadActiveOrders() {
         File file = new File(dataFolder, "orders.json");
@@ -221,7 +225,7 @@ public class DataManager {
             }
         }
     }
-    
+
     private void saveActiveOrders() {
         File file = new File(dataFolder, "orders.json");
         try (Writer writer = new FileWriter(file)) {
@@ -230,7 +234,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save executive orders: " + e.getMessage());
         }
     }
-    
+
     // Active Decisions
     private void loadActiveDecisions() {
         File file = new File(dataFolder, "decisions.json");
@@ -245,7 +249,7 @@ public class DataManager {
             }
         }
     }
-    
+
     private void saveActiveDecisions() {
         File file = new File(dataFolder, "decisions.json");
         try (Writer writer = new FileWriter(file)) {
@@ -254,7 +258,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save cabinet decisions: " + e.getMessage());
         }
     }
-    
+
     // Arena Session
     private void loadArenaSession() {
         File file = new File(dataFolder, "arena.json");
@@ -266,9 +270,10 @@ public class DataManager {
             }
         }
     }
-    
+
     private void saveArenaSession() {
-        if (arenaSession == null) return;
+        if (arenaSession == null)
+            return;
         File file = new File(dataFolder, "arena.json");
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(arenaSession, writer);
@@ -276,7 +281,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save arena session: " + e.getMessage());
         }
     }
-    
+
     // Recall Petition
     private void loadRecallPetition() {
         File file = new File(dataFolder, "recall.json");
@@ -288,11 +293,12 @@ public class DataManager {
             }
         }
     }
-    
+
     private void saveRecallPetition() {
         File file = new File(dataFolder, "recall.json");
         if (recallPetition == null) {
-            if (file.exists()) file.delete();
+            if (file.exists())
+                file.delete();
             return;
         }
         try (Writer writer = new FileWriter(file)) {
@@ -301,7 +307,7 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save recall petition: " + e.getMessage());
         }
     }
-    
+
     // Misc Data
     private void loadMiscData() {
         File file = new File(dataFolder, "misc.json");
@@ -317,7 +323,7 @@ public class DataManager {
             }
         }
     }
-    
+
     private void saveMiscData() {
         File file = new File(dataFolder, "misc.json");
         MiscData data = new MiscData();
@@ -329,45 +335,86 @@ public class DataManager {
             plugin.getLogger().warning("Failed to save misc data: " + e.getMessage());
         }
     }
-    
+
     private static class MiscData {
         long lastExecutiveOrderTime;
         int gamesThisTerm;
     }
-    
+
     // Getters
-    public Government getGovernment() { return government; }
-    public Election getElection() { return election; }
-    public Treasury getTreasury() { return treasury; }
-    public PresidentHistory getPresidentHistory() { return presidentHistory; }
-    public List<ExecutiveOrder> getActiveOrders() { return activeOrders; }
-    public List<CabinetDecision> getActiveDecisions() { return activeDecisions; }
-    public ArenaSession getArenaSession() { return arenaSession; }
-    public void setArenaSession(ArenaSession arenaSession) { this.arenaSession = arenaSession; }
-    public RecallPetition getRecallPetition() { return recallPetition; }
-    public void setRecallPetition(RecallPetition recallPetition) { this.recallPetition = recallPetition; }
-    public long getLastExecutiveOrderTime() { return lastExecutiveOrderTime; }
-    public void setLastExecutiveOrderTime(long time) { this.lastExecutiveOrderTime = time; }
-    public int getGamesThisTerm() { return gamesThisTerm; }
-    public void setGamesThisTerm(int games) { this.gamesThisTerm = games; }
-    
+    public Government getGovernment() {
+        return government;
+    }
+
+    public Election getElection() {
+        return election;
+    }
+
+    public Treasury getTreasury() {
+        return treasury;
+    }
+
+    public PresidentHistory getPresidentHistory() {
+        return presidentHistory;
+    }
+
+    public List<ExecutiveOrder> getActiveOrders() {
+        return activeOrders;
+    }
+
+    public List<CabinetDecision> getActiveDecisions() {
+        return activeDecisions;
+    }
+
+    public ArenaSession getArenaSession() {
+        return arenaSession;
+    }
+
+    public void setArenaSession(ArenaSession arenaSession) {
+        this.arenaSession = arenaSession;
+    }
+
+    public RecallPetition getRecallPetition() {
+        return recallPetition;
+    }
+
+    public void setRecallPetition(RecallPetition recallPetition) {
+        this.recallPetition = recallPetition;
+    }
+
+    public long getLastExecutiveOrderTime() {
+        return lastExecutiveOrderTime;
+    }
+
+    public void setLastExecutiveOrderTime(long time) {
+        this.lastExecutiveOrderTime = time;
+    }
+
+    public int getGamesThisTerm() {
+        return gamesThisTerm;
+    }
+
+    public void setGamesThisTerm(int games) {
+        this.gamesThisTerm = games;
+    }
+
     public PlayerData getPlayerData(UUID uuid) {
         return playerDataMap.get(uuid);
     }
-    
+
     public PlayerData getOrCreatePlayerData(UUID uuid, String name) {
         return playerDataMap.computeIfAbsent(uuid, k -> new PlayerData(uuid, name));
     }
-    
+
     public Collection<PlayerData> getAllPlayerData() {
         return playerDataMap.values();
     }
-    
+
     public int getActivePlayerCount() {
         long threshold = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000); // 7 days
         return (int) playerDataMap.values().stream()
-            .filter(p -> p.getLastSeen() > threshold)
-            .count();
+                .filter(p -> p.getLastSeen() > threshold)
+                .count();
     }
 
     public List<PresidentHistory.PresidentRecord> getAllPresidentHistory() {

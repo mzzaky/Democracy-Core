@@ -2,7 +2,9 @@ package id.democracycore.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,22 +27,23 @@ import id.democracycore.models.Treasury;
 import id.democracycore.utils.MessageUtils;
 
 public class DemocracyCommand implements CommandExecutor, TabCompleter {
-    
+
     private final DemocracyCore plugin;
-    
+    private final Map<UUID, Runnable> pendingConfirmations = new HashMap<>();
+
     public DemocracyCommand(DemocracyCore plugin) {
         this.plugin = plugin;
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             showHelp(sender);
             return true;
         }
-        
+
         String subCommand = args[0].toLowerCase();
-        
+
         switch (subCommand) {
             case "menu":
             case "gui":
@@ -116,14 +119,14 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 MessageUtils.send(sender, "general.unknown_command");
                 break;
         }
-        
+
         return true;
     }
-    
+
     // === HELP ===
-    
+
     // === MAIN MENU ===
-    
+
     private void handleMainMenu(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -132,9 +135,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getGUIListener().openMainMenu(player);
     }
-    
+
     // === HELP ===
-    
+
     private void showHelp(CommandSender sender) {
         MessageUtils.send(sender, "help.header");
         MessageUtils.send(sender, "help.title");
@@ -168,9 +171,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(sender, "help.admin_commands.admin");
         }
     }
-    
+
     // === GOVERNMENT INFO ===
-    
+
     private void showGovernmentInfo(CommandSender sender) {
         Government gov = plugin.getDataManager().getGovernment();
 
@@ -183,9 +186,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             String presName = Bukkit.getOfflinePlayer(gov.getPresidentUUID()).getName();
             MessageUtils.send(sender, "government.president", "name", presName);
             MessageUtils.send(sender, "government.president_term", "term", gov.getCurrentTerm(), "time",
-                MessageUtils.formatTime(gov.getTermEndTime() - System.currentTimeMillis()));
+                    MessageUtils.formatTime(gov.getTermEndTime() - System.currentTimeMillis()));
             MessageUtils.send(sender, "government.approval_rating", "rating",
-                String.format("%.1f", gov.getApprovalRating()));
+                    String.format("%.1f", gov.getApprovalRating()));
         } else {
             MessageUtils.send(sender, "government.no_president");
         }
@@ -197,7 +200,8 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             UUID ministerUUID = gov.getCabinetMember(pos.toGovernmentPosition());
             if (ministerUUID != null) {
                 String minName = Bukkit.getOfflinePlayer(ministerUUID).getName();
-                MessageUtils.send(sender, "government.cabinet_member", "position", pos.getDisplayName(), "name", minName);
+                MessageUtils.send(sender, "government.cabinet_member", "position", pos.getDisplayName(), "name",
+                        minName);
             } else {
                 MessageUtils.send(sender, "government.cabinet_empty", "position", pos.getDisplayName());
             }
@@ -210,7 +214,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(sender, "government.active_orders_title");
             for (ExecutiveOrder order : activeOrders) {
                 MessageUtils.send(sender, "government.active_order", "type", order.getType().getDisplayName(),
-                    "time", MessageUtils.formatTime(order.getRemainingTime()));
+                        "time", MessageUtils.formatTime(order.getRemainingTime()));
             }
         }
 
@@ -221,13 +225,13 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(sender, "government.active_decisions_title");
             for (CabinetDecision decision : activeDecisions) {
                 MessageUtils.send(sender, "government.active_decision", "type", decision.getType().getDisplayName(),
-                    "time", MessageUtils.formatTime(decision.getRemainingTime()));
+                        "time", MessageUtils.formatTime(decision.getRemainingTime()));
             }
         }
     }
-    
+
     // === ELECTION ===
-    
+
     private void showElectionInfo(CommandSender sender) {
         Election election = plugin.getDataManager().getElection();
 
@@ -237,7 +241,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         MessageUtils.send(sender, "election.phase", "phase", election.getPhase().getDisplayName());
         MessageUtils.send(sender, "election.time_remaining", "time",
-            MessageUtils.formatTime(election.getPhaseEndTime() - System.currentTimeMillis()));
+                MessageUtils.formatTime(election.getPhaseEndTime() - System.currentTimeMillis()));
         MessageUtils.send(sender, "election.candidate_count", "count", election.getCandidates().size());
         MessageUtils.send(sender, "election.total_votes", "count", election.getTotalVotes());
 
@@ -250,7 +254,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
-    
+
     private void showCandidates(CommandSender sender) {
         Election election = plugin.getDataManager().getElection();
 
@@ -264,12 +268,11 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             // Sort by votes (if voting phase) or endorsements
             List<UUID> sortedCandidates = new ArrayList<>(election.getCandidates().keySet());
             if (election.getPhase() == Election.ElectionPhase.VOTING ||
-                election.getPhase() == Election.ElectionPhase.INAUGURATION) {
-                sortedCandidates.sort((a, b) ->
-                    Double.compare(election.getVoteCount(b), election.getVoteCount(a)));
+                    election.getPhase() == Election.ElectionPhase.INAUGURATION) {
+                sortedCandidates.sort((a, b) -> Double.compare(election.getVoteCount(b), election.getVoteCount(a)));
             } else {
-                sortedCandidates.sort((a, b) ->
-                    Integer.compare(election.getEndorsementCount(b), election.getEndorsementCount(a)));
+                sortedCandidates.sort(
+                        (a, b) -> Integer.compare(election.getEndorsementCount(b), election.getEndorsementCount(a)));
             }
 
             int rank = 1;
@@ -278,17 +281,17 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 int endorsements = election.getEndorsementCount(candidateUUID);
                 double votes = election.getVoteCount(candidateUUID);
 
-                String info = election.getPhase() == Election.ElectionPhase.VOTING ?
-                    String.format("%.1f votes", votes) : endorsements + " endorsements";
+                String info = election.getPhase() == Election.ElectionPhase.VOTING ? String.format("%.1f votes", votes)
+                        : endorsements + " endorsements";
 
                 MessageUtils.send(sender, "candidates.candidate_entry", "rank", rank, "name", name, "info", info);
                 rank++;
             }
         }
     }
-    
+
     // === VOTING ===
-    
+
     private void handleVote(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -316,9 +319,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getElectionManager().castVote(player, candidate.getUniqueId());
     }
-    
+
     // === REGISTRATION ===
-    
+
     private void handleRegister(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -327,9 +330,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getElectionManager().registerCandidate(player, "");
     }
-    
+
     // === ENDORSEMENT ===
-    
+
     private void handleEndorse(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -351,9 +354,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getElectionManager().endorseCandidate(player, offlinePlayer.getUniqueId());
     }
-    
+
     // === CAMPAIGN ===
-    
+
     private void handleCampaign(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -378,9 +381,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.broadcast("campaign.broadcast_message", "message", message);
         MessageUtils.broadcast("campaign.broadcast_footer");
     }
-    
+
     // === EXECUTIVE ORDERS ===
-    
+
     private void handleExecutiveOrder(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -402,10 +405,10 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 boolean onCooldown = plugin.getExecutiveOrderManager().isOrderOnCooldown(type);
                 boolean active = plugin.getExecutiveOrderManager().isOrderActive(type);
 
-                String status = active ? "<green>[ACTIVE]" :
-                    (onCooldown ? "<red>[COOLDOWN]" : "<yellow>[AVAILABLE]");
+                String status = active ? "<green>[ACTIVE]" : (onCooldown ? "<red>[COOLDOWN]" : "<yellow>[AVAILABLE]");
 
-                MessageUtils.send(player, "executive_orders.order_entry", "status", status, "name", type.name(), "display", type.getDisplayName());
+                MessageUtils.send(player, "executive_orders.order_entry", "status", status, "name", type.name(),
+                        "display", type.getDisplayName());
             }
             MessageUtils.send(player, "executive_orders.usage");
             return;
@@ -419,9 +422,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(player, "executive_orders.invalid_order");
         }
     }
-    
+
     // === CABINET ===
-    
+
     private void handleCabinetCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -453,7 +456,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 break;
         }
     }
-    
+
     private void showCabinetHelp(Player player) {
         MessageUtils.send(player, "cabinet.help_header");
         MessageUtils.send(player, "cabinet.help_info");
@@ -463,7 +466,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(player, "");
         MessageUtils.send(player, "cabinet.help_positions");
     }
-    
+
     private void handleCabinetAppoint(Player player, String[] args) {
         Government gov = plugin.getDataManager().getGovernment();
 
@@ -493,14 +496,15 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             }
 
             plugin.getGovernmentManager().appointCabinetMember(position.toGovernmentPosition(), target.getUniqueId());
-            MessageUtils.send(player, "cabinet.appoint_success", "player", target.getName(), "position", position.getDisplayName());
+            MessageUtils.send(player, "cabinet.appoint_success", "player", target.getName(), "position",
+                    position.getDisplayName());
             MessageUtils.send(target, "cabinet.appoint_target", "position", position.getDisplayName());
 
         } catch (IllegalArgumentException e) {
             MessageUtils.send(player, "cabinet.appoint_invalid_position");
         }
     }
-    
+
     private void handleCabinetDismiss(Player player, String[] args) {
         Government gov = plugin.getDataManager().getGovernment();
 
@@ -529,13 +533,14 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
             String ministerName = Bukkit.getOfflinePlayer(currentMinister).getName();
             plugin.getGovernmentManager().removeCabinetMember(position.toGovernmentPosition());
-            MessageUtils.send(player, "cabinet.dismiss_success", "player", ministerName, "position", position.getDisplayName());
+            MessageUtils.send(player, "cabinet.dismiss_success", "player", ministerName, "position",
+                    position.getDisplayName());
 
         } catch (IllegalArgumentException e) {
             MessageUtils.send(player, "cabinet.appoint_invalid_position");
         }
     }
-    
+
     private void handleCabinetDecision(Player player, String[] args) {
         if (args.length < 3) {
             // Show available decisions for this player
@@ -558,13 +563,13 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(player, "cabinet.decision_header", "POSITION", myPosition.getDisplayName().toUpperCase());
 
             for (CabinetDecision.DecisionType type : CabinetDecision.DecisionType.values()) {
-                if (type.getPosition() != myPosition) continue;
+                if (type.getPosition() != myPosition)
+                    continue;
 
                 boolean onCooldown = plugin.getCabinetManager().isDecisionOnCooldown(type);
                 boolean active = plugin.getCabinetManager().isDecisionActive(type);
 
-                String status = active ? "<green>[ACTIVE]" :
-                    (onCooldown ? "<red>[CD]" : "<yellow>[OK]");
+                String status = active ? "<green>[ACTIVE]" : (onCooldown ? "<red>[CD]" : "<yellow>[OK]");
 
                 MessageUtils.send(player, "cabinet.decision_entry", "status", status, "name", type.name());
                 MessageUtils.send(player, "cabinet.decision_description", "description", type.getDescription());
@@ -580,7 +585,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(player, "cabinet.decision_invalid");
         }
     }
-    
+
     private void showCabinetInfo(Player player) {
         Government gov = plugin.getDataManager().getGovernment();
 
@@ -590,24 +595,23 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
             UUID ministerUUID = gov.getCabinetMember(pos.toGovernmentPosition());
-            String ministerName = ministerUUID != null ?
-                Bukkit.getOfflinePlayer(ministerUUID).getName() : "Empty";
+            String ministerName = ministerUUID != null ? Bukkit.getOfflinePlayer(ministerUUID).getName() : "Empty";
 
             MessageUtils.send(player, "cabinet.info_member", "position", pos.getDisplayName(), "name", ministerName);
 
             // Show active decisions for this position
             var decisions = plugin.getCabinetManager().getActiveDecisionsByPosition(pos);
             if (decisions != null) {
-            for (CabinetDecision decision : decisions) {
-                MessageUtils.send(player, "cabinet.info_decision", "type", decision.getType().getDisplayName(),
-                    "time", MessageUtils.formatTime(decision.getRemainingTime()));
-            }
+                for (CabinetDecision decision : decisions) {
+                    MessageUtils.send(player, "cabinet.info_decision", "type", decision.getType().getDisplayName(),
+                            "time", MessageUtils.formatTime(decision.getRemainingTime()));
+                }
             }
         }
     }
-    
+
     // === TREASURY ===
-    
+
     private void handleTreasury(CommandSender sender, String[] args) {
         Treasury treasury = plugin.getDataManager().getTreasury();
 
@@ -616,17 +620,21 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "treasury.footer");
         MessageUtils.send(sender, "treasury.balance", "balance", MessageUtils.formatNumber(treasury.getBalance()));
         MessageUtils.send(sender, "treasury.income", "income",
-            MessageUtils.formatNumber(treasury.getTotalIncome()));
+                MessageUtils.formatNumber(treasury.getTotalIncome()));
         MessageUtils.send(sender, "treasury.expenses", "expenses",
-            MessageUtils.formatNumber(treasury.getTotalExpenses()));
+                MessageUtils.formatNumber(treasury.getTotalExpenses()));
 
         // Recent transactions
         MessageUtils.send(sender, "");
         MessageUtils.send(sender, "treasury.transactions_title");
         var transactions = treasury.getRecentTransactions(5);
         for (Treasury.Transaction tx : transactions) {
-            String type = tx.getType().name().contains("INCOME") || tx.getType().name().contains("DONATION") || tx.getType().name().contains("FUND") || tx.getType().name().contains("REFUND") ? "treasury.transaction_income" : "treasury.transaction_expense";
-            MessageUtils.send(sender, type, "amount", MessageUtils.formatNumber(tx.getAmount()), "description", tx.getDescription());
+            String type = tx.getType().name().contains("INCOME") || tx.getType().name().contains("DONATION")
+                    || tx.getType().name().contains("FUND") || tx.getType().name().contains("REFUND")
+                            ? "treasury.transaction_income"
+                            : "treasury.transaction_expense";
+            MessageUtils.send(sender, type, "amount", MessageUtils.formatNumber(tx.getAmount()), "description",
+                    tx.getDescription());
         }
 
         // Donate option
@@ -641,9 +649,11 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 }
 
                 plugin.getVaultHook().withdraw(player.getUniqueId(), amount);
-                plugin.getTreasuryManager().deposit(Treasury.TransactionType.DONATION, amount, "Donation from " + player.getName(), player.getUniqueId());
+                plugin.getTreasuryManager().deposit(Treasury.TransactionType.DONATION, amount,
+                        "Donation from " + player.getName(), player.getUniqueId());
                 MessageUtils.send(player, "treasury.donate_success", "amount", MessageUtils.formatNumber(amount));
-                MessageUtils.broadcast("treasury.donate_broadcast", "player", player.getName(), "amount", MessageUtils.formatNumber(amount));
+                MessageUtils.broadcast("treasury.donate_broadcast", "player", player.getName(), "amount",
+                        MessageUtils.formatNumber(amount));
             } catch (NumberFormatException e) {
                 MessageUtils.send(sender, "treasury.donate_invalid");
             }
@@ -652,9 +662,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "");
         MessageUtils.send(sender, "treasury.donate_usage");
     }
-    
+
     // === ARENA ===
-    
+
     private void handleArena(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -690,7 +700,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 break;
         }
     }
-    
+
     private void showArenaHelp(Player player) {
         MessageUtils.send(player, "arena.help_header");
         MessageUtils.send(player, "arena.help_join");
@@ -702,7 +712,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(player, "arena.help_start");
         }
     }
-    
+
     private void handleArenaStart(Player player) {
         Government gov = plugin.getDataManager().getGovernment();
 
@@ -715,25 +725,25 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getArenaManager().startNewSession(player);
     }
-    
+
     private void handleArenaJoin(Player player) {
         plugin.getArenaManager().joinArena(player);
     }
-    
+
     private void handleArenaLeave(Player player) {
         plugin.getArenaManager().leaveArena(player.getUniqueId());
     }
-    
+
     private void showArenaStats(Player player) {
         showArenaStatsFor(player);
     }
-    
+
     private void showArenaLeaderboard(Player player) {
         showArenaLeaderboardFor(player);
     }
-    
+
     // === RECALL ===
-    
+
     private void handleRecall(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -770,7 +780,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 break;
         }
     }
-    
+
     private void showRecallHelp(Player player) {
         MessageUtils.send(player, "recall.help_header");
         MessageUtils.send(player, "recall.help_start");
@@ -778,11 +788,12 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(player, "recall.help_vote");
         MessageUtils.send(player, "recall.help_status");
     }
-    
+
     private void showRecallStatus(Player player) {
         RecallPetition petition = plugin.getDataManager().getRecallPetition();
 
-        if (petition == null || petition.getPhase() == RecallPetition.RecallPhase.COMPLETED || petition.getPhase() == RecallPetition.RecallPhase.FAILED) {
+        if (petition == null || petition.getPhase() == RecallPetition.RecallPhase.COMPLETED
+                || petition.getPhase() == RecallPetition.RecallPhase.FAILED) {
             MessageUtils.send(player, "recall.no_active_petition");
             return;
         }
@@ -790,16 +801,17 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(player, "recall.status_header");
         MessageUtils.send(player, "recall.status_phase", "phase", petition.getPhase().name());
         int requiredSignatures = (int) Math.ceil(plugin.getServer().getOnlinePlayers().size() * 0.3);
-        MessageUtils.send(player, "recall.status_signatures", "current", petition.getSignatureCount(), "required", requiredSignatures);
+        MessageUtils.send(player, "recall.status_signatures", "current", petition.getSignatureCount(), "required",
+                requiredSignatures);
 
         if (petition.getPhase() == RecallPetition.RecallPhase.VOTING) {
             MessageUtils.send(player, "recall.status_remove_votes", "votes", petition.getRemoveVotes());
             MessageUtils.send(player, "recall.status_keep_votes", "votes", petition.getKeepVotes());
         }
     }
-    
+
     // === RATING ===
-    
+
     private void handleRating(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "general.player_only");
@@ -816,7 +828,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         if (args.length < 2) {
             MessageUtils.send(player, "rating.usage");
             MessageUtils.send(player, "rating.current_rating", "rating",
-                String.format("%.1f", gov.getApprovalRating()));
+                    String.format("%.1f", gov.getApprovalRating()));
             return;
         }
 
@@ -864,31 +876,31 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         plugin.getGUIListener().openGovernmentGUI(player);
     }
-    
+
     // === LEADERBOARD ===
-    
+
     private void handleLeaderboard(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "<red>Perintah ini hanya untuk player!");
             return;
         }
-        
+
         plugin.getGUIListener().openLeaderboardGUI(player);
     }
-    
+
     // === QUICK ACTIONS ===
-    
+
     private void handleQuickActions(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             MessageUtils.send(sender, "<red>Perintah ini hanya untuk player!");
             return;
         }
-        
+
         plugin.getGUIListener().openQuickActionsGUI(player);
     }
 
     // === HISTORY ===
-    
+
     private void showHistory(CommandSender sender, String[] args) {
         PresidentHistory history = plugin.getDataManager().getPresidentHistory();
         List<PresidentHistory.PresidentRecord> records = history != null ? history.getRecords() : new ArrayList<>();
@@ -905,14 +917,15 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 PresidentHistory.PresidentRecord h = records.get(i);
                 String name = Bukkit.getOfflinePlayer(h.getUuid()).getName();
                 MessageUtils.send(sender, "history.entry", "rank", (i + 1), "name", name);
-                MessageUtils.send(sender, "history.entry_stats", "rating", String.format("%.1f", h.getFinalApprovalRating()),
-                    "orders", h.getExecutiveOrdersIssued(), "games", h.getPresidentialGamesHosted());
+                MessageUtils.send(sender, "history.entry_stats", "rating",
+                        String.format("%.1f", h.getFinalApprovalRating()),
+                        "orders", h.getExecutiveOrdersIssued(), "games", h.getPresidentialGamesHosted());
             }
         }
     }
-    
+
     // === STATS ===
-    
+
     private void showPlayerStats(CommandSender sender, String[] args) {
         UUID targetUUID;
         String targetName;
@@ -949,9 +962,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "stats.arena_kills", "kills", data.getArenaKills(), "deaths", data.getArenaDeaths());
         MessageUtils.send(sender, "stats.arena_streak", "streak", data.getBestKillstreak());
     }
-    
+
     // === ADMIN ===
-    
+
     private void handleAdmin(CommandSender sender, String[] args) {
         if (!sender.hasPermission("democracy.admin")) {
             MessageUtils.send(sender, "general.no_permission");
@@ -966,18 +979,30 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         String subCmd = args[1].toLowerCase();
 
         switch (subCmd) {
-            case "setpresident":
-                handleAdminSetPresident(sender, args);
+            case "set":
+                if (args.length > 2 && args[2].equalsIgnoreCase("president")) {
+                    handleAdminSetPresident(sender, args);
+                } else {
+                    MessageUtils.send(sender, "admin.help_setpresident");
+                }
                 break;
-            case "removepresident":
-                handleAdminRemovePresident(sender);
+            case "remove":
+                if (args.length > 2 && args[2].equalsIgnoreCase("president")) {
+                    handleAdminRemovePresident(sender);
+                } else {
+                    MessageUtils.send(sender, "admin.help_removepresident");
+                }
                 break;
-            case "startElection":
+            case "confirm":
+                handleAdminConfirm(sender);
+                break;
             case "startelection":
+            case "startElection": // Case insensitive fallback handled by toLowerCase() above, but keeping for
+                                  // clarity
                 handleAdminStartElection(sender);
                 break;
-            case "endElection":
             case "endelection":
+            case "endElection":
                 handleAdminEndElection(sender);
                 break;
             case "addtreasury":
@@ -997,7 +1022,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 break;
         }
     }
-    
+
     private void showAdminHelp(CommandSender sender) {
         MessageUtils.send(sender, "admin.help_header");
         MessageUtils.send(sender, "admin.help_setpresident");
@@ -1008,38 +1033,92 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "admin.help_reload");
         MessageUtils.send(sender, "admin.help_reset");
     }
-    
+
     private void handleAdminSetPresident(CommandSender sender, String[] args) {
-        if (args.length < 3) {
+        if (args.length < 4) {
             MessageUtils.send(sender, "admin.setpresident_usage");
             return;
         }
 
-        var offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
+        var offlinePlayer = Bukkit.getOfflinePlayer(args[3]);
         if (!offlinePlayer.hasPlayedBefore()) {
             MessageUtils.send(sender, "general.player_not_found");
             return;
         }
 
-        plugin.getGovernmentManager().setPresident(offlinePlayer.getUniqueId(), offlinePlayer.getName(), false);
-        MessageUtils.send(sender, "admin.setpresident_success", "player", offlinePlayer.getName());
+        if (sender instanceof Player player) {
+            pendingConfirmations.put(player.getUniqueId(), () -> {
+                plugin.getGovernmentManager().setPresident(offlinePlayer.getUniqueId(), offlinePlayer.getName(), false);
+
+                // Ensure election phase is stopped/reset
+                plugin.getElectionManager().endElection();
+                plugin.getDataManager().saveElection();
+                plugin.getDataManager().saveGovernment();
+
+                MessageUtils.send(sender, "admin.setpresident_success", "player", offlinePlayer.getName());
+            });
+            MessageUtils.send(sender, "<yellow>Are you sure you want to set <gold>" + offlinePlayer.getName() +
+                    "</gold> as president? This will end the current election.</yellow>");
+            MessageUtils.send(sender, "<green>Type <gold>/dc admin confirm</gold> to proceed.</green>");
+        } else {
+            // Console doesn't need confirmation
+            plugin.getGovernmentManager().setPresident(offlinePlayer.getUniqueId(), offlinePlayer.getName(), false);
+            plugin.getElectionManager().endElection();
+            plugin.getDataManager().saveElection();
+            plugin.getDataManager().saveGovernment();
+            MessageUtils.send(sender, "admin.setpresident_success", "player", offlinePlayer.getName());
+        }
     }
-    
+
+    private void handleAdminConfirm(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            MessageUtils.send(sender, "general.player_only");
+            return;
+        }
+
+        if (pendingConfirmations.containsKey(player.getUniqueId())) {
+            pendingConfirmations.remove(player.getUniqueId()).run();
+        } else {
+            MessageUtils.send(player, "<red>You have no pending confirmations.</red>");
+        }
+    }
+
     private void handleAdminRemovePresident(CommandSender sender) {
-        plugin.getGovernmentManager().endTerm("ADMIN_REMOVAL");
-        MessageUtils.send(sender, "admin.removepresident_success");
+        Government gov = plugin.getDataManager().getGovernment();
+        if (!gov.hasPresident()) {
+            MessageUtils.send(sender, "<red>There is no active president to remove.</red>");
+            return;
+        }
+
+        if (sender instanceof Player player) {
+            pendingConfirmations.put(player.getUniqueId(), () -> {
+                plugin.getGovernmentManager().endTerm("ADMIN_REMOVAL");
+                plugin.getElectionManager().startElection(); // Sync phase: Start registration immediately
+                MessageUtils.send(sender, "admin.removepresident_success");
+                MessageUtils.broadcast(
+                        "<yellow>A new election cycle has been initiated following the removal of the president.</yellow>");
+            });
+            MessageUtils.send(sender,
+                    "<yellow>Are you sure you want to remove the current president? This will start a new election.</yellow>");
+            MessageUtils.send(sender, "<green>Type <gold>/dc admin confirm</gold> to proceed.</green>");
+        } else {
+            // Console doesn't need confirmation
+            plugin.getGovernmentManager().endTerm("ADMIN_REMOVAL");
+            plugin.getElectionManager().startElection();
+            MessageUtils.send(sender, "admin.removepresident_success");
+        }
     }
-    
+
     private void handleAdminStartElection(CommandSender sender) {
         plugin.getElectionManager().startElection();
         MessageUtils.send(sender, "admin.startelection_success");
     }
-    
+
     private void handleAdminEndElection(CommandSender sender) {
         plugin.getElectionManager().endElection();
         MessageUtils.send(sender, "admin.endelection_success");
     }
-    
+
     private void handleAdminAddTreasury(CommandSender sender, String[] args) {
         if (args.length < 3) {
             MessageUtils.send(sender, "admin.addtreasury_usage");
@@ -1048,20 +1127,21 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
 
         try {
             long amount = Long.parseLong(args[2]);
-            plugin.getTreasuryManager().deposit(Treasury.TransactionType.MISC_EXPENSE, amount, "Admin deposit by " + sender.getName(), null);
+            plugin.getTreasuryManager().deposit(Treasury.TransactionType.MISC_EXPENSE, amount,
+                    "Admin deposit by " + sender.getName(), null);
             MessageUtils.send(sender, "admin.addtreasury_success", "amount", MessageUtils.formatNumber(amount));
         } catch (NumberFormatException e) {
             MessageUtils.send(sender, "admin.addtreasury_invalid");
         }
     }
-    
+
     private void handleAdminReload(CommandSender sender) {
         plugin.reloadConfig();
         plugin.reloadLanguage();
         plugin.reloadGUI();
         MessageUtils.send(sender, "general.config_reloaded");
     }
-    
+
     private void handleAdminReset(CommandSender sender, String[] args) {
         if (args.length < 3) {
             MessageUtils.send(sender, "admin.reset_usage");
@@ -1117,23 +1197,22 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
     }
 
     // === TAB COMPLETE ===
-    
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-        
+
         if (args.length == 1) {
             completions.addAll(Arrays.asList(
-                "menu", "help", "info", "election", "candidates", "vote", "register",
-                "endorse", "campaign", "order", "cabinet", "treasury", "arena",
-                "recall", "rate", "history", "stats", "government", "leaderboard"
-            ));
+                    "menu", "help", "info", "election", "candidates", "vote", "register",
+                    "endorse", "campaign", "order", "cabinet", "treasury", "arena",
+                    "recall", "rate", "history", "stats", "government", "leaderboard"));
             if (sender.hasPermission("democracy.admin")) {
                 completions.add("admin");
             }
         } else if (args.length == 2) {
             String sub = args[0].toLowerCase();
-            
+
             switch (sub) {
                 case "vote":
                 case "endorse":
@@ -1171,9 +1250,8 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 case "admin":
                     if (sender.hasPermission("democracy.admin")) {
                         completions.addAll(Arrays.asList(
-                            "setpresident", "removepresident", "startelection",
-                            "endelection", "addtreasury", "reload", "reset", "stoporder"
-                        ));
+                                "set", "remove", "startelection",
+                                "endelection", "addtreasury", "reload", "reset", "stoporder", "confirm"));
                     }
                     break;
                 case "treasury":
@@ -1183,7 +1261,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         } else if (args.length == 3) {
             String sub = args[0].toLowerCase();
             String sub2 = args[1].toLowerCase();
-            
+
             if (sub.equals("cabinet")) {
                 if (sub2.equals("appoint") || sub2.equals("dismiss")) {
                     for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
@@ -1208,37 +1286,42 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             } else if (sub.equals("recall") && sub2.equals("vote")) {
                 completions.addAll(Arrays.asList("yes", "no", "remove", "keep"));
             } else if (sub.equals("admin")) {
-                if (sub2.equals("setpresident")) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        completions.add(p.getName());
-                    }
+                if (sub2.equals("set") || sub2.equals("remove")) {
+                    completions.add("president");
                 } else if (sub2.equals("reset")) {
                     completions.addAll(Arrays.asList("government", "election", "treasury", "all"));
                 }
             }
         } else if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("cabinet") && args[1].equalsIgnoreCase("appoint")) {
+            String sub = args[0].toLowerCase();
+            String sub2 = args[1].toLowerCase();
+
+            if (sub.equals("cabinet") && sub2.equals("appoint")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    completions.add(p.getName());
+                }
+            } else if (sub.equals("admin") && sub2.equals("set") && args[2].equalsIgnoreCase("president")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
                 }
             }
         }
-        
+
         // Filter based on input
         String input = args[args.length - 1].toLowerCase();
         return completions.stream()
-            .filter(s -> s.toLowerCase().startsWith(input))
-            .collect(Collectors.toList());
+                .filter(s -> s.toLowerCase().startsWith(input))
+                .collect(Collectors.toList());
     }
-    
+
     // === HELPER METHODS ===
-    
+
     private int calculateLevel(PlayerData data) {
         // Calculate level based on playtime hours (1 level per 10 hours)
         double hours = data.getTotalPlaytime() / (1000.0 * 60 * 60);
         return (int) (hours / 10) + 1;
     }
-    
+
     private void showArenaStatsFor(Player player) {
         PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
         MessageUtils.send(player, "arena.stats_header");
@@ -1247,12 +1330,12 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(player, "arena.stats_kills", "kills", data.getArenaKills());
         MessageUtils.send(player, "arena.stats_deaths", "deaths", data.getArenaDeaths());
         MessageUtils.send(player, "arena.stats_kd", "ratio",
-            String.format("%.2f", data.getArenaDeaths() > 0 ?
-                (double) data.getArenaKills() / data.getArenaDeaths() : data.getArenaKills()));
+                String.format("%.2f", data.getArenaDeaths() > 0 ? (double) data.getArenaKills() / data.getArenaDeaths()
+                        : data.getArenaKills()));
         MessageUtils.send(player, "arena.stats_streak", "streak", data.getCurrentKillstreak());
         MessageUtils.send(player, "arena.stats_best", "best", data.getBestKillstreak());
     }
-    
+
     private void showArenaLeaderboardFor(Player player) {
         MessageUtils.send(player, "arena.leaderboard_header");
         MessageUtils.send(player, "arena.leaderboard_title");
@@ -1261,14 +1344,15 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         // Get top players by kills
         var allPlayers = plugin.getDataManager().getAllPlayerData();
         var topPlayers = allPlayers.stream()
-            .sorted((a, b) -> Integer.compare(b.getArenaKills(), a.getArenaKills()))
-            .limit(10)
-            .toList();
+                .sorted((a, b) -> Integer.compare(b.getArenaKills(), a.getArenaKills()))
+                .limit(10)
+                .toList();
 
         int rank = 1;
         for (PlayerData data : topPlayers) {
             String name = Bukkit.getOfflinePlayer(data.getUuid()).getName();
-            MessageUtils.send(player, "arena.leaderboard_entry", "rank", rank, "name", name, "kills", data.getArenaKills(), "streak", data.getBestKillstreak());
+            MessageUtils.send(player, "arena.leaderboard_entry", "rank", rank, "name", name, "kills",
+                    data.getArenaKills(), "streak", data.getBestKillstreak());
             rank++;
         }
     }

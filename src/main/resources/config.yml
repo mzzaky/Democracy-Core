@@ -89,6 +89,7 @@ cabinet:
 # Election Settings
 election:
   registration-days: 3
+  max-candidates: 3 # Maximum number of candidates that can register
   campaign-days: 7
   voting-days: 3
   inauguration-days: 1
