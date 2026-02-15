@@ -1,6 +1,135 @@
+# ========================================
 # GUI Configuration for Democracy Core Plugin
-# This file controls the appearance and behavior of GUI elements in MainMenuGUI.java
-# Supports placeholders: {player_name}, {level}, {playtime}, {balance}, {president_name}, {term}, {remaining_time}, {rating}, etc.
+# ========================================
+#
+# This file controls the appearance and behavior of GUI elements
+# Each item supports the following properties:
+#   - gui_slot: Position in inventory (0-53 for 54-slot GUI)
+#   - material: Minecraft material name
+#   - display_name: Item display name (supports color codes with §)
+#   - lore: List of lore lines
+#   - click_sound: Sound played when clicked
+#   - on_click: Action to execute when clicked (see list below)
+#   - hide_attributes: Hide item flags (see list below)
+#
+# Hide Attributes (hide_attributes):
+#   Specify which item information to hide. Can be a single value or list:
+#   - ALL               - Hide all item flags
+#   - ENCHANTS          - Hide enchantments
+#   - ATTRIBUTES        - Hide attribute modifiers (damage, speed, etc)
+#   - UNBREAKABLE       - Hide unbreakable tag
+#   - DESTROYS          - Hide "can destroy" tags
+#   - PLACED_ON         - Hide "can be placed on" tags
+#   - POTION_EFFECTS    - Hide potion effects
+#   - DYE               - Hide dye information (leather armor)
+#
+#   Examples:
+#     hide_attributes: ALL
+#     hide_attributes: ENCHANTS
+#     hide_attributes: [ENCHANTS, ATTRIBUTES]
+#
+# Placeholders (auto-replaced in display_name and lore):
+#   Note: You can also use any PlaceholderAPI placeholders (e.g., %democracy_president%)
+#   See .wiki/PLACEHOLDER_API.MD for a full list of available placeholders.
+#
+#   === PLAYER INFO ===
+#   {player_name}           - Player's current username
+#   {level}                 - Player's experience level (calculated from playtime)
+#   {playtime}              - Total playtime formatted (e.g., "123h 45m")
+#   {balance}               - Player's economy balance (formatted with commas)
+#
+#   === GOVERNMENT INFO ===
+#   {president_name}        - Current president's name (or "No President")
+#   {term}                  - Current presidential term number
+#   {remaining_time}        - Time remaining in current term (formatted)
+#   {rating}                - President's approval rating (0.0 - 5.0)
+#
+#   === ELECTION INFO ===
+#   {phase}                 - Current election phase (Registration/Campaign/Voting/etc)
+#   {election_details}      - Dynamic election info based on phase
+#   {candidates}            - Number of registered candidates
+#   {votes}                 - Total votes cast
+#
+#   === CABINET INFO ===
+#   {cabinet_members}       - List of cabinet ministers and positions
+#   {filled}                - Number of filled cabinet positions
+#   {total}                 - Total number of cabinet positions (5)
+#
+#   === TREASURY INFO ===
+#   {balance}               - Treasury current balance (formatted)
+#   {income}                - Total treasury income (formatted)
+#   {expenses}              - Total treasury expenses (formatted)
+#
+#   === ACTIVE EFFECTS INFO ===
+#   {total}                 - Total active effects (executive orders + cabinet decisions)
+#   {executive_orders}      - List of active executive orders
+#   {cabinet_decisions}     - List of active cabinet decisions
+#   {active_count}          - Number of active executive orders
+#
+#   === ARENA INFO ===
+#   {kills}                 - Player's arena kills
+#   {deaths}                - Player's arena deaths
+#   {streak}                - Player's current kill streak
+#   {players}               - Number of players currently in arena
+#
+#   === RECALL INFO ===
+#   {phase}                 - Recall petition phase (Collecting/Voting/etc)
+#   {signatures}            - Number of petition signatures
+#   {voting_details}        - Voting statistics (if in voting phase)
+#   {deposit}               - Required deposit amount (formatted)
+#   {threshold}             - Required threshold percentage
+#
+#   === HISTORY INFO ===
+#   {total}                 - Total number of past presidents
+#   {recent_presidents}     - List of recent presidents with ratings
+#
+#   === PLAYER STATISTICS ===
+#   {votes_cast}            - Number of times player has voted
+#   {endorsements}          - Number of endorsements given by player
+#   {president_times}       - Number of times served as president
+#   {minister_times}        - Number of times served as minister/cabinet member
+#
+#   === REGISTRATION INFO ===
+#   {cost}                  - Registration fee (formatted)
+#   {current_rating}        - Current president's rating (for rate_president item)
+#
+#   === STATUS LINES ===
+#   {status_lines}          - Dynamic status (shows if player is President/Minister)
+
+#
+# ========================================
+# AVAILABLE GUI ACTIONS (on_click)
+# ========================================
+#
+# === OPEN GUI ACTIONS ===
+# <open_gui_main_menu>          - Opens Main Menu GUI
+# <open_gui_player_stats>       - Opens Player Statistics GUI
+# <open_gui_government>         - Opens Government GUI
+# <open_gui_voting>             - Opens Voting/Election GUI
+# <open_gui_cabinet>            - Opens Cabinet GUI
+# <open_gui_treasury>           - Opens Treasury GUI
+# <open_gui_executive_orders>   - Opens Executive Orders GUI
+# <open_gui_recall>             - Opens Recall System GUI
+# <open_gui_history>            - Opens Presidential History GUI
+# <open_gui_leaderboard>        - Opens Leaderboard GUI
+# <open_gui_help>               - Opens Help/Guide GUI
+#
+# === SPECIAL ACTIONS ===
+# <action_register_candidate>   - Register as presidential candidate
+# <action_rate_president>       - Show rating command message
+# <action_close_inventory>      - Close inventory
+# <action_arena_info>           - Show arena information
+# <action_endorse_candidate>    - Show endorse command message
+# <action_donate_treasury>      - Show donate command message
+# <action_join_arena>           - Join presidential arena
+# <action_refresh_gui>          - Reload/refresh current GUI
+# <action_console_command>      - Execute console command (requires 'value' field)
+#                                  Example:
+#                                    on_click: "<action_console_command>"
+#                                    value: "give %player_name% diamond 1"
+#
+# ========================================
+
 
 gui:
   # Main Menu GUI Configuration
@@ -9,6 +138,7 @@ gui:
     items:
       # Player Head (Slot 4)
       player_head:
+        gui_slot: 4
         material: PLAYER_HEAD
         custom_model_data: 0
         display_name: "§b§l👤 {player_name}"
@@ -22,13 +152,16 @@ gui:
           - ""
           - "§aClick for detailed statistics"
         click_sound: "entity.player.levelup"
+        on_click: "<open_gui_player_stats>"
 
       # President Info (Slot 10)
       president_item:
+        gui_slot: 10
         # When president exists
         default:
           material: GOLDEN_HELMET
           custom_model_data: 0
+          hide_attributes: ATTRIBUTES
           display_name: "§6§l👑 PRESIDENT"
           lore:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
@@ -39,6 +172,7 @@ gui:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
             - "§aClick for government details"
           click_sound: "block.anvil.use"
+          on_click: "<open_gui_government>"
         # When no president
         no_president:
           material: BARRIER
@@ -51,9 +185,11 @@ gui:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
             - "§eClick for election info"
           click_sound: "block.anvil.break"
+          on_click: "<open_gui_voting>"
 
       # Cabinet Info (Slot 12)
       cabinet_item:
+        gui_slot: 12
         material: LECTERN
         custom_model_data: 0
         display_name: "§e§l📋 CABINET"
@@ -65,9 +201,11 @@ gui:
           - ""
           - "§aClick for cabinet details"
         click_sound: "item.book.page_turn"
+        on_click: "<open_gui_cabinet>"
 
       # Treasury Info (Slot 14)
       treasury_item:
+        gui_slot: 14
         material: GOLD_BLOCK
         custom_model_data: 0
         display_name: "§6§l💰 TREASURY"
@@ -79,9 +217,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick for treasury details"
         click_sound: "block.note_block.pling"
+        on_click: "<open_gui_treasury>"
 
       # Active Effects (Slot 16)
       active_effects_item:
+        gui_slot: 16
         # When no effects
         inactive:
           material: GLASS
@@ -92,6 +232,7 @@ gui:
             - "§7No active effects"
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           click_sound: "block.glass.break"
+          on_click: "<open_gui_executive_orders>"
         # When effects active
         active:
           material: BEACON
@@ -103,9 +244,11 @@ gui:
             - "{cabinet_decisions}"
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           click_sound: "block.beacon.activate"
+          on_click: "<open_gui_executive_orders>"
 
       # Election (Slot 19)
       election_item:
+        gui_slot: 19
         material: PAPER
         custom_model_data: 0
         display_name: "§b§l🗳 ELECTION"
@@ -116,9 +259,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick to open voting GUI"
         click_sound: "item.book.page_turn"
+        on_click: "<open_gui_voting>"
 
       # Executive Orders (Slot 21)
       executive_orders_item:
+        gui_slot: 21
         material: WRITABLE_BOOK
         custom_model_data: 0
         display_name: "§c§l📜 EXECUTIVE ORDERS"
@@ -132,13 +277,16 @@ gui:
           - ""
           - "§aClick to view orders"
         click_sound: "item.book.page_turn"
+        on_click: "<open_gui_executive_orders>"
 
       # Presidential Arena (Slot 23)
       arena_item:
+        gui_slot: 23
         # When inactive
         inactive:
           material: IRON_SWORD
           custom_model_data: 0
+          hide_attributes: ALL
           display_name: "§4§l⚔ PRESIDENTIAL ARENA"
           lore:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
@@ -151,10 +299,12 @@ gui:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
             - "§aClick for arena info"
           click_sound: "entity.player.attack.sweep"
+          on_click: "<action_arena_info>"
         # When active
         active:
           material: DIAMOND_SWORD
           custom_model_data: 0
+          hide_attributes: ALL
           display_name: "§4§l⚔ PRESIDENTIAL ARENA"
           lore:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
@@ -168,9 +318,11 @@ gui:
             - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
             - "§aClick for arena info"
           click_sound: "entity.player.attack.crit"
+          on_click: "<action_arena_info>"
 
       # Recall System (Slot 25)
       recall_item:
+        gui_slot: 25
         # When inactive
         inactive:
           material: TORCH
@@ -188,6 +340,7 @@ gui:
             - ""
             - "§eClick for recall info"
           click_sound: "block.torch.extinguish"
+          on_click: "<open_gui_recall>"
         # When active
         active:
           material: REDSTONE_TORCH
@@ -205,9 +358,11 @@ gui:
             - ""
             - "§eClick for recall info"
           click_sound: "block.redstone_torch.burnout"
+          on_click: "<open_gui_recall>"
 
       # History (Slot 28)
       history_item:
+        gui_slot: 28
         material: BOOK
         custom_model_data: 0
         display_name: "§5§l📚 PRESIDENTIAL HISTORY"
@@ -218,9 +373,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick to view history"
         click_sound: "item.book.page_turn"
+        on_click: "<open_gui_history>"
 
       # My Stats (Slot 30)
       my_stats_item:
+        gui_slot: 30
         material: COMPASS
         custom_model_data: 0
         display_name: "§b§l📊 MY STATISTICS"
@@ -233,9 +390,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick for full details"
         click_sound: "item.spyglass.use"
+        on_click: "<open_gui_player_stats>"
 
       # Leaderboard (Slot 32)
       leaderboard_item:
+        gui_slot: 32
         material: GOLDEN_APPLE
         custom_model_data: 0
         display_name: "§6§l🏆 LEADERBOARD"
@@ -248,9 +407,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick to view leaderboard"
         click_sound: "entity.player.levelup"
+        on_click: "<open_gui_leaderboard>"
 
       # Help (Slot 34)
       help_item:
+        gui_slot: 34
         material: KNOWLEDGE_BOOK
         custom_model_data: 0
         display_name: "§a§l❓ GUIDE & HELP"
@@ -265,9 +426,11 @@ gui:
           - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick to open guide"
         click_sound: "item.book.page_turn"
+        on_click: "<open_gui_help>"
 
       # Quick Actions
       register_candidate:
+        gui_slot: 38
         material: EMERALD
         custom_model_data: 0
         display_name: "§a§l📝 REGISTER CANDIDATE"
@@ -279,8 +442,10 @@ gui:
           - ""
           - "§aClick to register!"
         click_sound: "entity.experience_orb.pickup"
+        on_click: "<action_register_candidate>"
 
       vote_now:
+        gui_slot: 40
         material: LIME_CONCRETE
         custom_model_data: 0
         display_name: "§a§l🗳 VOTE NOW!"
@@ -292,8 +457,10 @@ gui:
           - ""
           - "§aClick to vote!"
         click_sound: "ui.button.click"
+        on_click: "<open_gui_voting>"
 
       rate_president:
+        gui_slot: 42
         material: NETHER_STAR
         custom_model_data: 0
         display_name: "§e§l⭐ RATE PRESIDENT"
@@ -305,25 +472,28 @@ gui:
           - ""
           - "§eClick to rate!"
         click_sound: "entity.firework_rocket.launch"
+        on_click: "<action_rate_president>"
 
       # Close Button (Slot 49)
       close_button:
+        gui_slot: 49
         material: BARRIER
         custom_model_data: 0
         display_name: "§c§lClose Menu"
         lore:
           - "§7Click to close"
         click_sound: "block.chest.close"
+        on_click: "<action_close_inventory>"
 
       # Glass Pane Filler
       glass_pane:
-        material: GRAY_STAINED_GLASS_PANE
+        material: AIR
         custom_model_data: 0
         display_name: " "
 
       # Corner Decorations
       corner_decoration:
-        material: ORANGE_STAINED_GLASS_PANE
+        material: AIR
         custom_model_data: 0
         display_name: " "
 
@@ -339,6 +509,7 @@ gui:
           - "§7Cost: §6{cost}"
           - "§aClick to register!"
         click_sound: "entity.experience_orb.pickup"
+        on_click: "<action_register_candidate>"
 
       vote_candidate:
         material: LIME_WOOL
@@ -348,6 +519,7 @@ gui:
           - "§7Choose presidential candidate"
           - "§aClick to vote!"
         click_sound: "ui.button.click"
+        on_click: "<open_gui_voting>"
 
       endorse_candidate:
         material: GOLDEN_APPLE
@@ -357,6 +529,7 @@ gui:
           - "§7Support your chosen candidate"
           - "§eClick to endorse!"
         click_sound: "entity.villager.yes"
+        on_click: "<action_endorse_candidate>"
 
       rate_president_qa:
         material: NETHER_STAR
@@ -366,6 +539,7 @@ gui:
           - "§7Rate the president"
           - "§eClick to rate!"
         click_sound: "entity.firework_rocket.launch"
+        on_click: "<action_rate_president>"
 
       donate_treasury:
         material: GOLD_INGOT
@@ -375,6 +549,7 @@ gui:
           - "§7Donate to national treasury"
           - "§eClick for donation info!"
         click_sound: "block.note_block.pling"
+        on_click: "<action_donate_treasury>"
 
       join_arena:
         material: IRON_SWORD
@@ -384,6 +559,7 @@ gui:
           - "§7Presidential Games active!"
           - "§aClick to join!"
         click_sound: "entity.player.attack.sweep"
+        on_click: "<action_join_arena>"
 
       back_button:
         material: ARROW
@@ -392,3 +568,4 @@ gui:
         lore:
           - "§7Back to main menu"
         click_sound: "item.flintandsteel.use"
+        on_click: "<open_gui_main_menu>"

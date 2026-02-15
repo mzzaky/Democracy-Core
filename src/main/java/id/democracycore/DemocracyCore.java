@@ -92,6 +92,11 @@ public class DemocracyCore extends JavaPlugin {
         // Start scheduled tasks
         startScheduledTasks();
 
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new id.democracycore.placeholders.DemocracyExpansion(this).register();
+            getLogger().info("PlaceholderAPI found! Registered placeholders.");
+        }
+
         getLogger().info("DemocracyCore has been enabled!");
     }
 

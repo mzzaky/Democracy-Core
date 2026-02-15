@@ -1,11 +1,12 @@
 name: DemocracyCore
-version: 1.2.0
+version: 1.3.0
 main: id.democracycore.DemocracyCore
 api-version: '1.21'
 description: A comprehensive democracy and government simulation plugin
 author: DemocracyCore Team
 softdepend:
   - Vault
+  - PlaceholderAPI
 
 commands:
   democracycore:

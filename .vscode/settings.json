@@ -1,5 +1,12 @@
 {
+    "files.exclude": {
+        "**/.version": true
+    },
+    "search.exclude": {
+        "**/.version": true
+    },
     "java.configuration.updateBuildConfiguration": "automatic",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m",
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.runtimes": [
         {
@@ -21,7 +28,6 @@
         }
     ],
     "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-21",
-    "java.home": "C:\\Program Files\\Java\\jdk-21",
     "java.project.importHint": "maven",
     "java.import.maven.enabled": true,
     "java.import.projectConfiguration.update": "automatic",

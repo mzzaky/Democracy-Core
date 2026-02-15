@@ -1,6 +1,6 @@
 # Build script untuk Democracy Core Plugin
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host "Building Democracy Core Plugin v1.2" -ForegroundColor Cyan
+Write-Host "Building Democracy Core Plugin v1.3.0" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -19,7 +19,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "BUILD SUCCESS!" -ForegroundColor Green
     Write-Host "====================================" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Output JAR: target\democracy-core-v1-2-1.2.0.jar" -ForegroundColor Green
+    Write-Host "Output JAR: target\Democracy-Core-Plugin-1.3.0.jar" -ForegroundColor Green
     Write-Host ""
 } else {
     Write-Host ""

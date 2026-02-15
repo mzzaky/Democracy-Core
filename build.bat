@@ -1,7 +1,7 @@
 @echo off
 REM Build script untuk Democracy Core Plugin
 echo ====================================
-echo Building Democracy Core Plugin v1.2
+echo Building Democracy Core Plugin v1.3.0
 echo ====================================
 
 set MAVEN_PATH=C:\Users\mohza\AppData\Roaming\Code\User\globalStorage\pleiades.java-extension-pack-jdk\maven\latest\bin\mvn.cmd
@@ -20,7 +20,7 @@ if %ERRORLEVEL% EQU 0 (
     echo BUILD SUCCESS!
     echo ====================================
     echo.
-    echo Output JAR: target\democracy-core-v1-2-1.2.0.jar
+    echo Output JAR: target\Democracy-Core-Plugin-1.3.0.jar
     echo.
 ) else (
     echo.

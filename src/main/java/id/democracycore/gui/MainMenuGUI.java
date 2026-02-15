@@ -68,61 +68,74 @@ public class MainMenuGUI {
 
         // Player Head (Info Player)
         ItemStack playerHead = createPlayerHead(player, playerData);
-        inv.setItem(4, playerHead);
+        int playerHeadSlot = getGUISlot("gui.main_menu.items.player_head.gui_slot", 4);
+        inv.setItem(playerHeadSlot, playerHead);
 
         // === ROW 2: Government Status ===
 
-        // President Info (Slot 10)
-        ItemStack presidentItem = createPresidentItem(gov);
-        inv.setItem(10, presidentItem);
+        // President Info
+        ItemStack presidentItem = createPresidentItem(gov, player);
+        int presidentSlot = getGUISlot("gui.main_menu.items.president_item.gui_slot", 10);
+        inv.setItem(presidentSlot, presidentItem);
 
-        // Cabinet Info (Slot 12)
-        ItemStack cabinetItem = createCabinetItem(gov);
-        inv.setItem(12, cabinetItem);
+        // Cabinet Info
+        ItemStack cabinetItem = createCabinetItem(gov, player);
+        int cabinetSlot = getGUISlot("gui.main_menu.items.cabinet_item.gui_slot", 12);
+        inv.setItem(cabinetSlot, cabinetItem);
 
-        // Treasury Info (Slot 14)
-        ItemStack treasuryItem = createTreasuryItem(treasury);
-        inv.setItem(14, treasuryItem);
+        // Treasury Info
+        ItemStack treasuryItem = createTreasuryItem(treasury, player);
+        int treasurySlot = getGUISlot("gui.main_menu.items.treasury_item.gui_slot", 14);
+        inv.setItem(treasurySlot, treasuryItem);
 
-        // Active Effects (Slot 16)
-        ItemStack effectsItem = createActiveEffectsItem();
-        inv.setItem(16, effectsItem);
+        // Active Effects
+        ItemStack effectsItem = createActiveEffectsItem(player);
+        int effectsSlot = getGUISlot("gui.main_menu.items.active_effects_item.gui_slot", 16);
+        inv.setItem(effectsSlot, effectsItem);
 
         // === ROW 3: Main Features ===
 
-        // Election (Slot 19)
+        // Election
         ItemStack electionItem = createElectionItem(election, player);
-        inv.setItem(19, electionItem);
+        int electionSlot = getGUISlot("gui.main_menu.items.election_item.gui_slot", 19);
+        inv.setItem(electionSlot, electionItem);
 
-        // Executive Orders (Slot 21)
+        // Executive Orders
         ItemStack ordersItem = createExecutiveOrdersItem(gov, player);
-        inv.setItem(21, ordersItem);
+        int ordersSlot = getGUISlot("gui.main_menu.items.executive_orders_item.gui_slot", 21);
+        inv.setItem(ordersSlot, ordersItem);
 
-        // Presidential Arena (Slot 23)
-        ItemStack arenaItem = createArenaItem(playerData);
-        inv.setItem(23, arenaItem);
+        // Presidential Arena
+        ItemStack arenaItem = createArenaItem(playerData, player);
+        int arenaSlot = getGUISlot("gui.main_menu.items.arena_item.gui_slot", 23);
+        inv.setItem(arenaSlot, arenaItem);
 
-        // Recall System (Slot 25)
-        ItemStack recallItem = createRecallItem();
-        inv.setItem(25, recallItem);
+        // Recall System
+        ItemStack recallItem = createRecallItem(player);
+        int recallSlot = getGUISlot("gui.main_menu.items.recall_item.gui_slot", 25);
+        inv.setItem(recallSlot, recallItem);
 
         // === ROW 4: Info & Statistics ===
 
-        // President History (Slot 28)
-        ItemStack historyItem = createHistoryItem();
-        inv.setItem(28, historyItem);
+        // President History
+        ItemStack historyItem = createHistoryItem(player);
+        int historySlot = getGUISlot("gui.main_menu.items.history_item.gui_slot", 28);
+        inv.setItem(historySlot, historyItem);
 
-        // My Stats (Slot 30)
-        ItemStack statsItem = createMyStatsItem(playerData);
-        inv.setItem(30, statsItem);
+        // My Stats
+        ItemStack statsItem = createMyStatsItem(playerData, player);
+        int statsSlot = getGUISlot("gui.main_menu.items.my_stats_item.gui_slot", 30);
+        inv.setItem(statsSlot, statsItem);
 
-        // Leaderboard (Slot 32)
-        ItemStack leaderboardItem = createLeaderboardItem();
-        inv.setItem(32, leaderboardItem);
+        // Leaderboard
+        ItemStack leaderboardItem = createLeaderboardItem(player);
+        int leaderboardSlot = getGUISlot("gui.main_menu.items.leaderboard_item.gui_slot", 32);
+        inv.setItem(leaderboardSlot, leaderboardItem);
 
-        // Guide/Help (Slot 34)
-        ItemStack helpItem = createHelpItem();
-        inv.setItem(34, helpItem);
+        // Guide/Help
+        ItemStack helpItem = createHelpItem(player);
+        int helpSlot = getGUISlot("gui.main_menu.items.help_item.gui_slot", 34);
+        inv.setItem(helpSlot, helpItem);
 
         // === ROW 5: Quick Actions (if eligible) ===
 
@@ -154,7 +167,8 @@ public class MainMenuGUI {
                         "§7Registration Cost: §6" + MessageUtils.formatNumber(fee),
                         "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
                         "§aClick to register!");
-                inv.setItem(38, registerItem);
+                int registerSlot = getGUISlot("gui.main_menu.items.register_candidate.gui_slot", 38);
+                inv.setItem(registerSlot, registerItem);
             }
         }
 
@@ -169,7 +183,8 @@ public class MainMenuGUI {
                         "",
                         "§aClick to vote!");
                 addGlow(voteItem);
-                inv.setItem(40, voteItem);
+                int voteSlot = getGUISlot("gui.main_menu.items.vote_now.gui_slot", 40);
+                inv.setItem(voteSlot, voteItem);
             }
         }
 
@@ -182,23 +197,33 @@ public class MainMenuGUI {
                     "§7Current rating: §e" + String.format("%.1f", gov.getApprovalRating()) + "/5.0",
                     "",
                     "§eClick to rate!");
-            inv.setItem(42, rateItem);
+            int rateSlot = getGUISlot("gui.main_menu.items.rate_president.gui_slot", 42);
+            inv.setItem(rateSlot, rateItem);
         }
 
         // === ROW 6: Footer ===
 
         // Close Button
         ItemStack closeItem = createItem(Material.BARRIER, "§c§lClose Menu", "§7Click to close");
-        inv.setItem(49, closeItem);
+        int closeSlot = getGUISlot("gui.main_menu.items.close_button.gui_slot", 49);
+        inv.setItem(closeSlot, closeItem);
 
         // Fill empty slots with glass
-        fillGlass(inv);
+        fillGlass(inv, player);
 
         // Decorative corners
-        ItemStack corner = createItem(Material.ORANGE_STAINED_GLASS_PANE, " ");
-        int[] corners = { 0, 8, 45, 53 };
-        for (int c : corners) {
-            inv.setItem(c, corner);
+        // Decorative corners
+        Material cornerMat = getGUIMaterial("gui.main_menu.items.corner_decoration.material");
+
+        // Only set corners if not AIR
+        if (cornerMat != Material.AIR) {
+            String cornerName = getGUIString(player, "gui.main_menu.items.corner_decoration.display_name");
+            ItemStack corner = createConfiguredItem(cornerMat, cornerName, "gui.main_menu.items.corner_decoration");
+
+            int[] corners = { 0, 8, 45, 53 };
+            for (int c : corners) {
+                inv.setItem(c, corner);
+            }
         }
 
         player.openInventory(inv);
@@ -295,23 +320,26 @@ public class MainMenuGUI {
         ItemStack backItem = createItem(Material.ARROW, "§7§lBack", "§7Back to main menu");
         inv.setItem(18, backItem);
 
-        fillGlass(inv);
+        fillGlass(inv, player);
         player.openInventory(inv);
     }
 
     // === GUI Config Helper Methods ===
 
-    private String getGUIString(String path, Object... args) {
+    private String getGUIString(Player player, String path, Object... args) {
         String value = plugin.getGUIConfig().getString(path, "");
         for (int i = 0; i < args.length; i += 2) {
             String placeholder = "{" + args[i] + "}";
             String replacement = String.valueOf(args[i + 1]);
             value = value.replace(placeholder, replacement);
         }
+        if (player != null) {
+            return processPlaceholders(value, player);
+        }
         return value;
     }
 
-    private List<String> getGUILore(String path, Object... args) {
+    private List<String> getGUILore(Player player, String path, Object... args) {
         List<String> lore = plugin.getGUIConfig().getStringList(path);
         List<String> processed = new ArrayList<>();
         for (String line : lore) {
@@ -319,6 +347,9 @@ public class MainMenuGUI {
                 String placeholder = "{" + args[i] + "}";
                 String replacement = String.valueOf(args[i + 1]);
                 line = line.replace(placeholder, replacement);
+            }
+            if (player != null) {
+                line = processPlaceholders(line, player);
             }
             processed.add(line);
         }
@@ -338,6 +369,10 @@ public class MainMenuGUI {
         return plugin.getGUIConfig().getInt(path, 0);
     }
 
+    private int getGUISlot(String path, int defaultSlot) {
+        return plugin.getGUIConfig().getInt(path, defaultSlot);
+    }
+
     private Sound getGUISound(String path) {
         String soundName = plugin.getGUIConfig().getString(path, "ui.button.click");
         try {
@@ -345,6 +380,50 @@ public class MainMenuGUI {
         } catch (IllegalArgumentException e) {
             return Sound.UI_BUTTON_CLICK;
         }
+    }
+
+    /**
+     * Get the configured item flags to hide from gui.yml
+     * 
+     * @param path The path to hide_attributes in gui.yml
+     * @return Array of ItemFlags to hide
+     */
+    private ItemFlag[] getGUIItemFlags(String path) {
+        List<ItemFlag> flags = new ArrayList<>();
+
+        // Check if the value is a string (single value or "ALL")
+        if (plugin.getGUIConfig().isString(path)) {
+            String value = plugin.getGUIConfig().getString(path, "").trim().toUpperCase();
+            if (value.equals("ALL")) {
+                // Return all item flags
+                return ItemFlag.values();
+            } else if (!value.isEmpty()) {
+                // Try to parse single flag
+                try {
+                    flags.add(ItemFlag.valueOf("HIDE_" + value));
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Invalid hide_attributes value at " + path + ": " + value);
+                }
+            }
+        }
+        // Check if the value is a list
+        else if (plugin.getGUIConfig().isList(path)) {
+            List<String> values = plugin.getGUIConfig().getStringList(path);
+            for (String value : values) {
+                String upperValue = value.trim().toUpperCase();
+                if (upperValue.equals("ALL")) {
+                    // Return all item flags
+                    return ItemFlag.values();
+                }
+                try {
+                    flags.add(ItemFlag.valueOf("HIDE_" + upperValue));
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Invalid hide_attributes value at " + path + ": " + value);
+                }
+            }
+        }
+
+        return flags.toArray(new ItemFlag[0]);
     }
 
     // === Item Creation Methods ===
@@ -356,15 +435,16 @@ public class MainMenuGUI {
 
         meta.setOwningPlayer(player);
         meta.setDisplayName(
-                getGUIString("gui.main_menu.items.player_head.display_name", "player_name", player.getName()));
+                getGUIString(player, "gui.main_menu.items.player_head.display_name", "player_name", player.getName()));
 
-        List<String> lore = getGUILore("gui.main_menu.items.player_head.lore",
+        List<String> lore = getGUILore(player, "gui.main_menu.items.player_head.lore",
                 "level", calculateLevel(data),
                 "playtime", MessageUtils.formatTime(data.getTotalPlaytime()),
                 "balance", MessageUtils.formatNumber(plugin.getVaultHook().getBalance(player.getUniqueId())),
                 "status_lines", getStatusLines(player));
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.player_head");
         head.setItemMeta(meta);
 
         return head;
@@ -385,7 +465,7 @@ public class MainMenuGUI {
         return "";
     }
 
-    private ItemStack createPresidentItem(Government gov) {
+    private ItemStack createPresidentItem(Government gov, Player player) {
         ItemStack item;
 
         if (gov.hasPresident()) {
@@ -394,16 +474,16 @@ public class MainMenuGUI {
             ItemMeta meta = item.getItemMeta();
 
             String presName = Bukkit.getOfflinePlayer(gov.getPresidentUUID()).getName();
-            meta.setDisplayName(getGUIString("gui.main_menu.items.president_item.default.display_name"));
+            meta.setDisplayName(getGUIString(player, "gui.main_menu.items.president_item.default.display_name"));
 
-            List<String> lore = getGUILore("gui.main_menu.items.president_item.default.lore",
+            List<String> lore = getGUILore(player, "gui.main_menu.items.president_item.default.lore",
                     "president_name", presName,
                     "term", gov.getCurrentTerm(),
                     "remaining_time", MessageUtils.formatTime(gov.getTermEndTime() - System.currentTimeMillis()),
                     "rating", String.format("%.1f", gov.getApprovalRating()));
 
             meta.setLore(lore);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            applyConfigAttributes(meta, "gui.main_menu.items.president_item.default");
             item.setItemMeta(meta);
             addGlow(item);
         } else {
@@ -411,18 +491,19 @@ public class MainMenuGUI {
             item = new ItemStack(material);
             ItemMeta meta = item.getItemMeta();
 
-            meta.setDisplayName(getGUIString("gui.main_menu.items.president_item.no_president.display_name"));
+            meta.setDisplayName(getGUIString(player, "gui.main_menu.items.president_item.no_president.display_name"));
 
-            List<String> lore = getGUILore("gui.main_menu.items.president_item.no_president.lore");
+            List<String> lore = getGUILore(player, "gui.main_menu.items.president_item.no_president.lore");
 
             meta.setLore(lore);
+            applyConfigAttributes(meta, "gui.main_menu.items.president_item.no_president");
             item.setItemMeta(meta);
         }
 
         return item;
     }
 
-    private ItemStack createCabinetItem(Government gov) {
+    private ItemStack createCabinetItem(Government gov, Player player) {
         ItemStack item = createItem(Material.LECTERN, "§e§l📋 CABINET");
         ItemMeta meta = item.getItemMeta();
 
@@ -444,15 +525,18 @@ public class MainMenuGUI {
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
         lore.add("§7Filled: §f" + filled + "/5");
         lore.add("");
+        lore.add("");
+        lore.add("");
         lore.add("§aClick for cabinet details");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.cabinet_item");
         item.setItemMeta(meta);
 
         return item;
     }
 
-    private ItemStack createTreasuryItem(Treasury treasury) {
+    private ItemStack createTreasuryItem(Treasury treasury, Player player) {
         ItemStack item = createItem(Material.GOLD_BLOCK, "§6§l💰 TREASURY");
         ItemMeta meta = item.getItemMeta();
 
@@ -465,12 +549,13 @@ public class MainMenuGUI {
         lore.add("§aClick for treasury details");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.treasury_item");
         item.setItemMeta(meta);
 
         return item;
     }
 
-    private ItemStack createActiveEffectsItem() {
+    private ItemStack createActiveEffectsItem(Player player) {
         var activeOrders = plugin.getExecutiveOrderManager().getActiveOrders();
         var activeDecisions = plugin.getDataManager().getActiveDecisions();
         int total = activeOrders.size() + activeDecisions.size();
@@ -507,6 +592,7 @@ public class MainMenuGUI {
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.active_effects_item");
         item.setItemMeta(meta);
 
         if (total > 0)
@@ -551,6 +637,7 @@ public class MainMenuGUI {
         lore.add("§aClick to open voting GUI");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.election_item");
         item.setItemMeta(meta);
 
         if (election.isActive() && election.getPhase() == Election.ElectionPhase.VOTING
@@ -591,7 +678,7 @@ public class MainMenuGUI {
         return item;
     }
 
-    private ItemStack createArenaItem(PlayerData data) {
+    private ItemStack createArenaItem(PlayerData data, Player player) {
         boolean isActive = plugin.getArenaManager().isArenaActive();
         Material mat = isActive ? Material.DIAMOND_SWORD : Material.IRON_SWORD;
 
@@ -599,7 +686,10 @@ public class MainMenuGUI {
         ItemMeta meta = item.getItemMeta();
 
         meta.setDisplayName("§4§l⚔ PRESIDENTIAL ARENA");
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+        // Apply attributes from config based on state
+        String statePath = isActive ? "active" : "inactive";
+        applyConfigAttributes(meta, "gui.main_menu.items.arena_item." + statePath);
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -628,7 +718,7 @@ public class MainMenuGUI {
         return item;
     }
 
-    private ItemStack createRecallItem() {
+    private ItemStack createRecallItem(Player player) {
         RecallPetition petition = plugin.getDataManager().getRecallPetition();
         boolean isActive = petition != null &&
                 petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
@@ -664,6 +754,10 @@ public class MainMenuGUI {
         lore.add("§eClick for recall info");
 
         meta.setLore(lore);
+
+        String statePath = isActive ? "active" : "inactive";
+        applyConfigAttributes(meta, "gui.main_menu.items.recall_item." + statePath);
+
         item.setItemMeta(meta);
 
         if (isActive)
@@ -672,7 +766,7 @@ public class MainMenuGUI {
         return item;
     }
 
-    private ItemStack createHistoryItem() {
+    private ItemStack createHistoryItem(Player player) {
         var history = plugin.getDataManager().getAllPresidentHistory();
 
         ItemStack item = createItem(Material.BOOK, "§5§l📚 PRESIDENT HISTORY");
@@ -697,12 +791,13 @@ public class MainMenuGUI {
         lore.add("§aClick to view history");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.history_item");
         item.setItemMeta(meta);
 
         return item;
     }
 
-    private ItemStack createMyStatsItem(PlayerData data) {
+    private ItemStack createMyStatsItem(PlayerData data, Player player) {
         ItemStack item = createItem(Material.COMPASS, "§b§l📊 MY STATS");
         ItemMeta meta = item.getItemMeta();
 
@@ -716,12 +811,13 @@ public class MainMenuGUI {
         lore.add("§aClick for full details");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.my_stats_item");
         item.setItemMeta(meta);
 
         return item;
     }
 
-    private ItemStack createLeaderboardItem() {
+    private ItemStack createLeaderboardItem(Player player) {
         ItemStack item = createItem(Material.GOLDEN_APPLE, "§6§l🏆 LEADERBOARD");
         ItemMeta meta = item.getItemMeta();
 
@@ -735,12 +831,13 @@ public class MainMenuGUI {
         lore.add("§aClick to view leaderboard");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.leaderboard_item");
         item.setItemMeta(meta);
 
         return item;
     }
 
-    private ItemStack createHelpItem() {
+    private ItemStack createHelpItem(Player player) {
         ItemStack item = createItem(Material.KNOWLEDGE_BOOK, "§a§l❓ GUIDE & HELP");
         ItemMeta meta = item.getItemMeta();
 
@@ -756,6 +853,7 @@ public class MainMenuGUI {
         lore.add("§aClick to open guide");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, "gui.main_menu.items.help_item");
         item.setItemMeta(meta);
 
         return item;
@@ -774,6 +872,34 @@ public class MainMenuGUI {
         return item;
     }
 
+    /**
+     * Create an item with configuration support for custom_model_data and
+     * hide_attributes
+     * 
+     * @param material   Material type
+     * @param name       Display name
+     * @param configPath Path to item config in gui.yml (e.g.,
+     *                   "gui.main_menu.items.player_head")
+     * @param lore       Lore lines
+     * @return Configured ItemStack
+     */
+    private ItemStack createConfiguredItem(Material material, String name, String configPath, String... lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        if (lore.length > 0) {
+            meta.setLore(Arrays.asList(lore));
+        }
+
+        // Apply configured attributes
+        if (configPath != null && !configPath.isEmpty()) {
+            applyConfigAttributes(meta, configPath);
+        }
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
     private ItemStack createQuickItem(Material material, String name, String... lore) {
         ItemStack item = createItem(material, name, lore);
         return item;
@@ -786,10 +912,40 @@ public class MainMenuGUI {
         item.setItemMeta(meta);
     }
 
-    private void fillGlass(Inventory inv) {
-        ItemStack glass = createItem(Material.GRAY_STAINED_GLASS_PANE, " ");
+    /**
+     * Apply common config attributes (hide_attributes, custom_model_data) to
+     * ItemMeta
+     */
+    private void applyConfigAttributes(ItemMeta meta, String path) {
+        if (path == null || path.isEmpty())
+            return;
+
+        // Custom Model Data
+        int modelData = getGUICustomModelData(path + ".custom_model_data");
+        if (modelData != 0) {
+            meta.setCustomModelData(modelData);
+        }
+
+        // Hide Attributes
+        ItemFlag[] hideFlags = getGUIItemFlags(path + ".hide_attributes");
+        if (hideFlags.length > 0) {
+            meta.addItemFlags(hideFlags);
+        }
+    }
+
+    private void fillGlass(Inventory inv, Player player) {
+        Material material = getGUIMaterial("gui.main_menu.items.glass_pane.material");
+
+        // If AIR, don't fill anything
+        if (material == Material.AIR) {
+            return;
+        }
+
+        String name = getGUIString(player, "gui.main_menu.items.glass_pane.display_name");
+        ItemStack glass = createConfiguredItem(material, name, "gui.main_menu.items.glass_pane");
+
         for (int i = 0; i < inv.getSize(); i++) {
-            if (inv.getItem(i) == null) {
+            if (inv.getItem(i) == null || inv.getItem(i).getType() == Material.AIR) {
                 inv.setItem(i, glass);
             }
         }
@@ -798,5 +954,220 @@ public class MainMenuGUI {
     private int calculateLevel(PlayerData data) {
         double hours = data.getTotalPlaytime() / (1000.0 * 60 * 60);
         return (int) (hours / 10) + 1;
+    }
+
+    /**
+     * Play click sound for specific GUI slot based on gui.yml configuration
+     * 
+     * @param player The player to play sound for
+     * @param slot   The slot that was clicked
+     */
+    public void playClickSound(Player player, int slot) {
+        String soundPath = getClickSoundPath(slot);
+        if (soundPath != null) {
+            Sound sound = getGUISound(soundPath);
+            MessageUtils.playSound(player, sound);
+        }
+    }
+
+    /**
+     * Get the click_sound configuration path for a specific slot
+     * 
+     * @param slot The inventory slot
+     * @return The path to click_sound in gui.yml, or null if not configured
+     */
+    private String getClickSoundPath(int slot) {
+        // Map slots to their item configuration paths in gui.yml
+        switch (slot) {
+            case 4: // Player Head
+                return "gui.main_menu.items.player_head.click_sound";
+            case 10: // President Item
+                Government gov = plugin.getDataManager().getGovernment();
+                if (gov.hasPresident()) {
+                    return "gui.main_menu.items.president_item.default.click_sound";
+                } else {
+                    return "gui.main_menu.items.president_item.no_president.click_sound";
+                }
+            case 12: // Cabinet
+                return "gui.main_menu.items.cabinet_item.click_sound";
+            case 14: // Treasury
+                return "gui.main_menu.items.treasury_item.click_sound";
+            case 16: // Active Effects
+                var activeOrders = plugin.getExecutiveOrderManager().getActiveOrders();
+                var activeDecisions = plugin.getDataManager().getActiveDecisions();
+                if (activeOrders.size() + activeDecisions.size() > 0) {
+                    return "gui.main_menu.items.active_effects_item.active.click_sound";
+                } else {
+                    return "gui.main_menu.items.active_effects_item.inactive.click_sound";
+                }
+            case 19: // Election
+                return "gui.main_menu.items.election_item.click_sound";
+            case 21: // Executive Orders
+                return "gui.main_menu.items.executive_orders_item.click_sound";
+            case 23: // Arena
+                boolean isActive = plugin.getArenaManager().isArenaActive();
+                if (isActive) {
+                    return "gui.main_menu.items.arena_item.active.click_sound";
+                } else {
+                    return "gui.main_menu.items.arena_item.inactive.click_sound";
+                }
+            case 25: // Recall
+                RecallPetition petition = plugin.getDataManager().getRecallPetition();
+                boolean hasActivePetition = petition != null &&
+                        petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
+                        petition.getPhase() != RecallPetition.RecallPhase.FAILED;
+                if (hasActivePetition) {
+                    return "gui.main_menu.items.recall_item.active.click_sound";
+                } else {
+                    return "gui.main_menu.items.recall_item.inactive.click_sound";
+                }
+            case 28: // History
+                return "gui.main_menu.items.history_item.click_sound";
+            case 30: // My Stats
+                return "gui.main_menu.items.my_stats_item.click_sound";
+            case 32: // Leaderboard
+                return "gui.main_menu.items.leaderboard_item.click_sound";
+            case 34: // Help
+                return "gui.main_menu.items.help_item.click_sound";
+            case 38: // Register Candidate
+                return "gui.main_menu.items.register_candidate.click_sound";
+            case 40: // Vote Now
+                return "gui.main_menu.items.vote_now.click_sound";
+            case 42: // Rate President
+                return "gui.main_menu.items.rate_president.click_sound";
+            case 49: // Close Button
+                return "gui.main_menu.items.close_button.click_sound";
+            default:
+                return null; // No sound for this slot
+        }
+    }
+
+    /**
+     * Play click sound for Quick Actions menu items
+     * 
+     * @param player          The player to play sound for
+     * @param clickedMaterial The material of the item that was clicked
+     */
+    public void playQuickActionsSound(Player player, Material clickedMaterial) {
+        String soundPath = null;
+
+        switch (clickedMaterial) {
+            case EMERALD:
+                soundPath = "gui.quick_actions.items.register_candidate_qa.click_sound";
+                break;
+            case LIME_WOOL:
+                soundPath = "gui.quick_actions.items.vote_candidate.click_sound";
+                break;
+            case GOLDEN_APPLE:
+                soundPath = "gui.quick_actions.items.endorse_candidate.click_sound";
+                break;
+            case NETHER_STAR:
+                soundPath = "gui.quick_actions.items.rate_president_qa.click_sound";
+                break;
+            case GOLD_INGOT:
+                soundPath = "gui.quick_actions.items.donate_treasury.click_sound";
+                break;
+            case IRON_SWORD:
+                soundPath = "gui.quick_actions.items.join_arena.click_sound";
+                break;
+            case ARROW:
+                soundPath = "gui.quick_actions.items.back_button.click_sound";
+                break;
+            default:
+                break;
+        }
+
+        if (soundPath != null) {
+            Sound sound = getGUISound(soundPath);
+            MessageUtils.playSound(player, sound);
+        }
+    }
+
+    /**
+     * Get the configured slot for a specific item
+     * 
+     * @param itemKey     The item key in gui.yml (e.g., "player_head",
+     *                    "president_item")
+     * @param defaultSlot The default slot if not configured
+     * @return The configured slot number
+     */
+    public int getItemSlot(String itemKey, int defaultSlot) {
+        return getGUISlot("gui.main_menu.items." + itemKey + ".gui_slot", defaultSlot);
+    }
+
+    /**
+     * Get the configured GUI action for a specific item
+     * 
+     * @param itemKey The item key in gui.yml (e.g., "player_head",
+     *                "president_item")
+     * @param state   Optional state (e.g., "default", "no_president", "active",
+     *                "inactive")
+     * @return The GUIAction enum value, or UNKNOWN if not configured
+     */
+    public GUIAction getGUIAction(String itemKey, String state) {
+        String path = "gui.main_menu.items." + itemKey;
+        if (state != null && !state.isEmpty()) {
+            path += "." + state;
+        }
+        path += ".on_click";
+
+        String actionStr = plugin.getGUIConfig().getString(path, "");
+        return GUIAction.fromConfig(actionStr);
+    }
+
+    /**
+     * Get the configured GUI action for a specific item without state
+     */
+    public GUIAction getGUIAction(String itemKey) {
+        return getGUIAction(itemKey, null);
+    }
+
+    /**
+     * Get the command value for action_console_command
+     * 
+     * @param itemKey The item key in gui.yml
+     * @param state   Optional state (e.g., "default", "active", etc.)
+     * @return The command string, or null if not configured
+     */
+    public String getGUICommandValue(String itemKey, String state) {
+        String path = "gui.main_menu.items." + itemKey;
+        if (state != null && !state.isEmpty()) {
+            path += "." + state;
+        }
+        path += ".value";
+
+        return plugin.getGUIConfig().getString(path, null);
+    }
+
+    /**
+     * Get the command value without state
+     */
+    public String getGUICommandValue(String itemKey) {
+        return getGUICommandValue(itemKey, null);
+    }
+
+    /**
+     * Process placeholders in command string
+     * 
+     * @param command Command string with placeholders
+     * @param player  Player to replace placeholders for
+     * @return Processed command string
+     */
+    public String processPlaceholders(String command, Player player) {
+        if (command == null || command.isEmpty()) {
+            return command;
+        }
+
+        // Replace %player_name% with actual player name
+        command = command.replace("%player_name%", player.getName());
+        command = command.replace("%player%", player.getName());
+        command = command.replace("%player_uuid%", player.getUniqueId().toString());
+
+        // PlaceholderAPI support (if available)
+        if (plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            command = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, command);
+        }
+
+        return command;
     }
 }

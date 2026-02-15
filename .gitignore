@@ -30,3 +30,6 @@ buildNumber.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Custom exclusions
+.version/
