@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom GUI System - DemocracyCore Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0c10 0%, #111316 50%, #1a1d23 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Luxury background effects - Red Theme */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles effect - Red Theme */
+        .particle {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header Utama */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+            position: relative;
+        }
+
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .page-header p {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        /* Navigation Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .breadcrumb a {
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35), 0 0 50px rgba(220, 38, 38, 0.05);
+        }
+
+        .nav-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 8px;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #e4e6ea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-list a:hover::before {
+            left: 100%;
+        }
+
+        .nav-list a:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            color: #ef4444;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-list a.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(239, 68, 68, 0.05);
+        }
+
+        /* Section Styles */
+        .content-section {
+            padding: 32px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+            scroll-margin-top: 20px;
+            position: relative;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 {
+            color: #ef4444;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.2) 100%);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Text Styles */
+        h3 {
+            color: #ef4444;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
+        h4 {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        li strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3c3c3c;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            color: #9CDCFE;
+            text-shadow: none;
+        }
+
+        p code,
+        li code {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #f87171;
+            font-weight: 500;
+            border: 1px solid #444;
+            box-shadow: none;
+        }
+
+        /* Alert/Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.1);
+        }
+
+        .info-box-title {
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .info-box-content {
+            color: #e4e6ea;
+            line-height: 1.7;
+        }
+
+        /* Custom Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table thead th {
+            background: linear-gradient(135deg, #1a1d23 0%, #111316 100%);
+            color: #ef4444;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(239, 68, 68, 0.2);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(239, 68, 68, 0.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .data-table tbody td {
+            padding: 16px 20px;
+            color: #e4e6ea;
+            font-size: 14px;
+        }
+
+        .data-table tbody td:first-child {
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; width: 3px; height: 3px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; width: 2px; height: 2px; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; width: 4px; height: 4px; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; width: 2px; height: 2px; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; width: 3px; height: 3px; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; width: 2px; height: 2px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; width: 4px; height: 4px; animation-delay: 12s;"></div>
+
+    <div class="page-header">
+        <h1>Custom GUI System</h1>
+        <p>Fully Flexible & Configurable Menu System</p>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="wiki_index.html">Wiki Home</a>
+        <span>›</span>
+        <span style="color: #e4e6ea;">Custom GUI System</span>
+    </div>
+
+    <div class="content-container">
+        <nav class="side-nav">
+            <div class="nav-title">On This Page</div>
+            <ul class="nav-list">
+                <li><a href="#overview" class="active"><span class="nav-dot"></span>Overview</a></li>
+                <li><a href="#configuration"><span class="nav-dot"></span>Configuration</a></li>
+                <li><a href="#attributes"><span class="nav-dot"></span>Item Flags</a></li>
+                <li><a href="#placeholders"><span class="nav-dot"></span>Placeholders</a></li>
+                <li><a href="#requirements"><span class="nav-dot"></span>Requirements</a></li>
+                <li><a href="#papi"><span class="nav-dot"></span>PlaceholderAPI</a></li>
+                <li><a href="#actions"><span class="nav-dot"></span>GUI Actions</a></li>
+                <li><a href="#guide"><span class="nav-dot"></span>Implementation Guide</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section class="content-section" id="overview">
+                <div class="section-title">
+                    <h2>Overview</h2>
+                    <span class="section-badge">System Core</span>
+                </div>
+
+                <p>The updated DemocracyCore GUI system allows for unprecedented flexibility in configuring server menus
+                    through `gui.yml`. Administrators can now fully customize menu layouts, items, and interactions
+                    without modifying any Java code.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        Key Features
+                    </div>
+                    <div class="info-box-content">
+                        <ul>
+                            <li><strong>Flexibility:</strong> Modify item functions without code changes.</li>
+                            <li><strong>Customization:</strong> Add or remove items easily.</li>
+                            <li><strong>Maintainability:</strong> Centralized configuration in `gui.yml`.</li>
+                            <li><strong>State Handling:</strong> Support for context-aware items (e.g., different icons
+                                if a President is active or not).</li>
+                            <li><strong>Adaptive Sizes:</strong> Configure the main menu size (9-54 slots).</li>
+                            <li><strong>Sound Effects:</strong> Play custom sounds on item clicks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="configuration">
+                <div class="section-title">
+                    <h2>Configuration Structure</h2>
+                    <span class="section-badge">gui.yml</span>
+                </div>
+
+                <p>Each item in the GUI is defined in the configuration file with standard properties.</p>
+
+                <h3>GUI Size Configuration</h3>
+                <p>You can configure the size of the main menu inventory. Valid sizes are multiples of 9 (9, 18, 27, 36,
+                    45, 54).</p>
+                <pre><code class="language-yaml">gui:
+  main_menu:
+    inventory_slot: 45  # Sets GUI size to 5 rows (45 slots)
+    items: ...</code></pre>
+
+                <h3>Basic Item Format</h3>
+                <pre><code class="language-yaml">gui:
+  main_menu:
+    items:
+      unique_item_id:
+        gui_slot: 10             # Slot in inventory (0-53)
+        material: GOLDEN_HELMET  # Minecraft Material
+        display_name: "§6Item Name"
+        lore:
+          - "Item description"
+        click_sound: "entity.experience_orb.pickup" # Custom sound on click
+        hide_attributes: ALL      # Hides enchantments/attributes
+        on_click: "<action_name>" # Action to trigger on click</code></pre>
+
+                <h3>Items with Multiple States</h3>
+                <p>Some items can change their appearance based on server state (e.g., Active vs Inactive).</p>
+                <pre><code class="language-yaml">president_item:
+  gui_slot: 10
+  
+  # State when president exists
+  default:
+    material: GOLDEN_HELMET
+    display_name: "§6§l👑 PRESIDENT"
+    on_click: "<open_gui_government>"
+    
+  # State when no president (election phase)
+  no_president:
+    material: BARRIER
+    display_name: "§c§l👑 NO PRESIDENT"
+    on_click: "<open_gui_voting>"</code></pre>
+            </section>
+
+            <section class="content-section" id="attributes">
+                <div class="section-title">
+                    <h2>Item Attributes & Flags</h2>
+                    <span class="section-badge">Hide Attributes</span>
+                </div>
+
+                <p>The <code>hide_attributes</code> feature allows administrators to hide specific information flags on
+                    GUI items, such as enchantments, attributes, durability, etc. This creates a cleaner and more
+                    professional look for the interface.</p>
+
+                <h3>Usage Format</h3>
+                <pre><code class="language-yaml">gui:
+  main_menu:
+    items:
+      example_item:
+        material: DIAMOND_SWORD
+        display_name: "§aEpic Sword"
+        hide_attributes: ALL  # <-- Add this option
+        lore:
+          - "§7Clean look without attributes"</code></pre>
+
+                <h3>Supported Values</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ALL</code></td>
+                            <td>Hides all item flags (Enchants, Attributes, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>ENCHANTS</code></td>
+                            <td>Hides the list of enchantments</td>
+                        </tr>
+                        <tr>
+                            <td><code>ATTRIBUTES</code></td>
+                            <td>Hides attribute modifiers (Damage, Speed, Armor)</td>
+                        </tr>
+                        <tr>
+                            <td><code>UNBREAKABLE</code></td>
+                            <td>Hides the "Unbreakable" tag</td>
+                        </tr>
+                        <tr>
+                            <td><code>DESTROYS</code></td>
+                            <td>Hides "Can Destroy" tag</td>
+                        </tr>
+                        <tr>
+                            <td><code>PLACED_ON</code></td>
+                            <td>Hides "Can be Placed On" tag</td>
+                        </tr>
+                        <tr>
+                            <td><code>POTION_EFFECTS</code></td>
+                            <td>Hides potion effects</td>
+                        </tr>
+                        <tr>
+                            <td><code>DYE</code></td>
+                            <td>Hides dye information (Leather Armor)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Advanced Configuration</h3>
+                <p>You can hide multiple specific flags by using a list format:</p>
+                <pre><code class="language-yaml">special_item:
+  material: DIAMOND_SWORD
+  hide_attributes:
+    - ENCHANTS      # Hide enchantment list
+    - ATTRIBUTES    # Hide attack damage/speed</code></pre>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        Pro Tip
+                    </div>
+                    <div class="info-box-content">
+                        Use <code>ALL</code> for decorative weapons and armor to remove clutter like "Attack Damage" or
+                        "Armor" values. use <code>ATTRIBUTES</code> if you want to show enchantments but hide vanilla
+                        stats.
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="placeholders">
+                <div class="section-title">
+                    <h2>Available Placeholders</h2>
+                    <span class="section-badge">Dynamic Text</span>
+                </div>
+
+                <p>You can use these placeholders in `display_name` and `lore`. Standard PlaceholderAPI placeholders
+                    (e.g., `%player_name%`) are also supported.</p>
+
+                <h3>Player Info</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{player_name}</td>
+                            <td>Player's current username</td>
+                        </tr>
+                        <tr>
+                            <td>{level}</td>
+                            <td>Player's experience level</td>
+                        </tr>
+                        <tr>
+                            <td>{playtime}</td>
+                            <td>Formatted total playtime</td>
+                        </tr>
+                        <tr>
+                            <td>{balance}</td>
+                            <td>Economy balance</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Government Info</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{president_name}</td>
+                            <td>Current president's name</td>
+                        </tr>
+                        <tr>
+                            <td>{term}</td>
+                            <td>Presidential term number</td>
+                        </tr>
+                        <tr>
+                            <td>{remaining_time}</td>
+                            <td>Time remaining in term</td>
+                        </tr>
+                        <tr>
+                            <td>{rating}</td>
+                            <td>Approval rating (0.0 - 5.0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Election & Recall</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{phase}</td>
+                            <td>Current phase (Voting, Collection, etc)</td>
+                        </tr>
+                        <tr>
+                            <td>{votes}</td>
+                            <td>Total votes cast</td>
+                        </tr>
+                        <tr>
+                            <td>{signatures}</td>
+                            <td>Number of recall petition signatures</td>
+                        </tr>
+                        <tr>
+                            <td>{threshold}</td>
+                            <td>Required percentage for success</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="requirements">
+                <div class="section-title">
+                    <h2>Requirement Placeholders</h2>
+                    <span class="section-badge">Dynamic Conditions</span>
+                </div>
+                <p>These placeholders are used to display dynamic requirement values in item lore (e.g., for registering
+                    or voting).</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{req_level}</td>
+                            <td>Required player level</td>
+                        </tr>
+                        <tr>
+                            <td>{req_playtime}</td>
+                            <td>Required playtime (hours)</td>
+                        </tr>
+                        <tr>
+                            <td>{req_balance}</td>
+                            <td>Required economy balance</td>
+                        </tr>
+                        <tr>
+                            <td>{cost}</td>
+                            <td>Registration or action cost</td>
+                        </tr>
+                        <tr>
+                            <td>{current_rating}</td>
+                            <td>Current president rating (0.0-5.0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="papi">
+                <div class="section-title">
+                    <h2>PlaceholderAPI Integration</h2>
+                    <span class="section-badge">External API</span>
+                </div>
+                <p>The plugin supports 40+ PlaceholderAPI placeholders. You can use these in other plugins (scoreboards,
+                    tablists) or within the GUI itself.</p>
+
+                <h4>Government & Election</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_president%</td>
+                            <td>Current President Name</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_approval_rating%</td>
+                            <td>Approval Rating</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_term_time%</td>
+                            <td>Remaining Term Time</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_phase%</td>
+                            <td>Current Election Phase</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_total_votes%</td>
+                            <td>Total Votes Cast</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_election_active%</td>
+                            <td>Is Election Active (true/false)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Treasury & Economy</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_treasury%</td>
+                            <td>Current Treasury Balance</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_treasury_income%</td>
+                            <td>Daily Income</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_treasury_expenses%</td>
+                            <td>Daily Expenses</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_salary_payouts%</td>
+                            <td>Total Salaries Paid</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Player Statistics</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_votes_cast%</td>
+                            <td>Total Votes Cast by Player</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_playtime_hours%</td>
+                            <td>Hours Played</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_times_president%</td>
+                            <td>Times as President</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_is_president%</td>
+                            <td>Is Player President (true/false)</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_cabinet_position%</td>
+                            <td>Cabinet Position Name</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>Arena Stats</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_arena_kd%</td>
+                            <td>K/D Ratio</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_arena_kills%</td>
+                            <td>Arena Kills</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_killstreak%</td>
+                            <td>Current Killstreak</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="actions">
+                <div class="section-title">
+                    <h2>GUI Actions</h2>
+                    <span class="section-badge">Interactions</span>
+                </div>
+
+                <p>The `on_click` property defines what happens when a player clicks an item. Actions are
+                    case-insensitive.</p>
+
+                <h3>Navigation Actions (Open Menus)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action Tag</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&lt;open_gui_main_menu&gt;</code></td>
+                            <td>Opens Main Menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_government&gt;</code></td>
+                            <td>Opens Government Dashboard</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_voting&gt;</code></td>
+                            <td>Opens Election/Voting Menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_cabinet&gt;</code></td>
+                            <td>Opens Cabinet Ministers Menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_treasury&gt;</code></td>
+                            <td>Opens Treasury System Menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_executive_orders&gt;</code></td>
+                            <td>Opens Executive Orders Menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_recall&gt;</code></td>
+                            <td>Opens Recall/Impeachment System</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_player_stats&gt;</code></td>
+                            <td>Opens Player Statistics Profile</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_history&gt;</code></td>
+                            <td>Opens Presidential History Log</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_leaderboard&gt;</code></td>
+                            <td>Opens Server Leaderboards</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;open_gui_help&gt;</code></td>
+                            <td>Opens Help & Guide Menu</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Special Actions (Functional)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action Tag</th>
+                            <th>Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&lt;action_register_candidate&gt;</code></td>
+                            <td>Registers player as presidential candidate</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_rate_president&gt;</code></td>
+                            <td>Prompts to rate the current president</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_endorse_candidate&gt;</code></td>
+                            <td>Prompts to endorse a candidate</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_donate_treasury&gt;</code></td>
+                            <td>Prompts to donate to treasury</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_join_arena&gt;</code></td>
+                            <td>Joins the Presidential Arena (if active)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_arena_info&gt;</code></td>
+                            <td>Displays Arena status and stats</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_refresh_gui&gt;</code></td>
+                            <td>Reloads/Refreshes the current menu</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_close_inventory&gt;</code></td>
+                            <td>Closes the current menu immediately</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;action_console_command&gt;</code></td>
+                            <td>Executes a console command (Requires `value` field)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="guide">
+                <div class="section-title">
+                    <h2>Implementation Guide</h2>
+                    <span class="section-badge">Tutorial</span>
+                </div>
+
+                <h3>How to Add a New Item</h3>
+                <ol>
+                    <li>Open <code>src/main/resources/gui.yml</code>.</li>
+                    <li>Navigate to the <code>items</code> section of the desired menu.</li>
+                    <li>Add a new unique key for your item.</li>
+                    <li>Define the material, slot, name, and action.</li>
+                </ol>
+
+                <div class="info-box">
+                    <div class="info-box-title">Example: Adding a Discord Link</div>
+                    <div class="info-box-content">
+                        <pre><code class="language-yaml">discord_link:
+  gui_slot: 45
+  material: BLUE_WOOL
+  display_name: "§9Join Discord"
+  lore:
+    - "§7Click to get invite link"
+  on_click: "<action_close_inventory>" # Or a custom command action</code></pre>
+                    </div>
+                </div>
+
+                <h3>Troubleshooting</h3>
+                <ul>
+                    <li><strong>Item not appearing?</strong> Check if `gui_slot` overlaps with another item.</li>
+                    <li><strong>Action not working?</strong> Ensure the `on_click` tag is wrapped in angle brackets
+                        <code>&lt; &gt;</code>.
+                    </li>
+                    <li><strong>YAML Errors:</strong> Use a YAML validator to ensure correct indentation.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var navContainer = document.querySelector('.nav-list');
+
+            if (navContainer) {
+                navContainer.querySelectorAll('a').forEach(function (a) {
+                    a.removeAttribute('target');
+                    a.setAttribute('rel', 'noopener');
+                    a.setAttribute('role', 'button');
+                });
+
+                navContainer.addEventListener('click', function (e) {
+                    var link = e.target && e.target.closest ? e.target.closest('a') : null;
+                    if (!link) return;
+
+                    var href = link.getAttribute('href') || '';
+                    if (href.charAt(0) === '#') {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        var id = href.slice(1);
+                        var target = document.getElementById(id);
+                        if (target) {
+                            try {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } catch (err) {
+                                window.scrollTo(0, target.offsetTop);
+                            }
+
+                            navContainer.querySelectorAll('a').forEach(function (a) { a.classList.remove('active'); });
+                            link.classList.add('active');
+                        }
+                    }
+                }, true);
+            }
+
+            var sections = Array.prototype.slice.call(document.querySelectorAll('.content-section'));
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-list a'));
+
+            function highlightNav() {
+                var current = '';
+                var scrollPos = (window.scrollY || window.pageYOffset || 0) + 150;
+                for (var i = 0; i < sections.length; i++) {
+                    var s = sections[i];
+                    if (scrollPos >= s.offsetTop) {
+                        current = s.id;
+                    }
+                }
+                navLinks.forEach(function (link) {
+                    var href = link.getAttribute('href') || '';
+                    if (href === '#' + current) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', highlightNav);
+            window.addEventListener('load', highlightNav);
+        })();
+    </script>
+</body>
+
+</html>

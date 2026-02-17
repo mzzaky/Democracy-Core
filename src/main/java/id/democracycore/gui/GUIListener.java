@@ -68,9 +68,7 @@ public class GUIListener implements Listener {
         if (title.equals(MainMenuGUI.MAIN_MENU_TITLE)) {
             event.setCancelled(true);
             handleMainMenuGUI(player, clicked, event.getSlot());
-        } else if (title.equals(MainMenuGUI.QUICK_ACTIONS_TITLE)) {
-            event.setCancelled(true);
-            handleQuickActionsGUI(player, clicked);
+
         } else if (title.equals(VotingGUI.VOTING_GUI_TITLE)) {
             event.setCancelled(true);
             handleVotingGUI(player, clicked);
@@ -136,7 +134,7 @@ public class GUIListener implements Listener {
 
         // Cancel drag in all our GUIs
         if (title.equals(MainMenuGUI.MAIN_MENU_TITLE) ||
-                title.equals(MainMenuGUI.QUICK_ACTIONS_TITLE) ||
+
                 title.equals(VotingGUI.VOTING_GUI_TITLE) ||
                 title.startsWith(VotingGUI.CANDIDATE_GUI_TITLE) ||
                 title.equals(GovernmentGUI.GOVERNMENT_GUI_TITLE) ||
@@ -369,52 +367,6 @@ public class GUIListener implements Listener {
                 return;
             player.closeInventory();
             MessageUtils.send(player, "<yellow>Gunakan: <white>/dc rate <1-5> <gray>untuk memberi rating presiden");
-        }
-    }
-
-    // === QUICK ACTIONS GUI ===
-
-    private void handleQuickActionsGUI(Player player, ItemStack clicked) {
-        // Play click sound based on material
-        mainMenuGUI.playQuickActionsSound(player, clicked.getType());
-
-        if (clicked.getType() == Material.ARROW) {
-            mainMenuGUI.openMainMenu(player);
-            return;
-        }
-
-        if (clicked.getType() == Material.EMERALD) {
-            player.closeInventory();
-            plugin.getElectionManager().registerCandidate(player, "");
-            return;
-        }
-
-        if (clicked.getType() == Material.LIME_WOOL) {
-            votingGUI.openVotingMenu(player);
-            return;
-        }
-
-        if (clicked.getType() == Material.GOLDEN_APPLE) {
-            player.closeInventory();
-            MessageUtils.send(player, "<yellow>Gunakan: <white>/dc endorse <nama_kandidat>");
-            return;
-        }
-
-        if (clicked.getType() == Material.NETHER_STAR) {
-            player.closeInventory();
-            MessageUtils.send(player, "<yellow>Gunakan: <white>/dc rate <1-5>");
-        }
-
-        if (clicked.getType() == Material.GOLD_INGOT) {
-            player.closeInventory();
-            MessageUtils.send(player, "<yellow>Gunakan: <white>/dc treasury donate <jumlah>");
-            return;
-        }
-
-        if (clicked.getType() == Material.IRON_SWORD) {
-            player.closeInventory();
-            plugin.getArenaManager().joinArena(player);
-            return;
         }
     }
 
@@ -1007,10 +959,6 @@ public class GUIListener implements Listener {
         helpGUI.openHelpMenu(player);
     }
 
-    public void openQuickActionsGUI(Player player) {
-        mainMenuGUI.openQuickActionsMenu(player);
-    }
-
     public void openRecallGUI(Player player) {
         recallGUI.openRecallMenu(player);
     }
@@ -1096,8 +1044,7 @@ public class GUIListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (currentGUI.equals(MainMenuGUI.MAIN_MENU_TITLE)) {
                         mainMenuGUI.openMainMenu(player);
-                    } else if (currentGUI.equals(MainMenuGUI.QUICK_ACTIONS_TITLE)) {
-                        mainMenuGUI.openQuickActionsMenu(player);
+
                     } else if (currentGUI.equals(VotingGUI.VOTING_GUI_TITLE)) {
                         votingGUI.openVotingMenu(player);
                     } else if (currentGUI.equals(GovernmentGUI.GOVERNMENT_GUI_TITLE)) {

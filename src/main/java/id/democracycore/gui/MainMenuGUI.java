@@ -36,7 +36,6 @@ public class MainMenuGUI {
 
     // GUI Titles - loaded from config
     public static String MAIN_MENU_TITLE;
-    public static String QUICK_ACTIONS_TITLE;
 
     public MainMenuGUI(DemocracyCore plugin) {
         this.plugin = plugin;
@@ -45,7 +44,7 @@ public class MainMenuGUI {
 
     public static void loadGUITitles(DemocracyCore plugin) {
         MAIN_MENU_TITLE = plugin.getGUIConfig().getString("gui.main_menu.title", "§6§l⚜ DEMOCRACY CORE ⚜");
-        QUICK_ACTIONS_TITLE = plugin.getGUIConfig().getString("gui.quick_actions.title", "§e§l⚡ QUICK ACTIONS ⚡");
+
     }
 
     private void loadGUITitles() {
@@ -56,7 +55,14 @@ public class MainMenuGUI {
      * Open Main Menu GUI for player
      */
     public void openMainMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 54, MAIN_MENU_TITLE);
+        // Load custom inventory size (default 54, must be multiple of 9)
+        int size = plugin.getGUIConfig().getInt("gui.main_menu.inventory_slot", 54);
+        // Validate size to prevent errors
+        if (size < 9 || size > 54 || size % 9 != 0) {
+            size = 54;
+        }
+
+        Inventory inv = Bukkit.createInventory(null, size, MAIN_MENU_TITLE);
 
         Government gov = plugin.getDataManager().getGovernment();
         Election election = plugin.getDataManager().getElection();
@@ -64,78 +70,86 @@ public class MainMenuGUI {
         PlayerData playerData = plugin.getDataManager().getOrCreatePlayerData(player.getUniqueId(), player.getName());
         playerData.updateLastSeen();
 
+        // Helper to safely set item
+        final int finalSize = size;
+        java.util.function.BiConsumer<Integer, ItemStack> setItemSafe = (slot, item) -> {
+            if (slot >= 0 && slot < finalSize) {
+                inv.setItem(slot, item);
+            }
+        };
+
         // === ROW 1: Header Info ===
 
         // Player Head (Info Player)
         ItemStack playerHead = createPlayerHead(player, playerData);
         int playerHeadSlot = getGUISlot("gui.main_menu.items.player_head.gui_slot", 4);
-        inv.setItem(playerHeadSlot, playerHead);
+        setItemSafe.accept(playerHeadSlot, playerHead);
 
         // === ROW 2: Government Status ===
 
         // President Info
         ItemStack presidentItem = createPresidentItem(gov, player);
         int presidentSlot = getGUISlot("gui.main_menu.items.president_item.gui_slot", 10);
-        inv.setItem(presidentSlot, presidentItem);
+        setItemSafe.accept(presidentSlot, presidentItem);
 
         // Cabinet Info
         ItemStack cabinetItem = createCabinetItem(gov, player);
         int cabinetSlot = getGUISlot("gui.main_menu.items.cabinet_item.gui_slot", 12);
-        inv.setItem(cabinetSlot, cabinetItem);
+        setItemSafe.accept(cabinetSlot, cabinetItem);
 
         // Treasury Info
         ItemStack treasuryItem = createTreasuryItem(treasury, player);
         int treasurySlot = getGUISlot("gui.main_menu.items.treasury_item.gui_slot", 14);
-        inv.setItem(treasurySlot, treasuryItem);
+        setItemSafe.accept(treasurySlot, treasuryItem);
 
         // Active Effects
         ItemStack effectsItem = createActiveEffectsItem(player);
         int effectsSlot = getGUISlot("gui.main_menu.items.active_effects_item.gui_slot", 16);
-        inv.setItem(effectsSlot, effectsItem);
+        setItemSafe.accept(effectsSlot, effectsItem);
 
         // === ROW 3: Main Features ===
 
         // Election
         ItemStack electionItem = createElectionItem(election, player);
         int electionSlot = getGUISlot("gui.main_menu.items.election_item.gui_slot", 19);
-        inv.setItem(electionSlot, electionItem);
+        setItemSafe.accept(electionSlot, electionItem);
 
         // Executive Orders
         ItemStack ordersItem = createExecutiveOrdersItem(gov, player);
         int ordersSlot = getGUISlot("gui.main_menu.items.executive_orders_item.gui_slot", 21);
-        inv.setItem(ordersSlot, ordersItem);
+        setItemSafe.accept(ordersSlot, ordersItem);
 
         // Presidential Arena
         ItemStack arenaItem = createArenaItem(playerData, player);
         int arenaSlot = getGUISlot("gui.main_menu.items.arena_item.gui_slot", 23);
-        inv.setItem(arenaSlot, arenaItem);
+        setItemSafe.accept(arenaSlot, arenaItem);
 
         // Recall System
         ItemStack recallItem = createRecallItem(player);
         int recallSlot = getGUISlot("gui.main_menu.items.recall_item.gui_slot", 25);
-        inv.setItem(recallSlot, recallItem);
+        setItemSafe.accept(recallSlot, recallItem);
 
         // === ROW 4: Info & Statistics ===
 
         // President History
         ItemStack historyItem = createHistoryItem(player);
         int historySlot = getGUISlot("gui.main_menu.items.history_item.gui_slot", 28);
-        inv.setItem(historySlot, historyItem);
+        setItemSafe.accept(historySlot, historyItem);
 
         // My Stats
         ItemStack statsItem = createMyStatsItem(playerData, player);
         int statsSlot = getGUISlot("gui.main_menu.items.my_stats_item.gui_slot", 30);
-        inv.setItem(statsSlot, statsItem);
+        setItemSafe.accept(statsSlot, statsItem);
 
         // Leaderboard
         ItemStack leaderboardItem = createLeaderboardItem(player);
         int leaderboardSlot = getGUISlot("gui.main_menu.items.leaderboard_item.gui_slot", 32);
-        inv.setItem(leaderboardSlot, leaderboardItem);
+        setItemSafe.accept(leaderboardSlot, leaderboardItem);
 
         // Guide/Help
         ItemStack helpItem = createHelpItem(player);
         int helpSlot = getGUISlot("gui.main_menu.items.help_item.gui_slot", 34);
-        inv.setItem(helpSlot, helpItem);
+        setItemSafe.accept(helpSlot, helpItem);
 
         // === ROW 5: Quick Actions (if eligible) ===
 
@@ -156,49 +170,74 @@ public class MainMenuGUI {
                 String playStatus = pPlaytime >= minPlaytime ? "§a✔" : "§c✗";
                 String balStatus = pBalance >= minBalance ? "§a✔" : "§c✗";
 
-                ItemStack registerItem = createQuickItem(Material.EMERALD, "§a§l📝 REGISTER CANDIDATE",
-                        "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                        "§7Requirements:",
-                        String.format("§7• Level: §f%d§7/§a%d %s", pLevel, minLevel, levelStatus),
-                        String.format("§7• Playtime: §f%.1fh§7/§a%.0fh %s", pPlaytime, minPlaytime, playStatus),
-                        String.format("§7• Balance: §f%s§7/§a%s %s", MessageUtils.formatNumber(pBalance),
-                                MessageUtils.formatNumber(minBalance), balStatus),
-                        "",
-                        "§7Registration Cost: §6" + MessageUtils.formatNumber(fee),
-                        "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                        "§aClick to register!");
-                int registerSlot = getGUISlot("gui.main_menu.items.register_candidate.gui_slot", 38);
-                inv.setItem(registerSlot, registerItem);
+                // Formatted Requirement Strings
+                String reqLevelStr = String.format("§7• Level: §f%d§7/§a%d %s", pLevel, minLevel, levelStatus);
+                String reqPlaytimeStr = String.format("§7• Playtime: §f%.1fh§7/§a%.0fh %s", pPlaytime, minPlaytime,
+                        playStatus);
+                String reqBalanceStr = String.format("§7• Balance: §f%s§7/§a%s %s", MessageUtils.formatNumber(pBalance),
+                        MessageUtils.formatNumber(minBalance), balStatus);
+
+                // Create Item from Config
+                String path = "gui.main_menu.items.register_candidate";
+                Material material = getGUIMaterial(path + ".material");
+                ItemStack registerItem = new ItemStack(material);
+                ItemMeta meta = registerItem.getItemMeta();
+
+                meta.setDisplayName(getGUIString(player, path + ".display_name"));
+
+                List<String> lore = getGUILore(player, path + ".lore",
+                        "req_level", reqLevelStr,
+                        "req_playtime", reqPlaytimeStr,
+                        "req_balance", reqBalanceStr,
+                        "cost", MessageUtils.formatNumber(fee));
+
+                meta.setLore(lore);
+                applyConfigAttributes(meta, path);
+                registerItem.setItemMeta(meta);
+
+                int registerSlot = getGUISlot(path + ".gui_slot", 38);
+                setItemSafe.accept(registerSlot, registerItem);
             }
         }
 
         // Vote (if voting phase and haven't voted)
         if (election.getPhase() == Election.ElectionPhase.VOTING) {
             if (!election.hasVoted(player.getUniqueId())) {
-                ItemStack voteItem = createQuickItem(Material.LIME_CONCRETE, "§a§l🗳 VOTE NOW!",
-                        "§7Cast your vote",
-                        "§7for your chosen candidate!",
-                        "",
-                        "§c⚠ Cannot be undone!",
-                        "",
-                        "§aClick to vote!");
+                String path = "gui.main_menu.items.vote_now";
+                Material material = getGUIMaterial(path + ".material");
+                ItemStack voteItem = new ItemStack(material);
+                ItemMeta meta = voteItem.getItemMeta();
+
+                meta.setDisplayName(getGUIString(player, path + ".display_name"));
+                meta.setLore(getGUILore(player, path + ".lore"));
+
+                applyConfigAttributes(meta, path);
+                voteItem.setItemMeta(meta);
                 addGlow(voteItem);
-                int voteSlot = getGUISlot("gui.main_menu.items.vote_now.gui_slot", 40);
-                inv.setItem(voteSlot, voteItem);
+
+                int voteSlot = getGUISlot(path + ".gui_slot", 40);
+                setItemSafe.accept(voteSlot, voteItem);
             }
         }
 
         // Rate President (if there is a president)
         if (gov.hasPresident() && !gov.getPresidentUUID().equals(player.getUniqueId())) {
-            ItemStack rateItem = createQuickItem(Material.NETHER_STAR, "§e§l⭐ RATE PRESIDENT",
-                    "§7Give a rating for",
-                    "§7current president's performance",
-                    "",
-                    "§7Current rating: §e" + String.format("%.1f", gov.getApprovalRating()) + "/5.0",
-                    "",
-                    "§eClick to rate!");
-            int rateSlot = getGUISlot("gui.main_menu.items.rate_president.gui_slot", 42);
-            inv.setItem(rateSlot, rateItem);
+            String path = "gui.main_menu.items.rate_president";
+            Material material = getGUIMaterial(path + ".material");
+            ItemStack rateItem = new ItemStack(material);
+            ItemMeta meta = rateItem.getItemMeta();
+
+            meta.setDisplayName(getGUIString(player, path + ".display_name"));
+
+            List<String> lore = getGUILore(player, path + ".lore",
+                    "current_rating", String.format("%.1f", gov.getApprovalRating()));
+
+            meta.setLore(lore);
+            applyConfigAttributes(meta, path);
+            rateItem.setItemMeta(meta);
+
+            int rateSlot = getGUISlot(path + ".gui_slot", 42);
+            setItemSafe.accept(rateSlot, rateItem);
         }
 
         // === ROW 6: Footer ===
@@ -206,12 +245,11 @@ public class MainMenuGUI {
         // Close Button
         ItemStack closeItem = createItem(Material.BARRIER, "§c§lClose Menu", "§7Click to close");
         int closeSlot = getGUISlot("gui.main_menu.items.close_button.gui_slot", 49);
-        inv.setItem(closeSlot, closeItem);
+        setItemSafe.accept(closeSlot, closeItem);
 
         // Fill empty slots with glass
         fillGlass(inv, player);
 
-        // Decorative corners
         // Decorative corners
         Material cornerMat = getGUIMaterial("gui.main_menu.items.corner_decoration.material");
 
@@ -220,107 +258,12 @@ public class MainMenuGUI {
             String cornerName = getGUIString(player, "gui.main_menu.items.corner_decoration.display_name");
             ItemStack corner = createConfiguredItem(cornerMat, cornerName, "gui.main_menu.items.corner_decoration");
 
-            int[] corners = { 0, 8, 45, 53 };
+            int[] corners = { 0, 8, size - 9, size - 1 };
             for (int c : corners) {
-                inv.setItem(c, corner);
+                setItemSafe.accept(c, corner);
             }
         }
 
-        player.openInventory(inv);
-    }
-
-    /**
-     * Open Quick Actions Menu
-     */
-    public void openQuickActionsMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, QUICK_ACTIONS_TITLE);
-
-        Election election = plugin.getDataManager().getElection();
-        Government gov = plugin.getDataManager().getGovernment();
-
-        int slot = 10;
-
-        // Register (if possible)
-        if (election.getPhase() == Election.ElectionPhase.REGISTRATION) {
-            if (!election.getCandidates().containsKey(player.getUniqueId())) {
-                // Requirements & Stats
-                PlayerData data = plugin.getDataManager().getOrCreatePlayerData(player.getUniqueId(), player.getName());
-
-                int minLevel = plugin.getConfig().getInt("president.requirements.min-level", 100);
-                double minPlaytime = plugin.getConfig().getDouble("president.requirements.min-playtime-hours", 100);
-                double minBalance = plugin.getConfig().getDouble("president.requirements.min-vault-balance", 500000);
-                double fee = plugin.getConfig().getDouble("election.registration-fee", 500000);
-
-                int pLevel = player.getLevel();
-                double pPlaytime = data.getPlaytimeHours();
-                double pBalance = plugin.getVaultHook().getBalance(player.getUniqueId());
-
-                String levelStatus = pLevel >= minLevel ? "§a✔" : "§c✗";
-                String playStatus = pPlaytime >= minPlaytime ? "§a✔" : "§c✗";
-                String balStatus = pBalance >= minBalance ? "§a✔" : "§c✗";
-
-                ItemStack item = createQuickItem(Material.EMERALD, "§a§lRegister Candidate",
-                        "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                        "§7Requirements:",
-                        String.format("§7• Level: §f%d§7/§a%d %s", pLevel, minLevel, levelStatus),
-                        String.format("§7• Playtime: §f%.1fh§7/§a%.0fh %s", pPlaytime, minPlaytime, playStatus),
-                        String.format("§7• Balance: §f%s§7/§a%s %s", MessageUtils.formatNumber(pBalance),
-                                MessageUtils.formatNumber(minBalance), balStatus),
-                        "",
-                        "§7Registration Cost: §6" + MessageUtils.formatNumber(fee),
-                        "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                        "§aClick to register!");
-                inv.setItem(slot++, item);
-            }
-        }
-
-        // Vote (if possible)
-        if (election.getPhase() == Election.ElectionPhase.VOTING) {
-            if (!election.hasVoted(player.getUniqueId())) {
-                ItemStack item = createQuickItem(Material.LIME_WOOL, "§a§lVote Candidate",
-                        "§7Choose presidential candidate",
-                        "§aClick to vote!");
-                addGlow(item);
-                inv.setItem(slot++, item);
-            }
-        }
-
-        // Endorse (if campaign/registration phase)
-        if (election.getPhase() == Election.ElectionPhase.REGISTRATION ||
-                election.getPhase() == Election.ElectionPhase.CAMPAIGN) {
-            ItemStack item = createQuickItem(Material.GOLDEN_APPLE, "§6§lEndorse Candidate",
-                    "§7Support chosen candidate",
-                    "§eClick to endorse!");
-            inv.setItem(slot++, item);
-        }
-
-        // Rate President
-        if (gov.hasPresident()) {
-            ItemStack item = createQuickItem(Material.NETHER_STAR, "§e§lRate President",
-                    "§7Rate the president",
-                    "§eClick to rate!");
-            inv.setItem(slot++, item);
-        }
-
-        // Donate to Treasury
-        ItemStack donateItem = createQuickItem(Material.GOLD_INGOT, "§6§lTreasury Donation",
-                "§7Donate to state treasury",
-                "§eClick for donation info!");
-        inv.setItem(slot++, donateItem);
-
-        // Join Arena
-        if (plugin.getArenaManager().isArenaActive()) {
-            ItemStack arenaItem = createQuickItem(Material.IRON_SWORD, "§c§lJoin Arena",
-                    "§7Presidential Games active!",
-                    "§aClick to join!");
-            inv.setItem(slot++, arenaItem);
-        }
-
-        // Back button
-        ItemStack backItem = createItem(Material.ARROW, "§7§lBack", "§7Back to main menu");
-        inv.setItem(18, backItem);
-
-        fillGlass(inv, player);
         player.openInventory(inv);
     }
 
@@ -560,9 +503,25 @@ public class MainMenuGUI {
         var activeDecisions = plugin.getDataManager().getActiveDecisions();
         int total = activeOrders.size() + activeDecisions.size();
 
-        Material mat = total > 0 ? Material.BEACON : Material.GLASS;
-        ItemStack item = createItem(mat, "§a§l✨ ACTIVE EFFECTS: " + total);
+        String state = total > 0 ? "active" : "inactive";
+        String path = "gui.main_menu.items.active_effects_item." + state;
+
+        Material mat = getGUIMaterial(path + ".material");
+        // Fallback if config is missing material (though getGUIMaterial defaults to
+        // STONE)
+        if (mat == Material.STONE && !plugin.getGUIConfig().contains(path + ".material")) {
+            mat = total > 0 ? Material.BEACON : Material.GLASS;
+        }
+
+        ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
+
+        // Get Display Name from config
+        String displayName = getGUIString(player, path + ".display_name", "total", total);
+        if (displayName.isEmpty()) {
+            displayName = "§a§l✨ ACTIVE EFFECTS: " + total;
+        }
+        meta.setDisplayName(displayName);
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -574,7 +533,8 @@ public class MainMenuGUI {
                 lore.add("§c§lExecutive Orders:");
                 for (ExecutiveOrder order : activeOrders) {
                     lore.add("§7- " + order.getType().getDisplayName());
-                    lore.add("  §8(" + MessageUtils.formatTime(order.getRemainingTime()) + ")");
+                    long remaining = order.getRemainingTime();
+                    lore.add("  §8(" + MessageUtils.formatTime(remaining) + ")");
                 }
             }
 
@@ -584,7 +544,8 @@ public class MainMenuGUI {
                 lore.add("§e§lCabinet Decisions:");
                 for (var decision : activeDecisions) {
                     lore.add("§7- " + decision.getType().getDisplayName());
-                    lore.add("  §8(" + MessageUtils.formatTime(decision.getRemainingTime()) + ")");
+                    long remaining = decision.getRemainingTime();
+                    lore.add("  §8(" + MessageUtils.formatTime(remaining) + ")");
                 }
             }
         }
@@ -592,7 +553,10 @@ public class MainMenuGUI {
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.active_effects_item");
+
+        // Apply attributes from the correct path (active/inactive)
+        applyConfigAttributes(meta, path);
+
         item.setItemMeta(meta);
 
         if (total > 0)
@@ -1039,47 +1003,6 @@ public class MainMenuGUI {
                 return "gui.main_menu.items.close_button.click_sound";
             default:
                 return null; // No sound for this slot
-        }
-    }
-
-    /**
-     * Play click sound for Quick Actions menu items
-     * 
-     * @param player          The player to play sound for
-     * @param clickedMaterial The material of the item that was clicked
-     */
-    public void playQuickActionsSound(Player player, Material clickedMaterial) {
-        String soundPath = null;
-
-        switch (clickedMaterial) {
-            case EMERALD:
-                soundPath = "gui.quick_actions.items.register_candidate_qa.click_sound";
-                break;
-            case LIME_WOOL:
-                soundPath = "gui.quick_actions.items.vote_candidate.click_sound";
-                break;
-            case GOLDEN_APPLE:
-                soundPath = "gui.quick_actions.items.endorse_candidate.click_sound";
-                break;
-            case NETHER_STAR:
-                soundPath = "gui.quick_actions.items.rate_president_qa.click_sound";
-                break;
-            case GOLD_INGOT:
-                soundPath = "gui.quick_actions.items.donate_treasury.click_sound";
-                break;
-            case IRON_SWORD:
-                soundPath = "gui.quick_actions.items.join_arena.click_sound";
-                break;
-            case ARROW:
-                soundPath = "gui.quick_actions.items.back_button.click_sound";
-                break;
-            default:
-                break;
-        }
-
-        if (soundPath != null) {
-            Sound sound = getGUISound(soundPath);
-            MessageUtils.playSound(player, sound);
         }
     }
 

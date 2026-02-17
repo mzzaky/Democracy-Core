@@ -135,6 +135,9 @@ gui:
   # Main Menu GUI Configuration
   main_menu:
     title: "§6§l⚜ DEMOCRACY CORE ⚜"
+    # Custom GUI Size (9, 18, 27, 36, 45, 54)
+    # Ensure all items fit within the chosen size!
+    inventory_slot: 54
     items:
       # Player Head (Slot 4)
       player_head:
@@ -429,17 +432,21 @@ gui:
         on_click: "<open_gui_help>"
 
       # Quick Actions
+      # Quick Actions
       register_candidate:
         gui_slot: 38
         material: EMERALD
         custom_model_data: 0
         display_name: "§a§l📝 REGISTER CANDIDATE"
         lore:
-          - "§7Register yourself as a"
-          - "§7presidential candidate!"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Requirements:"
+          - "{req_level}"
+          - "{req_playtime}"
+          - "{req_balance}"
           - ""
-          - "§eCost: §6{cost}"
-          - ""
+          - "§7Registration Cost: §6{cost}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
           - "§aClick to register!"
         click_sound: "entity.experience_orb.pickup"
         on_click: "<action_register_candidate>"
@@ -450,8 +457,8 @@ gui:
         custom_model_data: 0
         display_name: "§a§l🗳 VOTE NOW!"
         lore:
-          - "§7Cast your vote for"
-          - "§7your chosen candidate!"
+          - "§7Cast your vote"
+          - "§7for your chosen candidate!"
           - ""
           - "§c⚠ Cannot be undone!"
           - ""
@@ -465,8 +472,8 @@ gui:
         custom_model_data: 0
         display_name: "§e§l⭐ RATE PRESIDENT"
         lore:
-          - "§7Rate the current"
-          - "§7president's performance"
+          - "§7Give a rating for"
+          - "§7current president's performance"
           - ""
           - "§7Current rating: §e{current_rating}/5.0"
           - ""
@@ -497,75 +504,4 @@ gui:
         custom_model_data: 0
         display_name: " "
 
-  # Quick Actions Menu Configuration
-  quick_actions:
-    title: "§e§l⚡ QUICK ACTIONS ⚡"
-    items:
-      register_candidate_qa:
-        material: EMERALD
-        custom_model_data: 0
-        display_name: "§a§lRegister Candidate"
-        lore:
-          - "§7Cost: §6{cost}"
-          - "§aClick to register!"
-        click_sound: "entity.experience_orb.pickup"
-        on_click: "<action_register_candidate>"
 
-      vote_candidate:
-        material: LIME_WOOL
-        custom_model_data: 0
-        display_name: "§a§lVote Candidate"
-        lore:
-          - "§7Choose presidential candidate"
-          - "§aClick to vote!"
-        click_sound: "ui.button.click"
-        on_click: "<open_gui_voting>"
-
-      endorse_candidate:
-        material: GOLDEN_APPLE
-        custom_model_data: 0
-        display_name: "§6§lEndorse Candidate"
-        lore:
-          - "§7Support your chosen candidate"
-          - "§eClick to endorse!"
-        click_sound: "entity.villager.yes"
-        on_click: "<action_endorse_candidate>"
-
-      rate_president_qa:
-        material: NETHER_STAR
-        custom_model_data: 0
-        display_name: "§e§lRate President"
-        lore:
-          - "§7Rate the president"
-          - "§eClick to rate!"
-        click_sound: "entity.firework_rocket.launch"
-        on_click: "<action_rate_president>"
-
-      donate_treasury:
-        material: GOLD_INGOT
-        custom_model_data: 0
-        display_name: "§6§lDonate Treasury"
-        lore:
-          - "§7Donate to national treasury"
-          - "§eClick for donation info!"
-        click_sound: "block.note_block.pling"
-        on_click: "<action_donate_treasury>"
-
-      join_arena:
-        material: IRON_SWORD
-        custom_model_data: 0
-        display_name: "§c§lJoin Arena"
-        lore:
-          - "§7Presidential Games active!"
-          - "§aClick to join!"
-        click_sound: "entity.player.attack.sweep"
-        on_click: "<action_join_arena>"
-
-      back_button:
-        material: ARROW
-        custom_model_data: 0
-        display_name: "§7§lBack"
-        lore:
-          - "§7Back to main menu"
-        click_sound: "item.flintandsteel.use"
-        on_click: "<open_gui_main_menu>"

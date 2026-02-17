@@ -111,10 +111,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             case "lb":
                 handleLeaderboard(sender);
                 break;
-            case "quickactions":
-            case "qa":
-                handleQuickActions(sender);
-                break;
+
             default:
                 MessageUtils.send(sender, "general.unknown_command");
                 break;
@@ -886,17 +883,6 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         }
 
         plugin.getGUIListener().openLeaderboardGUI(player);
-    }
-
-    // === QUICK ACTIONS ===
-
-    private void handleQuickActions(CommandSender sender) {
-        if (!(sender instanceof Player player)) {
-            MessageUtils.send(sender, "<red>Perintah ini hanya untuk player!");
-            return;
-        }
-
-        plugin.getGUIListener().openQuickActionsGUI(player);
     }
 
     // === HISTORY ===

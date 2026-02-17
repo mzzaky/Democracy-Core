@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaceholderAPI - DemocracyCore Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0c10 0%, #111316 50%, #1a1d23 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Luxury background effects - Red Theme */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+            position: relative;
+        }
+
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .page-header p {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .breadcrumb a {
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Side Nav */
+        .side-nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35), 0 0 50px rgba(220, 38, 38, 0.05);
+        }
+
+        .nav-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 8px;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #e4e6ea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-list a:hover::before {
+            left: 100%;
+        }
+
+        .nav-list a:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            color: #ef4444;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-list a.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(239, 68, 68, 0.05);
+        }
+
+        .content-section {
+            padding: 32px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+            scroll-margin-top: 20px;
+            position: relative;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 {
+            color: #ef4444;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.2) 100%);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        h3 {
+            color: #ef4444;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
+        h4 {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        ul,
+        ol {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        li strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3c3c3c;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            color: #9CDCFE;
+            text-shadow: none;
+        }
+
+        p code,
+        li code {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #f87171;
+            font-weight: 500;
+            border: 1px solid #444;
+            box-shadow: none;
+        }
+
+        /* Alert/Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.1);
+        }
+
+        .info-box-title {
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .info-box-content {
+            color: #e4e6ea;
+            line-height: 1.7;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table thead th {
+            background: linear-gradient(135deg, #1a1d23 0%, #111316 100%);
+            color: #ef4444;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(239, 68, 68, 0.2);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(239, 68, 68, 0.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .data-table tbody td {
+            padding: 16px 20px;
+            color: #e4e6ea;
+            font-size: 14px;
+        }
+
+        .data-table tbody td:first-child {
+            font-weight: 600;
+            color: #9CDCFE;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Grid for Usage Examples */
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .usage-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .usage-card:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+
+            .side-nav {
+                position: static;
+                margin-bottom: 32px;
+            }
+
+            .nav-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Particles -->
+    <div class="particle" style="left: 10%; width: 3px; height: 3px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; width: 4px; height: 4px; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 60%; width: 2px; height: 2px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 90%; width: 5px; height: 5px; animation-delay: 15s;"></div>
+
+    <div class="page-header">
+        <h1>PlaceholderAPI Integration</h1>
+        <p>Complete Reference for DemocracyCore Placeholders</p>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="wiki_index.html">Wiki Home</a>
+        <span>›</span>
+        <span style="color: #e4e6ea;">PlaceholderAPI</span>
+    </div>
+
+    <div class="content-container">
+        <nav class="side-nav">
+            <div class="nav-title">On This Page</div>
+            <ul class="nav-list">
+                <li><a href="#overview" class="active"><span class="nav-dot"></span>Overview</a></li>
+                <li><a href="#government"><span class="nav-dot"></span>Government</a></li>
+                <li><a href="#election"><span class="nav-dot"></span>Election</a></li>
+                <li><a href="#treasury"><span class="nav-dot"></span>Treasury</a></li>
+                <li><a href="#player"><span class="nav-dot"></span>Player Stats</a></li>
+                <li><a href="#arena"><span class="nav-dot"></span>Arena PvP</a></li>
+                <li><a href="#examples"><span class="nav-dot"></span>Examples</a></li>
+                <li><a href="#troubleshooting"><span class="nav-dot"></span>Troubleshooting</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section class="content-section" id="overview">
+                <div class="section-title">
+                    <h2>Overview</h2>
+                    <span class="section-badge">Integration</span>
+                </div>
+                <p>DemocracyCore provides complete integration with **PlaceholderAPI**, allowing you to display
+                    government data, election status, player statistics, treasury balance, and arena info in other
+                    plugins like scoreboards, chat, tab lists, and holograms.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">Requirements</div>
+                    <div class="info-box-content">
+                        <ul>
+                            <li><strong>PlaceholderAPI</strong> v2.11.6+</li>
+                            <li><strong>DemocracyCore</strong> v1.3.0+</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Installation</h3>
+                <pre><code>/papi ecloud download PlaceholderAPI
+/papi reload
+# Test
+/papi parse me %democracy_president%</code></pre>
+            </section>
+
+            <section class="content-section" id="government">
+                <div class="section-title">
+                    <h2>Government Placeholders</h2>
+                    <span class="section-badge">Global</span>
+                </div>
+
+                <h3>President & Term Info</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_president%</td>
+                            <td>Current president's name</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_term_time%</td>
+                            <td>Remaining term time</td>
+                            <td>Formatted String</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_approval_rating%</td>
+                            <td>Approval rating (1.0 - 5.0)</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_consecutive_terms%</td>
+                            <td>Number of consecutive terms</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_salary_payouts%</td>
+                            <td>Total salary paid this term</td>
+                            <td>Decimal</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Cabinet Ministers</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_defense_minister%</td>
+                            <td>Minister of Defense name</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_treasury_minister%</td>
+                            <td>Minister of Treasury name</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_commerce_minister%</td>
+                            <td>Minister of Commerce name</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_infrastructure_minister%</td>
+                            <td>Minister of Infrastructure name</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_culture_minister%</td>
+                            <td>Minister of Culture name</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="election">
+                <div class="section-title">
+                    <h2>Election Placeholders</h2>
+                    <span class="section-badge">Global</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_phase%</td>
+                            <td>Current election phase</td>
+                            <td>Voting, Campaign</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_phase_time%</td>
+                            <td>Time remaining in phase</td>
+                            <td>2d 8h 15m</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_election_active%</td>
+                            <td>Is election currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_candidates_count%</td>
+                            <td>Number of registered candidates</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_total_votes%</td>
+                            <td>Total votes cast in current election</td>
+                            <td>150</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="treasury">
+                <div class="section-title">
+                    <h2>Treasury Placeholders</h2>
+                    <span class="section-badge">Global</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_treasury%</td>
+                            <td>Current national treasury balance</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_treasury_income%</td>
+                            <td>Total lifetime income</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_treasury_expenses%</td>
+                            <td>Total lifetime expenses</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="player">
+                <div class="section-title">
+                    <h2>Player-Specific Placeholders</h2>
+                    <span class="section-badge">Context Required</span>
+                </div>
+
+                <h3>Government Role</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_is_president%</td>
+                            <td>Is the player president?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_is_cabinet%</td>
+                            <td>Is the player in cabinet?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_cabinet_position%</td>
+                            <td>Cabinet position title</td>
+                            <td>String / None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Lifetime Statistics</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_votes_cast%</td>
+                            <td>Total votes cast (lifetime)</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_times_ran%</td>
+                            <td>Times ran for president</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_times_president%</td>
+                            <td>Times served as president</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_times_cabinet%</td>
+                            <td>Times served as minister</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_endorsements_given%</td>
+                            <td>Total endorsements given</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_endorsements_received%</td>
+                            <td>Total endorsements received</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_total_donations%</td>
+                            <td>Total donations to treasury</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_playtime_hours%</td>
+                            <td>Total playtime in hours</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Current Election Context</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_has_voted%</td>
+                            <td>Has voted in current election?</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_is_candidate%</td>
+                            <td>Is currently a candidate?</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_candidate_votes%</td>
+                            <td>Votes received (if candidate)</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_candidate_endorsements%</td>
+                            <td>Endorsements received (if candidate)</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_candidate_slogan%</td>
+                            <td>Candidate slogan</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="arena">
+                <div class="section-title">
+                    <h2>Arena PvP Placeholders</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_arena_kills%</td>
+                            <td>Total arena kills</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_arena_deaths%</td>
+                            <td>Total arena deaths</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_arena_kd%</td>
+                            <td>Kill/Death ratio</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_killstreak%</td>
+                            <td>Current killstreak</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_best_killstreak%</td>
+                            <td>Best historical killstreak</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="examples">
+                <div class="section-title">
+                    <h2>Usage Examples</h2>
+                </div>
+
+                <div class="usage-grid">
+                    <div class="usage-card">
+                        <h4>Scoreboard (FeatherBoard)</h4>
+                        <pre><code>lines:
+  - "&ePresident: &f%democracy_president%"
+  - "&eRating: &f%democracy_approval_rating%"
+  - "&aElection: &f%democracy_phase%"
+  - "&aTime: &f%democracy_phase_time%"
+  - "&bRole: &f%democracy_cabinet_position%"</code></pre>
+                    </div>
+
+                    <div class="usage-card">
+                        <h4>Chat Prefix (Vault/LP)</h4>
+                        <pre><code># Conditional Formatting
+prefix: "%democracy_is_president:&6[President] :%%democracy_cabinet_position%"</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="troubleshooting">
+                <div class="section-title">
+                    <h2>Troubleshooting</h2>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-title">Placeholders not parsing?</div>
+                    <div class="info-box-content">
+                        <ol>
+                            <li>Ensure <strong>DemocracyCore</strong> is enabled in <code>/plugins</code>.</li>
+                            <li>Run <code>/papi list</code> and check if <code>democracy</code> is listed.</li>
+                            <li>Try <code>/papi reload</code>.</li>
+                            <li>Verify you are using the correct placeholder naming.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var navContainer = document.querySelector('.nav-list');
+
+            if (navContainer) {
+                navContainer.querySelectorAll('a').forEach(function (a) {
+                    a.removeAttribute('target');
+                    a.setAttribute('rel', 'noopener');
+                    a.setAttribute('role', 'button');
+                });
+
+                navContainer.addEventListener('click', function (e) {
+                    var link = e.target && e.target.closest ? e.target.closest('a') : null;
+                    if (!link) return;
+
+                    var href = link.getAttribute('href') || '';
+                    if (href.charAt(0) === '#') {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        var id = href.slice(1);
+                        var target = document.getElementById(id);
+                        if (target) {
+                            try {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } catch (err) {
+                                var start = window.pageYOffset || document.documentElement.scrollTop || 0;
+                                var end = target.getBoundingClientRect().top + start - 10;
+                                var duration = 400, startTime = null;
+                                function step(ts) {
+                                    if (!startTime) startTime = ts;
+                                    var p = Math.min((ts - startTime) / duration, 1);
+                                    var ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+                                    window.scrollTo(0, start + (end - start) * ease);
+                                    if (p < 1) requestAnimationFrame(step);
+                                }
+                                requestAnimationFrame(step);
+                            }
+
+                            navContainer.querySelectorAll('a').forEach(function (a) { a.classList.remove('active'); });
+                            link.classList.add('active');
+                        }
+                    }
+                }, true);
+            }
+
+            var sections = Array.prototype.slice.call(document.querySelectorAll('.content-section'));
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-list a'));
+
+            function highlightNav() {
+                var current = '';
+                var scrollPos = (window.scrollY || window.pageYOffset || 0) + 120;
+                for (var i = 0; i < sections.length; i++) {
+                    var s = sections[i];
+                    if (scrollPos >= s.offsetTop) {
+                        current = s.id;
+                    }
+                }
+                var hasActive = false;
+                navLinks.forEach(function (link) {
+                    var href = link.getAttribute('href') || '';
+                    var isActive = href.charAt(0) === '#' && href.slice(1) === current;
+                    if (isActive) {
+                        link.classList.add('active');
+                        hasActive = true;
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                if (!hasActive && navLinks.length > 0) {
+                    navLinks[0].classList.add('active');
+                    navLinks.slice(1).forEach(function (link) { link.classList.remove('active'); });
+                }
+            }
+            window.addEventListener('scroll', highlightNav, { passive: true });
+            setTimeout(highlightNav, 100);
+        })();
+    </script>
+</body>
+
+</html>

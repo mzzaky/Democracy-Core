@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recall System - DemocracyCore Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0c10 0%, #111316 50%, #1a1d23 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Luxury background effects - Red Theme */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles effect - Red Theme */
+        .particle {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header Utama */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+            position: relative;
+        }
+
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .page-header p {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        /* Navigation Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .breadcrumb a {
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35), 0 0 50px rgba(220, 38, 38, 0.05);
+        }
+
+        .nav-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 8px;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #e4e6ea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-list a:hover::before {
+            left: 100%;
+        }
+
+        .nav-list a:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            color: #ef4444;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-list a.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(239, 68, 68, 0.05);
+        }
+
+        /* Section Styles */
+        .content-section {
+            padding: 32px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+            scroll-margin-top: 20px;
+            position: relative;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 {
+            color: #ef4444;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.2) 100%);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Text Styles */
+        h3 {
+            color: #ef4444;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
+        h4 {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        li strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3c3c3c;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            color: #9CDCFE;
+            text-shadow: none;
+        }
+
+        p code,
+        li code {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #f87171;
+            font-weight: 500;
+            border: 1px solid #444;
+            box-shadow: none;
+        }
+
+        /* Alert/Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.1);
+        }
+
+        .info-box-title {
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .info-box-content {
+            color: #e4e6ea;
+            line-height: 1.7;
+        }
+
+        /* Custom Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table thead th {
+            background: linear-gradient(135deg, #1a1d23 0%, #111316 100%);
+            color: #ef4444;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(239, 68, 68, 0.2);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(239, 68, 68, 0.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .data-table tbody td {
+            padding: 16px 20px;
+            color: #e4e6ea;
+            font-size: 14px;
+        }
+
+        .data-table tbody td:first-child {
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        /* Phases Grid */
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.05), transparent);
+            transition: left 0.6s;
+        }
+
+        .phase-card:hover::before {
+            left: 100%;
+        }
+
+        .phase-card:hover {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .phase-card h4 {
+            color: #ef4444;
+            margin: 0 0 12px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+
+            .side-nav {
+                position: static;
+                margin-bottom: 32px;
+            }
+
+            .nav-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; width: 3px; height: 3px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; width: 2px; height: 2px; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; width: 4px; height: 4px; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; width: 2px; height: 2px; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; width: 3px; height: 3px; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; width: 2px; height: 2px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; width: 4px; height: 4px; animation-delay: 12s;"></div>
+
+    <div class="page-header">
+        <h1>Recall System</h1>
+        <p>Checks and Balances: The People's Power to Remove a President</p>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="wiki_index.html">Wiki Home</a>
+        <span>›</span>
+        <span style="color: #e4e6ea;">Recall System</span>
+    </div>
+
+    <div class="content-container">
+        <nav class="side-nav">
+            <div class="nav-title">On This Page</div>
+            <ul class="nav-list">
+                <li><a href="#overview" class="active"><span class="nav-dot"></span>Overview</a></li>
+                <li><a href="#flow"><span class="nav-dot"></span>Recall Process Flow</a></li>
+                <li><a href="#results"><span class="nav-dot"></span>Results & Consequences</a></li>
+                <li><a href="#security"><span class="nav-dot"></span>Security & Config</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section class="content-section" id="overview">
+                <div class="section-title">
+                    <h2>Overview</h2>
+                    <span class="section-badge">Core Module</span>
+                </div>
+
+                <p>This document explains the technical details of the **Recall System** (Impeachment) module in
+                    DemocracyCore. This system empowers the people to remove a president who is deemed incompetent or
+                    abusing power before their term ends.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        Key Functionality
+                    </div>
+                    <div class="info-box-content">
+                        The Recall System is designed as a mechanism for <em>checks and balances</em>. This process is
+                        not easy to carry out, requiring financial support and a significant majority vote to prevent
+                        abuse of features by minority groups.
+                    </div>
+                </div>
+
+                <p>The impeachment process is divided into two main phases:</p>
+                <ol>
+                    <li><strong>Petition Phase (Collecting):</strong> Collecting signatures of support.</li>
+                    <li><strong>Voting Phase (Recall Vote):</strong> Referendum on the president's fate.</li>
+                </ol>
+            </section>
+
+            <section class="content-section" id="flow">
+                <div class="section-title">
+                    <h2>Recall Process Flow</h2>
+                    <span class="section-badge">4 Steps</span>
+                </div>
+
+                <div class="phases-grid">
+                    <div class="phase-card">
+                        <h4>1. Initiation</h4>
+                        <p>A player starts a petition.</p>
+                        <ul>
+                            <li><strong>Requirements:</strong> President active, not self, no active petition, cooldown
+                                over.</li>
+                            <li><strong>Command:</strong> <code>/dc recall start</code></li>
+                            <li><strong>Cost:</strong> $50,000 Deposit</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>2. Signature Collection</h4>
+                        <p><strong>Duration:</strong> 7 Days</p>
+                        <p>Players sign petition to support recall.</p>
+                        <ul>
+                            <li><strong>Cost to Sign:</strong> $50,000 (Refundable if success)</li>
+                            <li><strong>Target:</strong> 30% of weekly active players</li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>3. Voting Phase</h4>
+                        <p><strong>Duration:</strong> 3 Days</p>
+                        <p>If signatures met, referendum begins.</p>
+                        <ul>
+                            <li><strong>Options:</strong> REMOVE (Red) vs KEEP (Green)</li>
+                            <li><strong>Command:</strong> <code>/dc recall vote &lt;remove/keep&gt;</code></li>
+                        </ul>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>4. Final Decision</h4>
+                        <p>Result determined by Super-Majority (60%).</p>
+                        <p>See "Results & Consequences" for details.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="results">
+                <div class="section-title">
+                    <h2>Results & Consequences</h2>
+                </div>
+
+                <div class="info-box"
+                    style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(21, 128, 61, 0.1) 100%); border-color: rgba(34, 197, 94, 0.3);">
+                    <div class="info-box-title" style="color: #22c55e;">
+                        ✅ Success Scenario (President Removed)
+                    </div>
+                    <div class="info-box-content">
+                        Occurs if <code>REMOVE</code> votes reach super-majority (Default: 60%).
+                        <ul>
+                            <li><strong>President Dismissed:</strong> President immediately loses office.</li>
+                            <li><strong>Full Refund:</strong> All deposits returned 100%.</li>
+                            <li><strong>Emergency Election:</strong> Triggered automatically.</li>
+                            <li><strong>Sound Effect:</strong> Global <em>Wither Death</em> sound played.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        ❌ Failed Scenario (President Stays)
+                    </div>
+                    <div class="info-box-content">
+                        Occurs if <code>REMOVE</code> votes are below threshold.
+                        <ul>
+                            <li><strong>President Safe:</strong> Term continues as normal.</li>
+                            <li><strong>Deposit Forfeited:</strong> All deposits seized to National Treasury.</li>
+                            <li><strong>Cooldown:</strong> System enters cooldown (15 Days).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="security">
+                <div class="section-title">
+                    <h2>Security & Configuration</h2>
+                    <span class="section-badge">config.yml</span>
+                </div>
+
+                <p>To prevent spam and abuse, the system implements:</p>
+                <ul>
+                    <li><strong>High Deposit:</strong> Prevents frivolous petitions.</li>
+                    <li><strong>Dynamic Requirement:</strong> Based on active players in last 7 days.</li>
+                    <li><strong>Super-Majority:</strong> Requires 60% agreement, not just simple majority.</li>
+                </ul>
+
+                <h3>Configuration</h3>
+                <pre><code>recall:
+  # Cooldown time before new petition after failure
+  cooldown-days: 15
+  
+  # Duration of signature collection
+  collection-days: 7
+  
+  # Duration of recall voting
+  voting-days: 3
+  
+  # Security deposit for signers
+  signature-deposit: 50000
+  
+  # Percentage of active players needed to trigger vote
+  required-signature-percentage: 30
+  
+  # Percentage of 'REMOVE' votes needed for success
+  required-percentage: 60</code></pre>
+
+                <h3>Admin Commands</h3>
+                <p>Admins can intervene in the process:</p>
+                <ul>
+                    <li><code>/dc admin cancelrecall &lt;reason&gt;</code>: Cancel active petition and refund everyone.
+                    </li>
+                    <li><code>/dc admin removepresident</code>: Force remove president without voting.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var navContainer = document.querySelector('.nav-list');
+
+            if (navContainer) {
+                navContainer.querySelectorAll('a').forEach(function (a) {
+                    a.removeAttribute('target');
+                    a.setAttribute('rel', 'noopener');
+                    a.setAttribute('role', 'button');
+                });
+
+                navContainer.addEventListener('click', function (e) {
+                    var link = e.target && e.target.closest ? e.target.closest('a') : null;
+                    if (!link) return;
+
+                    var href = link.getAttribute('href') || '';
+                    if (href.charAt(0) === '#') {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        var id = href.slice(1);
+                        var target = document.getElementById(id);
+                        if (target) {
+                            try {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } catch (err) {
+                                var start = window.pageYOffset || document.documentElement.scrollTop || 0;
+                                var end = target.getBoundingClientRect().top + start - 10;
+                                var duration = 400, startTime = null;
+                                function step(ts) {
+                                    if (!startTime) startTime = ts;
+                                    var p = Math.min((ts - startTime) / duration, 1);
+                                    var ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+                                    window.scrollTo(0, start + (end - start) * ease);
+                                    if (p < 1) requestAnimationFrame(step);
+                                }
+                                requestAnimationFrame(step);
+                            }
+
+                            navContainer.querySelectorAll('a').forEach(function (a) { a.classList.remove('active'); });
+                            link.classList.add('active');
+                        }
+                    }
+                }, true);
+            }
+
+            var sections = Array.prototype.slice.call(document.querySelectorAll('.content-section'));
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-list a'));
+
+            function highlightNav() {
+                var current = '';
+                var scrollPos = (window.scrollY || window.pageYOffset || 0) + 120;
+                for (var i = 0; i < sections.length; i++) {
+                    var s = sections[i];
+                    if (scrollPos >= s.offsetTop) {
+                        current = s.id;
+                    }
+                }
+                var hasActive = false;
+                navLinks.forEach(function (link) {
+                    var href = link.getAttribute('href') || '';
+                    var isActive = href.charAt(0) === '#' && href.slice(1) === current;
+                    if (isActive) {
+                        link.classList.add('active');
+                        hasActive = true;
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                if (!hasActive && navLinks.length > 0) {
+                    navLinks[0].classList.add('active');
+                    navLinks.slice(1).forEach(function (link) { link.classList.remove('active'); });
+                }
+            }
+            window.addEventListener('scroll', highlightNav, { passive: true });
+            setTimeout(highlightNav, 100);
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 ========================================
-DEMOCRACY CORE - UPDATE v1.3.0
-Tanggal: 13 Februari 2026
+DEMOCRACY CORE - UPDATE v1.3.0 - CUSTOM GUI
+Tanggal: 16 Februari 2026
 ========================================
 
 ## FITUR BARU
@@ -14,381 +14,146 @@ Tanggal: 13 Februari 2026
      * Treasury data (balance, income, expenses)
      * Player statistics (lifetime stats, arena stats, election participation)
      * Candidate-specific data (votes, endorsements, slogan)
-   
-2. CLASS BARU
-   - DemocracyExpansion.java - Handler untuk PlaceholderAPI integration
-   - Registrasi otomatis saat PlaceholderAPI terdeteksi
-   - Performance optimized dengan direct manager access
 
-3. DOKUMENTASI
-   - PLACEHOLDERAPI.MD - Dokumentasi teknis lengkap (Bahasa Indonesia)
-     * Panduan instalasi
-     * Daftar lengkap semua placeholder dengan contoh output
-     * 6+ contoh penggunaan praktis (scoreboard, tab, hologram, dll)
-     * Troubleshooting guide
-     * Implementasi teknis
-   - PLACEHOLDERAPI-QUICK-REFERENCE.md - Referensi cepat semua placeholder
+    Government (11 placeholders)
+    - %democracy_president%
+    - %democracy_term_time%
+    - %democracy_approval_rating%
+    - %democracy_consecutive_terms%
+    - %democracy_salary_payouts%
+    - %democracy_defense_minister%
+    - %democracy_treasury_minister%
+    - %democracy_commerce_minister%
+    - %democracy_infrastructure_minister%
+    - %democracy_culture_minister%
 
-## PERUBAHAN TEKNIS
+    Election (5 placeholders)
+    - %democracy_phase%
+    - %democracy_phase_time%
+    - %democracy_election_active%
+    - %democracy_candidates_count%
+    - %democracy_total_votes%
 
-- pom.xml: Menambahkan PlaceholderAPI repository dan dependency
-- plugin.yml: Menambahkan PlaceholderAPI ke softdepend
-- DemocracyCore.java: Auto-register expansion jika PlaceholderAPI tersedia
+    Treasury (3 placeholders)
+    - %democracy_treasury%
+    - %democracy_treasury_income%
+    - %democracy_treasury_expenses%
 
-## PLACEHOLDER CATEGORIES
+    Player Statistics (11 placeholders)
+    - %democracy_votes_cast%
+    - %democracy_times_ran%
+    - %democracy_times_president%
+    - %democracy_times_cabinet%
+    - %democracy_endorsements_given%
+    - %democracy_endorsements_received%
+    - %democracy_total_donations%
+    - %democracy_playtime_hours%
+    - %democracy_is_president%
+    - %democracy_is_cabinet%
+    - %democracy_cabinet_position%
 
-### Government (11 placeholders)
-- %democracy_president%
-- %democracy_term_time%
-- %democracy_approval_rating%
-- %democracy_consecutive_terms%
-- %democracy_salary_payouts%
-- %democracy_defense_minister%
-- %democracy_treasury_minister%
-- %democracy_commerce_minister%
-- %democracy_infrastructure_minister%
-- %democracy_culture_minister%
+    Arena Stats (5 placeholders)
+    - %democracy_arena_kills%
+    - %democracy_arena_deaths%
+    - %democracy_arena_kd%
+    - %democracy_killstreak%
+    - %democracy_best_killstreak%
 
-### Election (5 placeholders)
-- %democracy_phase%
-- %democracy_phase_time%
-- %democracy_election_active%
-- %democracy_candidates_count%
-- %democracy_total_votes%
+    Election Participation (5 placeholders)
+    - %democracy_has_voted%
+    - %democracy_is_candidate%
+    - %democracy_candidate_votes%
+    - %democracy_candidate_endorsements%
+    - %democracy_candidate_slogan%
 
-### Treasury (3 placeholders)
-- %democracy_treasury%
-- %democracy_treasury_income%
-- %democracy_treasury_expenses%
+    COMPATIBILITY
 
-### Player Statistics (11 placeholders)
-- %democracy_votes_cast%
-- %democracy_times_ran%
-- %democracy_times_president%
-- %democracy_times_cabinet%
-- %democracy_endorsements_given%
-- %democracy_endorsements_received%
-- %democracy_total_donations%
-- %democracy_playtime_hours%
-- %democracy_is_president%
-- %democracy_is_cabinet%
-- %democracy_cabinet_position%
+    Plugin ini sekarang kompatibel dengan:
+    - FeatherBoard / AnimatedScoreboard (scoreboards)
+    - TAB Plugin (tab list)
+    - DeluxeMenus (GUI menus)
+    - HolographicDisplays (holograms)
+    - Essentials / CMI (chat formatting)
+    - Dan semua plugin yang support PlaceholderAPI
+    CUSTOM GUI ENHANCEMENTS
 
-### Arena Stats (5 placeholders)
-- %democracy_arena_kills%
-- %democracy_arena_deaths%
-- %democracy_arena_kd%
-- %democracy_killstreak%
-- %democracy_best_killstreak%
-
-### Election Participation (5 placeholders)
-- %democracy_has_voted%
-- %democracy_is_candidate%
-- %democracy_candidate_votes%
-- %democracy_candidate_endorsements%
-- %democracy_candidate_slogan%
-
-## COMPATIBILITY
-
-Plugin ini sekarang kompatibel dengan:
-- FeatherBoard / AnimatedScoreboard (scoreboards)
-- TAB Plugin (tab list)
-- DeluxeMenus (GUI menus)
-- HolographicDisplays (holograms)
-- Essentials / CMI (chat formatting)
-- Dan semua plugin yang support PlaceholderAPI
-
-## CUSTOM GUI ENHANCEMENTS
-
-4. CLICK SOUND SYSTEM
+2. CUSTOM GUI UPDATE
+   - Menambahkan dokumentasi (comment help) pada bagian header gui.yml
    - Implementasi fungsi click_sound yang sudah dikonfigurasi di gui.yml
-   - Setiap item di GUI kini memiliki audio feedback saat diklik
-   - 21 item dengan sound yang dikustomisasi
-   - Dynamic sound berdasarkan state (active/inactive, ada/kosong)
-   
-   File yang dimodifikasi:
-   - MainMenuGUI.java: 
-     * Method playClickSound(Player, int slot)
-     * Method getClickSoundPath(int slot) - mapping slot ke config path
-     * Method playQuickActionsSound(Player, Material) - untuk Quick Actions menu
-   - GUIListener.java:
-     * Integrasi playClickSound() di handleMainMenuGUI()
-     * Integrasi playQuickActionsSound() di handleQuickActionsGUI()
-   
-   Sound Configuration Examples:
-   - Player Head: "entity.player.levelup"
-   - President (ada): "block.anvil.use"
-   - President (kosong): "block.anvil.break"
-   - Arena (active): "entity.player.attack.crit"
-   - Arena (inactive): "entity.player.attack.sweep"
-   - Recall (active): "block.redstone_torch.burnout"
-   - Recall (inactive): "block.torch.extinguish"
-   - Treasury: "block.note_block.pling"
-   - Election: "item.book.page_turn"
-   
-   Features:
-   - Fallback sound (UI_BUTTON_CLICK) jika sound tidak valid
-   - Sound dimainkan SEBELUM action (instant feedback)
-   - Volume 1.0f, Pitch 1.0f (dapat disesuaikan)
-
-5. CUSTOMIZABLE SLOT POSITIONS
+      - Setiap item di GUI kini memiliki audio feedback saat diklik
+      - Dynamic sound berdasarkan state (active/inactive, ada/kosong)
    - Menambahkan parameter gui_slot ke semua item di gui.yml
-   - Posisi slot sekarang dapat dikustomisasi tanpa mengubah kode Java
-   - Support untuk semua 17 item di Main Menu GUI
-   
-   File yang dimodifikasi:
-   - gui.yml:
-     * Menambahkan gui_slot untuk setiap item
-     * Dokumentasi di header tentang cara menggunakan gui_slot
-   - MainMenuGUI.java:
-     * Method getGUISlot(String path, int defaultSlot)
-     * Method getItemSlot(String itemKey, int defaultSlot) - public API
-     * Semua inv.setItem() kini membaca slot dari config
-   - GUIListener.java:
-     * Handler dinamis menggunakan mainMenuGUI.getItemSlot()
-     * Tidak lagi hardcoded slot positions
-   
-   Configurable Items:
-   - player_head (default: 4)
-   - president_item (default: 10)
-   - cabinet_item (default: 12)
-   - treasury_item (default: 14)
-   - active_effects_item (default: 16)
-   - election_item (default: 19)
-   - executive_orders_item (default: 21)
-   - arena_item (default: 23)
-   - recall_item (default: 25)
-   - history_item (default: 28)
-   - my_stats_item (default: 30)
-   - leaderboard_item (default: 32)
-   - help_item (default: 34)
-   - register_candidate (default: 38)
-   - vote_now (default: 40)
-   - rate_president (default: 42)
-   - close_button (default: 49)
-   
-   Features:
-   - Fallback ke default slot jika tidak dikonfigurasi
-   - Inventory 54-slot (0-53)
-   - Backward compatible dengan konfigurasi lama
-   - Hot-reload supported (cukup reload config)
-   
-   Contoh Penggunaan:
-   # Pindahkan player head dari slot 4 ke 13
-   player_head:
-     gui_slot: 13
-     
-   # Swap president dan treasury
-   president_item:
-     gui_slot: 14
-   treasury_item:
-     gui_slot: 10
-
-6. FLEXIBLE GUI ACTION SYSTEM
-   - Sistem GUI yang lebih fleksibel dengan konfigurasi on_click di gui.yml
-   - Setiap item kini dapat dikustomisasi untuk membuka GUI berbeda
-   - Administrator dapat mengubah fungsi item tanpa perlu edit code Java
-   - Mendukung multiple states (default/no_president, active/inactive)
-   
-   File yang ditambahkan:
-   - GUIAction.java (NEW):
-     * Enum untuk semua possible GUI actions
-     * Method fromConfig(String) untuk parsing action dari config
-     * 18 predefined actions (11 OPEN_GUI_*, 7 ACTION_*)
-   
-   File yang dimodifikasi:
-   - gui.yml:
-     * Menambahkan on_click untuk semua 24 items
-     * Menghapus gui_id (tidak digunakan di code)
-     * Header dokumentasi komprehensif (47 baris)
-     * Daftar lengkap semua available actions
-   - MainMenuGUI.java:
-     * Method getGUIAction(String itemKey, String state)
-     * Method getGUIAction(String itemKey) - overload tanpa state
-     * Support untuk reading on_click dari config dengan state support
-   
-   Available Actions:
-   
-   === OPEN GUI ACTIONS (11) ===
-   - <open_gui_main_menu>          : Opens Main Menu GUI
-   - <open_gui_player_stats>       : Opens Player Statistics GUI
-   - <open_gui_government>         : Opens Government GUI
-   - <open_gui_voting>             : Opens Voting/Election GUI
-   - <open_gui_cabinet>            : Opens Cabinet GUI
-   - <open_gui_treasury>           : Opens Treasury GUI
-   - <open_gui_executive_orders>   : Opens Executive Orders GUI
-   - <open_gui_recall>             : Opens Recall System GUI
-   - <open_gui_history>            : Opens Presidential History GUI
-   - <open_gui_leaderboard>        : Opens Leaderboard GUI
-   - <open_gui_help>               : Opens Help/Guide GUI
-   
-   === SPECIAL ACTIONS (7) ===
-   - <action_register_candidate>   : Register as presidential candidate
-   - <action_rate_president>       : Show rating command message
-   - <action_close_inventory>      : Close inventory
-   - <action_arena_info>           : Show arena information
-   - <action_endorse_candidate>    : Show endorse command message
-   - <action_donate_treasury>      : Show donate command message
-   - <action_join_arena>           : Join presidential arena
-   
-   Configuration Examples:
-   
-   # Single state item
-   player_head:
-     gui_slot: 4
-     material: PLAYER_HEAD
-     on_click: "<open_gui_player_stats>"
-   
-   # Multiple states item
-   president_item:
-     gui_slot: 10
-     default:  # When president exists
-       material: GOLDEN_HELMET
-       on_click: "<open_gui_government>"
-     no_president:  # When no president
-       material: BARRIER
-       on_click: "<open_gui_voting>"
-   
-   Features:
-   - Case-insensitive action parsing
-   - Support untuk angle brackets format <action>
-   - Fallback ke UNKNOWN action jika tidak ditemukan
-   - Multiple state support (default, no_president, active, inactive)
-   - Backward compatible dengan sistem click handling lama
-   - Hot-reload supported
-   
-   Benefits:
-   - Fleksibilitas: Ubah fungsi item tanpa edit Java
-   - Maintainability: Semua config GUI di satu tempat
-   - Customization: Layout dan behavior dapat disesuaikan server
-   - Extensibility: Mudah menambah GUI/action baru
-   
-   Dokumentasi:
-   - .docs/GUI-FLEXIBLE-SYSTEM.md (NEW):
-     * Panduan lengkap sistem GUI fleksibel
-     * Struktur konfigurasi dan format
-     * Daftar semua actions dengan deskripsi
-     * Cara menambahkan GUI/action baru
-     * Contoh implementasi
-     * Troubleshooting guide
-     * Future enhancements roadmap
-
-
-7. HIDE ATTRIBUTES SYSTEM
+      - Posisi slot sekarang dapat dikustomisasi tanpa mengubah kode Java
    - Sistem baru untuk menyembunyikan item flags/attributes pada GUI items
-   - Membuat tampilan GUI lebih bersih dan profesional
-   - Konfigurasi via hide_attributes di gui.yml
-   
-   File yang dimodifikasi:
-   - gui.yml:
-     * Menambahkan dokumentasi hide_attributes (opsi ALL, ENCHANTS, dll)
-     * Implementasi pada Arena Item (hide: ALL)
-     * Implementasi pada President Item (hide: ATTRIBUTES)
-   - MainMenuGUI.java:
-     * Method getGUIItemFlags(String path) - parsing config ke ItemFlag
-     * Update createPresidentItem() & createArenaItem()
-     * Method createConfiguredItem() - auto-apply flags dari config
-     * Refactor createItem() untuk menghindari ambiguity
-   
-   Features:
-   - Single value support: hide_attributes: ALL
-   - List support: hide_attributes:
-       - ENCHANTS
-       - ATTRIBUTES
-   - All ItemFlags supported (HIDE_ENCHANTS, HIDE_ATTRIBUTES, dll)
-   - State-aware configuration (bisa beda untuk active/inactive state)
-   
-   Dokumentasi:
-   - docs/GUI_HIDE_ATTRIBUTES.md (NEW) - Panduan lengkap fitur hide attributes
+      - Single value support: hide_attributes: ALL
+      - List support: hide_attributes:
+          - ENCHANTS
+          - ATTRIBUTES
+      - All ItemFlags supported (HIDE_ENCHANTS, HIDE_ATTRIBUTES, dll)
+      - State-aware configuration (bisa beda untuk active/inactive state)
+    - PLACEHOLDERAPI SUPPORT IN GUI
+      - Full support for PlaceholderAPI placeholders in gui.yml
+      - Can be used in display_name, lore, and command values
+      - Initializes automatically if PlaceholderAPI is present
+      - Supports both internal placeholders ({player_name}) and PAPI placeholders (%democracy_president%)
+   - CUSTOMIZABLE GUI SIZE
+      - Menambahkan opsi inventory_slot pada gui.yml
+      - Administrator kini dapat mengubah ukuran Main Menu GUI (9, 18, 27, 36, 45, 54 slot)
+      - Sistem auto-adapt untuk dekorasi corner sesuai ukuran GUI
+      - Validasi error check untuk memastikan ukuran GUI valid (kelipatan 9)
+   - Sistem GUI yang lebih fleksibel dengan konfigurasi on_click di gui.yml
+      - Setiap item kini dapat dikustomisasi untuk membuka GUI berbeda atau menjalankan special actions.
+      - Administrator dapat mengubah fungsi item tanpa perlu edit code Java
+      - Mendukung multiple states (default/no_president, active/inactive)
 
-8. ADVANCED SPECIAL ACTIONS
-   - Penambahan 2 action baru untuk kontrol GUI yang lebih canggih
-   - Generic action handling system di GUIListener
-   
-   New Actions:
-   - <action_refresh_gui>: Reload/refresh GUI saat ini
-     * Berguna untuk update data realtime (misal: setelah vote)
-   - <action_console_command>: Eksekusi command console
-     * Mendukung placeholder %player_name%
-     * Mendukung PlaceholderAPI parsing
-     * Requires 'value' field di config
-   
-   File yang dimodifikasi:
-   - GUIAction.java: Menambahkan enum baru
-   - MainMenuGUI.java: 
-     * Method getGUICommandValue() - baca command dari config
-     * Method processPlaceholders() - support PAPI & internal placeholder
-   - GUIListener.java:
-     * Implementasi executeGUIAction() - generic handler
-     * Centralized logic untuk semua GUI actions
-   
-   Contoh Penggunaan:
-     # Refresh GUI
-     on_click: "<action_refresh_gui>"
-     
-     # Execute Console Command
-     on_click: "<action_console_command>"
-     value: "give %player_name% diamond 1"
+      Available Actions and Special Action:
+      
+      === OPEN GUI ACTIONS (11) ===
+      - <open_gui_main_menu>          : Opens Main Menu GUI
+      - <open_gui_player_stats>       : Opens Player Statistics GUI
+      - <open_gui_government>         : Opens Government GUI
+      - <open_gui_voting>             : Opens Voting/Election GUI
+      - <open_gui_cabinet>            : Opens Cabinet GUI
+      - <open_gui_treasury>           : Opens Treasury GUI
+      - <open_gui_executive_orders>   : Opens Executive Orders GUI
+      - <open_gui_recall>             : Opens Recall System GUI
+      - <open_gui_history>            : Opens Presidential History GUI
+      - <open_gui_leaderboard>        : Opens Leaderboard GUI
+      - <open_gui_help>               : Opens Help/Guide GUI
+      
+      === SPECIAL ACTIONS (7) ===
+      - <action_register_candidate>   : Register as presidential candidate
+      - <action_rate_president>       : Show rating command message
+      - <action_close_inventory>      : Close inventory
+      - <action_arena_info>           : Show arena information
+      - <action_endorse_candidate>    : Show endorse command message
+      - <action_donate_treasury>      : Show donate command message
+      - <action_join_arena>           : Join presidential arena
+      - <action_refresh_gui>          : Refresh GUI
+      - <action_console_command>      : Run console command
 
-
-9. BUG FIX: GUI FILLER & CORNER DECORATION
+3. BUG FIX: GUI FILLER & CORNER DECORATION
    - Memperbaiki isu dimana material glass_pane dan corner_decoration hardcoded
    - Sekarang sepenuhnya membaca dari config gui.yml
    - Mendukung penggunaan material AIR untuk menghilangkan filler/dekorasi
-   
-   File yang dimodifikasi:
-   - MainMenuGUI.java:
-     * Update method fillGlass() - membaca material dari config
-     * Update openMainMenu() - membaca material corner_decoration dari config
-     * Handle logic khusus untuk material AIR (skip placement)
+   - Memperbaiki isu dimana item active_effects_item menggunakan hardcoded material dan nama
+   - Sekarang sepenuhnya membaca konfigurasi dari gui.yml berdasarkan state (active/inactive)
+   - Memastikan hide_attributes berfungsi dengan benar pada item ini sesuai state
+
+4. REFACTOR: QUICK ACTIONS MENU ITEMS
+   - Mengubah implementasi item Quick Actions (Register, Vote, Rate) agar tidak hardcoded
+   - Sepenuhnya membaca konfigurasi dari gui.yml (Material, Name, Lore, Attributes)
+   - Menambahkan placeholder persyaratan dinamis di gui.yml:
+     * {req_level}      : Status level requirement
+     * {req_playtime}   : Status playtime requirement
+     * {req_balance}    : Status balance requirement
+     * {cost}           : Biaya registrasi
+     * {current_rating} : Rating presiden saat ini
+
+5. REMOVED: QUICK ACTIONS GUI
+   - Menghapus fitur menu gui quick actions yang terpisah
+   - Menu ini dianggap redundan karena fungsinya sudah tercakup dalam main menu
 
 
-10. REFACTOR: APPLY CONFIG ATTRIBUTES HELPER
-    - Membuat method helper pusat `applyConfigAttributes` di MainMenuGUI
-    - Memastikan semua item GUI secara konsisten mendukung:
-      * `hide_attributes` (menyembunyikan flags)
-      * `custom_model_data` (custom texture pack support)
-    - Menghapus kode duplikat di setiap method pembuatan item
-    - Item baru otomatis mendukung fitur ini tanpa coding tambahan
-    
-    File yang dimodifikasi:
-    - MainMenuGUI.java:
-      * Menambahkan private method `applyConfigAttributes(ItemMeta, String path)`
-      * Update `createConfiguredItem` menggunakan helper ini
-      * Refactor semua item creator (President, Cabinet, Treasury, dll) menggunakan helper ini
-
-
-
-11. PLACEHOLDERAPI SUPPORT IN GUI
-    - Full support for PlaceholderAPI placeholders in gui.yml
-    - Can be used in display_name, lore, and command values
-    - Initializes automatically if PlaceholderAPI is present
-    - Supports both internal placeholders ({player_name}) and PAPI placeholders (%democracy_president%)
-    
-    File yang dimodifikasi:
-    - MainMenuGUI.java:
-      * Update getGUIString() - process placeholders
-      * Update getGUILore() - process placeholders per line
-      * Update all createItem methods to pass Player object
-    - gui.yml:
-      * Added documentation note about PAPI support
-
-
-## TESTING
-
-✅ Build successful (mvn clean package)
-✅ Semua 40+ placeholder terimplementasi
-✅ Real-time data update
-✅ Performance optimized
-✅ Click sound system fully functional
-✅ GUI slot customization working
-✅ GUI filler & corner decoration dapat dikustomisasi (AIR supported)
-✅ Flexible GUI action system implemented
-✅ All 24 items configured with on_click actions
-✅ Multiple state support (default/no_president, active/inactive) working
-✅ GUI documentation complete (.docs/GUI-FLEXIBLE-SYSTEM.md)
-✅ Backward compatibility maintained
-✅ Hide attributes functional (ALL/ATTRIBUTES)
-✅ Special actions (<refresh>/<console>) implemented generically
 
 ========================================

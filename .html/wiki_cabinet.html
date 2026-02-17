@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabinet System - DemocracyCore Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0c10 0%, #111316 50%, #1a1d23 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Luxury background effects - Red Theme */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles effect - Red Theme */
+        .particle {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header Utama */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+            position: relative;
+        }
+
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .page-header p {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        /* Navigation Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .breadcrumb a {
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35), 0 0 50px rgba(220, 38, 38, 0.05);
+        }
+
+        .nav-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 8px;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #e4e6ea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-list a:hover::before {
+            left: 100%;
+        }
+
+        .nav-list a:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            color: #ef4444;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-list a.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(239, 68, 68, 0.05);
+        }
+
+        /* Section Styles */
+        .content-section {
+            padding: 32px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+            scroll-margin-top: 20px;
+            position: relative;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 {
+            color: #ef4444;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.2) 100%);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Text Styles */
+        h3 {
+            color: #ef4444;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
+        h4 {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        li strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3c3c3c;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            color: #9CDCFE;
+            text-shadow: none;
+        }
+
+        p code,
+        li code {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #f87171;
+            font-weight: 500;
+            border: 1px solid #444;
+            box-shadow: none;
+        }
+
+        /* Alert/Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.1);
+        }
+
+        .info-box-title {
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .info-box-content {
+            color: #e4e6ea;
+            line-height: 1.7;
+        }
+
+        /* Custom Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table thead th {
+            background: linear-gradient(135deg, #1a1d23 0%, #111316 100%);
+            color: #ef4444;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(239, 68, 68, 0.2);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(239, 68, 68, 0.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .data-table tbody td {
+            padding: 16px 20px;
+            color: #e4e6ea;
+            font-size: 14px;
+        }
+
+        .data-table tbody td:first-child {
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        /* Phases Grid */
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.05), transparent);
+            transition: left 0.6s;
+        }
+
+        .phase-card:hover::before {
+            left: 100%;
+        }
+
+        .phase-card:hover {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .phase-card h4 {
+            color: #ef4444;
+            margin: 0 0 12px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+
+            .side-nav {
+                position: static;
+                margin-bottom: 32px;
+            }
+
+            .nav-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; width: 3px; height: 3px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; width: 2px; height: 2px; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; width: 4px; height: 4px; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; width: 2px; height: 2px; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; width: 3px; height: 3px; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; width: 2px; height: 2px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; width: 4px; height: 4px; animation-delay: 12s;"></div>
+
+    <div class="page-header">
+        <h1>Cabinet System</h1>
+        <p>The President's Right Hand in Server Administration</p>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="wiki_index.html">Wiki Home</a>
+        <span>›</span>
+        <span style="color: #e4e6ea;">Cabinet System</span>
+    </div>
+
+    <div class="content-container">
+        <nav class="side-nav">
+            <div class="nav-title">On This Page</div>
+            <ul class="nav-list">
+                <li><a href="#overview" class="active"><span class="nav-dot"></span>Overview</a></li>
+                <li><a href="#positions"><span class="nav-dot"></span>Cabinet Positions</a></li>
+                <li><a href="#powers"><span class="nav-dot"></span>Ministry Powers</a></li>
+                <li><a href="#mechanics"><span class="nav-dot"></span>Mechanics & Limits</a></li>
+                <li><a href="#configuration"><span class="nav-dot"></span>Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section class="content-section" id="overview">
+                <div class="section-title">
+                    <h2>Overview</h2>
+                    <span class="section-badge">Core Module</span>
+                </div>
+
+                <p>This document explains in detail the structure, function, and power of the **Cabinet of Ministers**
+                    in the server administration. Ministers are the President's right hand who help manage specific
+                    aspects of the server.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        Key Functionality
+                    </div>
+                    <div class="info-box-content">
+                        There are 5 strategic ministry positions that can be appointed by the President. Each minister
+                        has a focus area, special chat prefix, and unique abilities known as <strong>Cabinet
+                            Decisions</strong>.
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="positions">
+                <div class="section-title">
+                    <h2>Cabinet Positions</h2>
+                    <span class="section-badge">5 Roles</span>
+                </div>
+
+                <div class="phases-grid">
+                    <div class="phase-card">
+                        <h4>1. Minister of Defense</h4>
+                        <p><strong>Prefix:</strong> <code>&4[MoD]</code></p>
+                        <p><strong>Focus:</strong> Server security, PvP, and territory protection.</p>
+                        <p>Responsible for security stability and managing combat events.</p>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>2. Minister of Treasury</h4>
+                        <p><strong>Prefix:</strong> <code>&2[MoT]</code></p>
+                        <p><strong>Focus:</strong> Economy, taxes, and market.</p>
+                        <p>Managing economic stability and distributing wealth.</p>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>3. Minister of Commerce</h4>
+                        <p><strong>Prefix:</strong> <code>&9[MoC]</code></p>
+                        <p><strong>Focus:</strong> Player trade, shops, and resources.</p>
+                        <p>Improving trade activity and availability of rare items.</p>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>4. Minister of Infrastructure</h4>
+                        <p><strong>Prefix:</strong> <code>&7[MoI]</code></p>
+                        <p><strong>Focus:</strong> Building, land claims, and materials.</p>
+                        <p>Facilitating city building and public projects.</p>
+                    </div>
+
+                    <div class="phase-card">
+                        <h4>5. Minister of Culture</h4>
+                        <p><strong>Prefix:</strong> <code>&d[MoK]</code></p>
+                        <p><strong>Focus:</strong> Events, entertainment, and community experience.</p>
+                        <p>Keeping community spirit high through festivals and celebrations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="powers">
+                <div class="section-title">
+                    <h2>Ministry Powers (Decisions)</h2>
+                </div>
+
+                <p>Each minister has access to a set of special policies called <strong>Cabinet Decisions</strong>.
+                    These policies have a cost (from the National Treasury) and a specific duration.</p>
+
+                <h3>🛡️ Defense (MoD)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Duration</th>
+                            <th>Effect</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DECLARE_WAR</td>
+                            <td>24 Hours</td>
+                            <td>Activates War Games Event.</td>
+                            <td>PvP zone open with double loot.</td>
+                        </tr>
+                        <tr>
+                            <td>MILITARY_DRAFT</td>
+                            <td>-</td>
+                            <td>Conscription & PvP Tournament.</td>
+                            <td>Gives basic combat items to all players.</td>
+                        </tr>
+                        <tr>
+                            <td>DEFENSE_PROTOCOL</td>
+                            <td>12 Hours</td>
+                            <td>National defense protocol.</td>
+                            <td>Reduces damage taken by all players by 20%.</td>
+                        </tr>
+                        <tr>
+                            <td>ARMORY_DISCOUNT</td>
+                            <td>24 Hours</td>
+                            <td>Weaponry subsidy.</td>
+                            <td>30% discount for weapons & armor in NPC shops.</td>
+                        </tr>
+                        <tr>
+                            <td>BORDER_PATROL</td>
+                            <td>48 Hours</td>
+                            <td>Border patrol.</td>
+                            <td>Spawns elite mobs at borders with special drops.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>💰 Treasury (MoT)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Duration</th>
+                            <th>Effect</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TAX_HOLIDAY</td>
+                            <td>24 Hours</td>
+                            <td>Tax Exemption.</td>
+                            <td>No server transaction tax.</td>
+                        </tr>
+                        <tr>
+                            <td>ECONOMIC_STIMULUS</td>
+                            <td>Instant</td>
+                            <td>Direct Cash Assistance (BLT).</td>
+                            <td>Distributes 10k Vault Points to all online players.</td>
+                        </tr>
+                        <tr>
+                            <td>AUCTION_BOOST</td>
+                            <td>48 Hours</td>
+                            <td>Auction market boost.</td>
+                            <td>Doubles auction limits & reduces admin fees.</td>
+                        </tr>
+                        <tr>
+                            <td>TREASURY_BONUS</td>
+                            <td>12 Hours</td>
+                            <td>state dividend.</td>
+                            <td>+50% money from killing mobs & mining.</td>
+                        </tr>
+                        <tr>
+                            <td>MARKET_CRASH</td>
+                            <td>6 Hours</td>
+                            <td>Market crisis simulation.</td>
+                            <td>40% discount at Admin Shop (Flash Sale).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>📈 Commerce (MoC)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Duration</th>
+                            <th>Effect</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TRADE_FAIR</td>
+                            <td>24 Hours</td>
+                            <td>Trade Exhibition.</td>
+                            <td>Exclusive item merchant NPC appears.</td>
+                        </tr>
+                        <tr>
+                            <td>RESOURCE_BOOM</td>
+                            <td>12 Hours</td>
+                            <td>Resource Boom.</td>
+                            <td>x2 Drop rate for mining, farming, fishing.</td>
+                        </tr>
+                        <tr>
+                            <td>MERCHANT_CARAVAN</td>
+                            <td>6 Hours</td>
+                            <td>Merchant Caravan.</td>
+                            <td>Caravan NPC with rare items at low prices.</td>
+                        </tr>
+                        <tr>
+                            <td>BLACK_FRIDAY</td>
+                            <td>48 Hours</td>
+                            <td>Massive Promotion.</td>
+                            <td>Free shop ads & increased visibility.</td>
+                        </tr>
+                        <tr>
+                            <td>TREASURE_HUNT</td>
+                            <td>Instant</td>
+                            <td>Treasure Hunt.</td>
+                            <td>Scatters 20 treasure chests across the map.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🏗️ Infrastructure (MoI)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Duration</th>
+                            <th>Effect</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CONSTRUCTION_BOOM</td>
+                            <td>24 Hours</td>
+                            <td>Construction Acceleration.</td>
+                            <td>Haste III + Jump Boost II effect globally.</td>
+                        </tr>
+                        <tr>
+                            <td>FREE_REAL_ESTATE</td>
+                            <td>48 Hours</td>
+                            <td>Land Subsidy.</td>
+                            <td>50% discount on claim block costs.</td>
+                        </tr>
+                        <tr>
+                            <td>BUILDERS_PARADISE</td>
+                            <td>12 Hours</td>
+                            <td>Builder's Paradise.</td>
+                            <td>Double drops for building items (stone, wood).</td>
+                        </tr>
+                        <tr>
+                            <td>PUBLIC_WORKS</td>
+                            <td>30 Mins</td>
+                            <td>Public Project.</td>
+                            <td>Rain of building materials at spawn.</td>
+                        </tr>
+                        <tr>
+                            <td>INFRASTRUCTURE_GRANT</td>
+                            <td>Instant</td>
+                            <td>Construction Grant.</td>
+                            <td>Gives 50k to 10 random players to build.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🎨 Culture (MoK)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Duration</th>
+                            <th>Effect</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>FESTIVAL_WEEK</td>
+                            <td>72 Hours</td>
+                            <td>Festival Week.</td>
+                            <td>Minigames tournament with prizes.</td>
+                        </tr>
+                        <tr>
+                            <td>DOUBLE_XP_WEEKEND</td>
+                            <td>48 Hours</td>
+                            <td>XP Party.</td>
+                            <td>2x XP gain server-wide.</td>
+                        </tr>
+                        <tr>
+                            <td>FIREWORK_SHOW</td>
+                            <td>24 Hours</td>
+                            <td>Fireworks Party.</td>
+                            <td>Automatic firework show every hour at spawn.</td>
+                        </tr>
+                        <tr>
+                            <td>CULTURAL_EXCHANGE</td>
+                            <td>24 Hours</td>
+                            <td>Cultural Exchange.</td>
+                            <td>NPC trading rare decoration items.</td>
+                        </tr>
+                        <tr>
+                            <td>COMMUNITY_EVENT</td>
+                            <td>Instant</td>
+                            <td>Community Competition.</td>
+                            <td>Starts building/PvP event with 500k prize.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" id="mechanics">
+                <div class="section-title">
+                    <h2>Mechanics & Limits</h2>
+                </div>
+
+                <p>The cabinet system operates under strict rules to ensure fair governance and economic stability.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        Appointment & Removal
+                    </div>
+                    <div class="info-box-content">
+                        Only the President has the authority to appoint or dismiss ministers.
+                        <br>
+                        <strong>Command:</strong> <code>/dc cabinet appoint &lt;position&gt; &lt;player&gt;</code>
+                    </div>
+                </div>
+
+                <h3>Other Requirements</h3>
+                <ul>
+                    <li><strong>Cost:</strong> Every decision consumes funds directly from the <strong>National
+                            Treasury</strong>.</li>
+                    <li><strong>Cooldown:</strong> There is a cooldown period between decision usages (Default: 48 Hours
+                        per minister).</li>
+                    <li><strong>Eligibility:</strong> The minister must be currently in office.</li>
+                    <li><strong>Funds:</strong> The Treasury must have sufficient balance to cover the cost.</li>
+                </ul>
+            </section>
+
+            <section class="content-section" id="configuration">
+                <div class="section-title">
+                    <h2>Configuration</h2>
+                    <span class="section-badge">config.yml</span>
+                </div>
+
+                <p>Cost and duration settings can be modified in <code>config.yml</code> under the
+                    <code>cabinet.decisions</code> node.
+                </p>
+
+                <p>Ensure to restart the server or reload the configuration for changes to take effect.</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var navContainer = document.querySelector('.nav-list');
+
+            if (navContainer) {
+                navContainer.querySelectorAll('a').forEach(function (a) {
+                    a.removeAttribute('target');
+                    a.setAttribute('rel', 'noopener');
+                    a.setAttribute('role', 'button');
+                });
+
+                navContainer.addEventListener('click', function (e) {
+                    var link = e.target && e.target.closest ? e.target.closest('a') : null;
+                    if (!link) return;
+
+                    var href = link.getAttribute('href') || '';
+                    if (href.charAt(0) === '#') {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        var id = href.slice(1);
+                        var target = document.getElementById(id);
+                        if (target) {
+                            try {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } catch (err) {
+                                var start = window.pageYOffset || document.documentElement.scrollTop || 0;
+                                var end = target.getBoundingClientRect().top + start - 10;
+                                var duration = 400, startTime = null;
+                                function step(ts) {
+                                    if (!startTime) startTime = ts;
+                                    var p = Math.min((ts - startTime) / duration, 1);
+                                    var ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+                                    window.scrollTo(0, start + (end - start) * ease);
+                                    if (p < 1) requestAnimationFrame(step);
+                                }
+                                requestAnimationFrame(step);
+                            }
+
+                            navContainer.querySelectorAll('a').forEach(function (a) { a.classList.remove('active'); });
+                            link.classList.add('active');
+                        }
+                    }
+                }, true);
+            }
+
+            var sections = Array.prototype.slice.call(document.querySelectorAll('.content-section'));
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-list a'));
+
+            function highlightNav() {
+                var current = '';
+                var scrollPos = (window.scrollY || window.pageYOffset || 0) + 120;
+                for (var i = 0; i < sections.length; i++) {
+                    var s = sections[i];
+                    if (scrollPos >= s.offsetTop) {
+                        current = s.id;
+                    }
+                }
+                var hasActive = false;
+                navLinks.forEach(function (link) {
+                    var href = link.getAttribute('href') || '';
+                    var isActive = href.charAt(0) === '#' && href.slice(1) === current;
+                    if (isActive) {
+                        link.classList.add('active');
+                        hasActive = true;
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                if (!hasActive && navLinks.length > 0) {
+                    navLinks[0].classList.add('active');
+                    navLinks.slice(1).forEach(function (link) { link.classList.remove('active'); });
+                }
+            }
+            window.addEventListener('scroll', highlightNav, { passive: true });
+            setTimeout(highlightNav, 100);
+        })();
+    </script>
+</body>
+
+</html>

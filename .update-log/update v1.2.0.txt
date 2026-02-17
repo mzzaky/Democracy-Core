@@ -20,3 +20,6 @@
 
 16. menambahkan sub gui "Goverment Salary", gui ini berisi informasi total jumlah gaji yang telah diterima oleh presiden dan menteri, dan informasi kapan gaji akan tersedia lagi.
 17. mengubah sistem gaji presiden dan menteri dari automatis menjadi klaim manual yang tersedia pada gui "Goverment Salary"
+
+
+Date Release: 12-2-2026

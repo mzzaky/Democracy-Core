@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Log - DemocracyCore Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0c10 0%, #111316 50%, #1a1d23 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Luxury background effects - Red Theme (from wiki_arena.html) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles effect - Red Theme */
+        .particle {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header Utama */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .page-header h1 {
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+            position: relative;
+        }
+
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .page-header p {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        .current-version {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 30px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .current-version span {
+            color: #22c55e;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Navigation Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .breadcrumb a {
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #f87171;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35), 0 0 50px rgba(220, 38, 38, 0.05);
+        }
+
+        .nav-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 8px;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #e4e6ea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-list a:hover::before {
+            left: 100%;
+        }
+
+        .nav-list a:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            color: #ef4444;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-list a.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .version-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(239, 68, 68, 0.05);
+        }
+
+        /* Version Section */
+        .version-section {
+            padding: 32px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.05);
+            scroll-margin-top: 20px;
+            position: relative;
+        }
+
+        .version-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+        }
+
+        .version-section:last-child {
+            border-bottom: none;
+        }
+
+        .version-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            padding: 8px;
+            margin: -8px;
+            border-radius: 12px;
+        }
+
+        .version-header:hover {
+            background: rgba(239, 68, 68, 0.02);
+        }
+
+        /* Collapse/Expand Button */
+        .version-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .version-toggle:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.2) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
+        }
+
+        .version-toggle-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .version-section.collapsed .version-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .version-toggle-text {
+            font-size: 11px;
+        }
+
+        /* Version Content */
+        .version-content {
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .version-section.collapsed .version-content {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            margin-bottom: 0;
+            pointer-events: none;
+        }
+
+        .version-section:not(.collapsed) .version-content {
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Collapsed state indicator */
+        .version-section.collapsed {
+            padding-bottom: 24px;
+        }
+
+        .version-section.collapsed .version-header {
+            margin-bottom: 0;
+        }
+
+        /* Header Left Side */
+        .version-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .version-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .version-title h2 {
+            color: #ef4444;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .version-type {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .version-type.major {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .version-type.feature {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .version-type.patch {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.1);
+        }
+
+        .version-type.update {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(147, 51, 234, 0.2) 100%);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1);
+        }
+
+        .release-date {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Change Categories */
+        .change-category {
+            margin-bottom: 32px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 12px;
+            border-left: 3px solid;
+        }
+
+        .category-header.added {
+            border-color: #22c55e;
+        }
+
+        .category-header.fixed {
+            border-color: #ef4444;
+        }
+
+        .category-header.improved {
+            border-color: #3b82f6;
+        }
+
+        .category-header.enhanced {
+            border-color: #a855f7;
+        }
+
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .category-icon.added {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .category-icon.fixed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .category-icon.improved {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .category-icon.enhanced {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .category-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Change Items */
+        .change-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0 40px;
+        }
+
+        .change-item {
+            margin-bottom: 16px;
+            color: #d1d5db;
+            line-height: 1.7;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .change-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .change-item strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .sub-item {
+            margin-left: 24px;
+            margin-top: 8px;
+            color: #9ca3af;
+            font-size: 14px;
+            list-style: none;
+        }
+
+        .sub-item::before {
+            content: '→';
+            margin-right: 8px;
+            color: #6b7280;
+        }
+
+        /* Code Inline */
+        code {
+            background: rgba(239, 68, 68, 0.1);
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: #ef4444;
+            font-family: 'Outfit', monospace;
+            font-size: 13px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Overview Box */
+        .overview-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(185, 28, 28, 0.05) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.05);
+        }
+
+        .overview-title {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .overview-stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+
+        .stat-label {
+            color: #9ca3af;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            color: #ef4444;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+
+            .side-nav {
+                position: static;
+                margin-bottom: 32px;
+            }
+
+            .nav-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .version-section {
+                padding: 24px;
+            }
+
+            .version-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .version-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .version-header-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .change-list {
+                margin-left: 20px;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .version-section {
+                padding: 20px;
+            }
+
+            .change-list {
+                margin-left: 10px;
+            }
+
+            .change-item {
+                padding-left: 16px;
+            }
+        }
+
+        /* Scrollbar Customization */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; width: 3px; height: 3px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; width: 2px; height: 2px; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; width: 4px; height: 4px; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; width: 2px; height: 2px; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; width: 3px; height: 3px; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; width: 2px; height: 2px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; width: 4px; height: 4px; animation-delay: 12s;"></div>
+    <div class="particle" style="left: 80%; width: 3px; height: 3px; animation-delay: 14s;"></div>
+    <div class="particle" style="left: 90%; width: 2px; height: 2px; animation-delay: 16s;"></div>
+
+    <div class="page-header">
+        <h1>Release Log</h1>
+        <p>Track all updates and features for Democracy Core Plugin</p>
+        <span>Latest Version: v1.3.0</span>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="wiki_index.html">Wiki Home</a>
+        <span>›</span>
+        <span style="color: #e4e6ea;">Release Log</span>
+    </div>
+
+    <div class="content-container">
+        <nav class="side-nav">
+            <div class="nav-title">Version History</div>
+            <ul class="nav-list">
+                <li><a href="#v1-3-0" class="active">v1.3.0 <span class="version-badge">Custom GUI</span></a></li>
+                <li><a href="#v1-2-0">v1.2.0 <span class="version-badge">Treasury</span></a></li>
+                <li><a href="#v1-1-0">v1.1.0 <span class="version-badge">GUI Update</span></a></li>
+                <li><a href="#v1-0-0">v1.0.0 <span class="version-badge">Initial</span></a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <!-- Version 1.3.0 (Latest - Open by default) -->
+            <section class="version-section" id="v1-3-0">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.3.0</h2>
+                            <span class="version-type feature">Custom GUI & Placeholders</span>
+                        </div>
+                        <div class="release-date">February 16, 2026</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            This update introduces comprehensive PlaceholderAPI support with over 40 new placeholders, a
+                            fully customizable GUI system with dynamic sound effects, adjustable sizes, and flexible
+                            item configurations, alongside significant refactoring and bug fixes.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">15+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">System</div>
+                                <div class="stat-value">GUI / API</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Update</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PlaceholderAPI Integration -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - PlaceholderAPI Integration</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>PlaceholderAPI Support</strong>
+                                <br>Added soft dependency for PlaceholderAPI integration.
+                            </li>
+                            <li class="change-item">
+                                <strong>Comprehensive Placeholders</strong>
+                                <br>Implemented 40+ placeholders covering various game aspects:
+                                <div class="sub-item">Government: <code>%democracy_president%</code>,
+                                    <code>%democracy_approval_rating%</code>, etc.
+                                </div>
+                                <div class="sub-item">Election: <code>%democracy_phase%</code>,
+                                    <code>%democracy_total_votes%</code>, etc.
+                                </div>
+                                <div class="sub-item">Treasury: <code>%democracy_treasury%</code>,
+                                    <code>%democracy_treasury_income%</code>, etc.
+                                </div>
+                                <div class="sub-item">Player Stats: <code>%democracy_votes_cast%</code>,
+                                    <code>%democracy_playtime_hours%</code>, etc.
+                                </div>
+                                <div class="sub-item">Arena: <code>%democracy_arena_kd%</code>,
+                                    <code>%democracy_killstreak%</code>, etc.
+                                </div>
+                                <div class="sub-item">Candidate: <code>%democracy_candidate_votes%</code>,
+                                    <code>%democracy_candidate_slogan%</code></div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Expanded Compatibility</strong>
+                                <br>Verified support for external visualization plugins:
+                                <div class="sub-item">FeatherBoard / AnimatedScoreboard</div>
+                                <div class="sub-item">TAB Plugin & HolographicDisplays</div>
+                                <div class="sub-item">DeluxeMenus & Essentials/CMI</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Custom GUI Update -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">↑</div>
+                            <div class="category-title">Improved - Custom GUI System</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Click Sound Feedback</strong>
+                                <br>Implemented configurable audio feedback when clicking GUI items.
+                            </li>
+                            <li class="change-item">
+                                <strong>Customizable GUI Size</strong>
+                                <br>Admins can now configure the Main Menu size (9, 18, 27, 36, 45, or 54 slots).
+                                <div class="sub-item">Added auto-adaptation for corner decorations based on size.</div>
+                                <div class="sub-item">Included smart validation to ensure valid slot counts.</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Flexible Item Slotting</strong>
+                                <br>Added <code>gui_slot</code> parameter to move items without Java code changes.
+                            </li>
+                            <li class="change-item">
+                                <strong>Hide Attributes Control</strong>
+                                <br>New system to hide ItemFlags (Attributes, Enchants, etc.) via config.
+                            </li>
+                            <li class="change-item">
+                                <strong>Placeholder Support in GUI</strong>
+                                <br>Full PAPI support in Display Names, Lore, and Commands within the GUI.
+                            </li>
+                            <li class="change-item">
+                                <strong>Advanced Action System</strong>
+                                <br>New <code>on_click</code> configuration allows defining actions like:
+                                <div class="sub-item"><code>&lt;open_gui_...&gt;</code> to open specific menus
+                                    (Government, Treasury, etc.)</div>
+                                <div class="sub-item"><code>&lt;action_register_candidate&gt;</code>,
+                                    <code>&lt;action_donate_treasury&gt;</code>, etc.
+                                </div>
+                                <div class="sub-item"><code>&lt;action_console_command&gt;</code> for executing server
+                                    commands.</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Configuration Documentation</strong>
+                                <br>Added comprehensive comment documentation to the <code>gui.yml</code> header.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Refactoring -->
+                    <div class="change-category">
+                        <div class="category-header enhanced">
+                            <div class="category-icon enhanced">⚡</div>
+                            <div class="category-title">Refactored - Quick Actions</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Configurable Quick Actions</strong>
+                                <br>Register, Vote, and Rate items are now fully configurable in <code>gui.yml</code>.
+                            </li>
+                            <li class="change-item">
+                                <strong>Dynamic Requirements</strong>
+                                <br>Added placeholders for requirements in GUIs:
+                                <div class="sub-item"><code>{req_level}</code>, <code>{req_playtime}</code>,
+                                    <code>{req_balance}</code>, <code>{cost}</code>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Bug Fixes -->
+                    <div class="change-category">
+                        <div class="category-header fixed">
+                            <div class="category-icon fixed">🔧</div>
+                            <div class="category-title">Fixed - Bug Fixes</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>GUI Decoration Logic</strong>
+                                <br>Fixed hardcoded glass pane materials; now correctly reads from config.
+                                <div class="sub-item">Added support for <code>AIR</code> material to remove decorations.
+                                </div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Active Effects Item</strong>
+                                <br>Fixed issues with hardcoded materials and attributes for active status items.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Removed -->
+                    <div class="change-category">
+                        <div class="category-header fixed" style="border-color: #6b7280;">
+                            <div class="category-icon fixed"
+                                style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">-</div>
+                            <div class="category-title" style="color: #9ca3af;">Removed - Legacy Features</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Quick Actions Menu</strong>
+                                <br>Removed the separate Quick Actions GUI as it is now redundant with the Main Menu
+                                improvements.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Version 1.2.0 (Previous) -->
+            <section class="version-section collapsed" id="v1-2-0">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.2.0</h2>
+                            <span class="version-type feature">Treasury & Economy</span>
+                        </div>
+                        <div class="release-date">February 12, 2026</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            This update brings significant improvements to the treasury and salary systems, introduces a
+                            new manual claim mechanism for government officials, and refines administrative controls
+                            with better safeguards and command structures.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">12+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">System</div>
+                                <div class="stat-value">Treasury</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Feature</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Treasury & Economy System -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Treasury & Economy System</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Treasury Logs</strong>: Detailed logging for all treasury activities (donations,
+                                salary claims, executive orders)
+                            </li>
+                            <li class="change-item">
+                                <strong>New Treasury GUI</strong>: "Treasury Transaction" sub-menu to view detailed
+                                income and expense logs
+                            </li>
+                            <li class="change-item">
+                                <strong>Government Salaries</strong>:
+                                <div class="sub-item">New "Government Salary" GUI for viewing salary status</div>
+                                <div class="sub-item">Changed from automatic distribution to manual claiming system
+                                </div>
+                                <div class="sub-item">Salaries are now directly deducted from the National Treasury
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Administrative Controls -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">!</div>
+                            <div class="category-title">Improved - Administrative Controls</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Command Restructuring</strong>:
+                                <div class="sub-item">Changed <code>/dc admin setpresident</code> to
+                                    <code>/dc admin set president</code>
+                                </div>
+                                <div class="sub-item">Changed <code>/dc admin removepresident</code> to
+                                    <code>/dc admin remove president</code>
+                                </div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Safety Mechanisms</strong>: Added confirmation requirements for sensitive admin
+                                actions
+                            </li>
+                            <li class="change-item">
+                                <strong>Phase Synchronization</strong>: Automatic game phase updates when admins
+                                manually modify the presidency
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Election & Core Mechanics -->
+                    <div class="change-category">
+                        <div class="category-header enhanced">
+                            <div class="category-icon enhanced">➜</div>
+                            <div class="category-title">Enhanced - Election & Core Mechanics</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Registration Logic</strong>: Registration phase now automatically restarts if no
+                                candidates register
+                            </li>
+                            <li class="change-item">
+                                <strong>Candidate Limits</strong>: Added configurable limit for presidential candidates
+                                (Default: 3)
+                            </li>
+                            <li class="change-item">
+                                <strong>Recall GUI</strong>: Added dedicated GUI for managing recall petitions
+                            </li>
+                            <li class="change-item">
+                                <strong>Localization</strong>: Complete English translation for all GUI interfaces
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Fixes -->
+                    <div class="change-category">
+                        <div class="category-header fixed">
+                            <div class="category-icon fixed">!</div>
+                            <div class="category-title">Bug Fixes</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Message System</strong>: Fixed issue where raw message codes were displayed
+                                instead of formatted text
+                            </li>
+                            <li class="change-item">
+                                <strong>Legacy Systems</strong>: Removed obsolete transaction logging method (Red Dye)
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Version 1.1.0 (Collapsed by default) -->
+            <section class="version-section collapsed" id="v1-1-0">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.1.0</h2>
+                            <span class="version-type feature">GUI Update</span>
+                        </div>
+                        <div class="release-date">December 22, 2025</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            This update focuses on enhancing user experience by introducing a comprehensive GUI system.
+                            Players can now access all plugin features through an intuitive graphical interface,
+                            eliminating the need to remember complex commands.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">5+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">GUIs Added</div>
+                                <div class="stat-value">5</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Feature</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Menu GUI System -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Main Menu GUI System</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Main Menu GUI</strong>: New entry point accessible via <code>/dc menu</code>
+                                <div class="sub-item">Visual layout with 54-slot inventory organized into logical
+                                    sections</div>
+                                <div class="sub-item">Smart icons with glow effects for important items</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Player Statistics GUI</strong>: Detailed stats for viewing own and other
+                                players' data
+                                <div class="sub-item">Political stats, Arena stats, and Progress info</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Leaderboard GUI</strong>: Visual leaderboard showing top players
+                                <div class="sub-item">Top Kills, Top Playtime, and Top Presidents categories</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Help & Guide System</strong>: In-game guide explaining all features
+                                <div class="sub-item">Detailed guides for Elections, Cabinet, Executive Orders, etc.
+                                </div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Quick Actions Menu</strong>: Context-aware menu for common tasks
+                                <div class="sub-item">Shows relevant actions like Register, Vote, or Endorse based on
+                                    game state</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Technical Changes -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">!</div>
+                            <div class="category-title">Technical Changes & Improvements</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>GUIListener Refactor</strong>: Extended to handle all new GUI menus and
+                                interactions
+                            </li>
+                            <li class="change-item">
+                                <strong>Language Configuration</strong>: Moved messages to dedicated
+                                <code>language.yml</code> file
+                                <div class="sub-item">Better organization and easier localization</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>New Commands</strong>: Added <code>/dc menu</code>,
+                                <code>/dc leaderboard</code>, and <code>/dc quickactions</code>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Fixes & Admin Tools -->
+                    <div class="change-category">
+                        <div class="category-header fixed">
+                            <div class="category-icon fixed">!</div>
+                            <div class="category-title">Fixes & Admin Tools</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Chat Color Fix</strong>: Fixed legacy color code parsing issues
+                                <div class="sub-item">Plugin messages now correctly display colors using both legacy
+                                    codes (&) and MiniMessage tags</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Stop Executive Orders</strong>: New admin command
+                                <code>/dc admin stoporder</code>
+                                <div class="sub-item">Admins can manually terminate active executive orders immediately
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Version 1.0.0 (Collapsed by default) -->
+            <section class="version-section collapsed" id="v1-0-0">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.0.0</h2>
+                            <span class="version-type major">Initial Release</span>
+                        </div>
+                        <div class="release-date">December 19, 2025</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            Democracy Core is a comprehensive democracy and government simulation plugin for Minecraft
+                            servers. This release introduces a full-featured democratic system with elections,
+                            government management, executive powers, cabinet decisions, and community events.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">30+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Systems</div>
+                                <div class="stat-value">5+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Major</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core Government System -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Core Government System</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Presidential Elections</strong>: Multi-phase election system (Registration →
+                                Campaign → Voting → Inauguration)
+                            </li>
+                            <li class="change-item">
+                                <strong>Cabinet System</strong>: 5 ministries (Defense, Treasury, Commerce,
+                                Infrastructure, Culture) with appointed ministers
+                            </li>
+                            <li class="change-item">
+                                <strong>Approval Ratings</strong>: Players can rate the president (1-5 stars) affecting
+                                government performance
+                            </li>
+                            <li class="change-item">
+                                <strong>Term Limits</strong>: Presidents serve 30-day terms with automatic elections
+                            </li>
+                            <li class="change-item">
+                                <strong>Government History</strong>: Track all past presidents and their achievements
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Election Mechanics -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Election Mechanics</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Candidate Registration</strong>: Level/playtime/balance requirements with
+                                campaign deposits
+                            </li>
+                            <li class="change-item">
+                                <strong>Endorsement System</strong>: Candidates gain support through player endorsements
+                            </li>
+                            <li class="change-item">
+                                <strong>Weighted Voting</strong>: Vote weight based on player level, playtime, and
+                                balance
+                            </li>
+                            <li class="change-item">
+                                <strong>Campaign Broadcasting</strong>: Candidates can broadcast campaign messages
+                                during campaign phase
+                            </li>
+                            <li class="change-item">
+                                <strong>Voter Rewards</strong>: Participation rewards and lottery system for voters
+                            </li>
+                            <li class="change-item">
+                                <strong>Automatic Elections</strong>: Elections trigger automatically before term end or
+                                when no president exists
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Executive Powers -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Executive Powers</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Executive Orders</strong>: President can issue powerful orders with treasury
+                                costs and cooldowns:
+                                <div class="sub-item">Golden Age: XP/Vault multipliers, rare drop bonuses</div>
+                                <div class="sub-item">State of Emergency: Disables PvP server-wide</div>
+                                <div class="sub-item">National Holiday: Clears player cooldowns</div>
+                                <div class="sub-item">War Economy: Doubles PvP rewards</div>
+                                <div class="sub-item">Economic Recovery: Stimulus payments and shop discounts</div>
+                                <div class="sub-item">Infrastructure Initiative: Haste effects for all players</div>
+                                <div class="sub-item">Environmental Protection: Farming multipliers</div>
+                                <div class="sub-item">Education Advancement: XP multipliers</div>
+                                <div class="sub-item">Purge Protocol: Full PvP everywhere</div>
+                                <div class="sub-item">Presidential Pardon: Clears player punishments</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Cabinet Decisions -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Cabinet Decisions</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Defense Ministry</strong>
+                                <div class="sub-item">War Games, Military Draft, National Protection, Armory Discount,
+                                    Border Patrol</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Treasury Ministry</strong>
+                                <div class="sub-item">Tax Holiday, Economic Stimulus, Auction Boost, Treasury Bonus,
+                                    Market Crash</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Commerce Ministry</strong>
+                                <div class="sub-item">Trade Fair, Resource Boom, Merchant Caravan, Black Friday,
+                                    Treasure Hunt</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Infrastructure Ministry</strong>
+                                <div class="sub-item">Construction Boom, Free Real Estate, Builder's Paradise, Public
+                                    Works, Infrastructure Grants</div>
+                            </li>
+                            <li class="change-item">
+                                <strong>Culture Ministry</strong>
+                                <div class="sub-item">Festival Week, Double XP Weekend, Firework Celebration, Cultural
+                                    Exchange, Community Event</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Presidential Arena & Recall -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - Arena & Recall System</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Presidential Arena</strong>: 7-day PvP events, killstreaks, leaderboards, grand
+                                prizes
+                            </li>
+                            <li class="change-item">
+                                <strong>Recall System</strong>: Petition creation, signature collection (30%), recall
+                                voting (60% to remove)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Technical & Other -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">!</div>
+                            <div class="category-title">Technical & Player Features</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">
+                                <strong>Treasury Management</strong>: Audit trails, automatic salaries, donations
+                            </li>
+                            <li class="change-item">
+                                <strong>Player Features</strong>: Playtime tracking, level calculation, daily rewards
+                            </li>
+                            <li class="change-item">
+                                <strong>Admin Tools</strong>: Force elections, treasury control, data management
+                            </li>
+                            <li class="change-item">
+                                <strong>Dependencies</strong>: Vault (for economy)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Future Plans -->
+                    <div class="change-category">
+                        <div class="category-header enhanced">
+                            <div class="category-icon enhanced">➜</div>
+                            <div class="category-title">Future Plans & Roadmap</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item">International relations system</li>
+                            <li class="change-item">Political parties</li>
+                            <li class="change-item">Advanced diplomacy features</li>
+                            <li class="change-item">Custom election maps</li>
+                            <li class="change-item">Mobile voting support</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('.version-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const section = header.parentElement;
+                section.classList.toggle('collapsed');
+
+                const toggleText = header.querySelector('.version-toggle-text');
+                if (section.classList.contains('collapsed')) {
+                    toggleText.textContent = 'Expand';
+                } else {
+                    toggleText.textContent = 'Minimize';
+                }
+            });
+        });
+
+        // Handle initial hash
+        if (window.location.hash) {
+            const id = window.location.hash.substring(1);
+            const section = document.getElementById(id);
+            if (section) {
+                section.classList.remove('collapsed');
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+
+</html>
