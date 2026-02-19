@@ -1,5 +1,5 @@
 name: DemocracyCore
-version: 1.3.0
+version: 1.4.0
 main: id.democracycore.DemocracyCore
 api-version: '1.21'
 description: A comprehensive democracy and government simulation plugin
@@ -32,6 +32,12 @@ permissions:
     default: false
   democracy.cabinet:
     description: Cabinet member commands
+    default: false
+  democracy.tax:
+    description: View tax information
+    default: true
+  democracy.tax.exempt:
+    description: Exempt from global taxes
     default: false
   democracy.admin:
     description: Admin commands

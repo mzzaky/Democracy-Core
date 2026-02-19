@@ -111,6 +111,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             case "lb":
                 handleLeaderboard(sender);
                 break;
+            case "tax":
+                handleTax(sender, args);
+                break;
 
             default:
                 MessageUtils.send(sender, "general.unknown_command");
@@ -1192,7 +1195,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             completions.addAll(Arrays.asList(
                     "menu", "help", "info", "election", "candidates", "vote", "register",
                     "endorse", "campaign", "order", "cabinet", "treasury", "arena",
-                    "recall", "rate", "history", "stats", "government", "leaderboard"));
+                    "recall", "rate", "history", "stats", "government", "leaderboard", "tax"));
             if (sender.hasPermission("democracy.admin")) {
                 completions.add("admin");
             }
@@ -1243,6 +1246,12 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 case "treasury":
                     completions.add("donate");
                     break;
+                case "tax":
+                    completions.addAll(Arrays.asList("info", "pay", "gui"));
+                    if (sender.hasPermission("democracy.admin")) {
+                        completions.add("admin");
+                    }
+                    break;
             }
         } else if (args.length == 3) {
             String sub = args[0].toLowerCase();
@@ -1269,6 +1278,11 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                         }
                     }
                 }
+            } else if (sub.equals("tax") && sub2.equals("admin")) {
+                if (sender.hasPermission("democracy.admin")) {
+                    completions.addAll(Arrays.asList("collect", "enable", "disable",
+                            "exempt", "unexempt", "forgive", "setamount"));
+                }
             } else if (sub.equals("recall") && sub2.equals("vote")) {
                 completions.addAll(Arrays.asList("yes", "no", "remove", "keep"));
             } else if (sub.equals("admin")) {
@@ -1286,6 +1300,12 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
                 }
+            } else if (sub.equals("tax") && sub2.equals("admin") &&
+                    (args[2].equalsIgnoreCase("exempt") || args[2].equalsIgnoreCase("unexempt")
+                            || args[2].equalsIgnoreCase("forgive"))) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    completions.add(p.getName());
+                }
             } else if (sub.equals("admin") && sub2.equals("set") && args[2].equalsIgnoreCase("president")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
@@ -1298,6 +1318,176 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         return completions.stream()
                 .filter(s -> s.toLowerCase().startsWith(input))
                 .collect(Collectors.toList());
+    }
+
+    // === TAX ===
+
+    private void handleTax(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            MessageUtils.send(sender, "general.player_only");
+            return;
+        }
+
+        if (args.length < 2) {
+            // Open Tax GUI
+            plugin.getGUIListener().openTaxGUI(player);
+            return;
+        }
+
+        String subCommand = args[1].toLowerCase();
+
+        switch (subCommand) {
+            case "info":
+            case "status":
+                showTaxInfo(player);
+                break;
+            case "pay":
+                plugin.getTaxManager().payDebt(player);
+                break;
+            case "gui":
+                plugin.getGUIListener().openTaxGUI(player);
+                break;
+            case "admin":
+                if (!player.hasPermission("democracy.admin")) {
+                    MessageUtils.send(player, "general.no_permission");
+                    return;
+                }
+                handleTaxAdmin(player, args);
+                break;
+            default:
+                MessageUtils.send(player, "<red>Unknown tax command. Use <yellow>/dc tax</yellow> to open the tax menu.");
+                break;
+        }
+    }
+
+    private void showTaxInfo(Player player) {
+        var taxManager = plugin.getTaxManager();
+        var record = taxManager.getTaxRecord();
+        String uuidStr = player.getUniqueId().toString();
+        var taxData = record.getPlayerTaxData(uuidStr);
+
+        MessageUtils.send(player, "tax.header");
+        MessageUtils.send(player, "tax.title");
+        MessageUtils.send(player, "tax.footer");
+
+        if (taxManager.isEnabled()) {
+            MessageUtils.send(player, "tax.status_enabled");
+        } else {
+            MessageUtils.send(player, "tax.status_disabled");
+        }
+
+        MessageUtils.send(player, "<gray>Tax Amount: <gold>$" + MessageUtils.formatNumber(taxManager.getTaxAmount()));
+        MessageUtils.send(player, "<gray>Collection Interval: <white>" +
+                plugin.getConfig().getLong("global-tax.collection-interval-hours", 24) + " hours");
+
+        long remaining = taxManager.getTimeUntilNextCollection();
+        if (remaining > 0) {
+            MessageUtils.send(player, "<gray>Next Collection: <white>" + MessageUtils.formatTime(remaining));
+        } else {
+            MessageUtils.send(player, "<gray>Next Collection: <yellow>Pending...");
+        }
+
+        MessageUtils.send(player, "<gray>Total Collected: <green>$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
+        MessageUtils.send(player, "<gray>Collection Cycles: <white>" + record.getTotalCollectionCycles());
+
+        if (taxData != null && taxData.getOutstandingDebt() > 0) {
+            MessageUtils.send(player, "<red>Your Debt: <gold>$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()));
+            MessageUtils.send(player, "<gray>Use <white>/dc tax pay <gray>to pay your debt.");
+        } else {
+            MessageUtils.send(player, "<green>Your Debt: $0 (Good standing!)");
+        }
+
+        MessageUtils.send(player, "tax.footer");
+    }
+
+    private void handleTaxAdmin(Player player, String[] args) {
+        if (args.length < 3) {
+            MessageUtils.send(player, "<gold>═══ TAX ADMIN COMMANDS ═══");
+            MessageUtils.send(player, "<white>/dc tax admin collect <gray>- Force tax collection");
+            MessageUtils.send(player, "<white>/dc tax admin enable/disable <gray>- Toggle tax system");
+            MessageUtils.send(player, "<white>/dc tax admin exempt <player> <gray>- Exempt player");
+            MessageUtils.send(player, "<white>/dc tax admin unexempt <player> <gray>- Remove exemption");
+            MessageUtils.send(player, "<white>/dc tax admin forgive <player> <gray>- Forgive player's debt");
+            MessageUtils.send(player, "<white>/dc tax admin setamount <amount> <gray>- Set tax amount");
+            return;
+        }
+
+        String adminSub = args[2].toLowerCase();
+
+        switch (adminSub) {
+            case "collect":
+                plugin.getTaxManager().collectTaxes();
+                MessageUtils.send(player, "tax.admin_collect");
+                break;
+            case "enable":
+                plugin.getTaxManager().getTaxRecord().setEnabled(true);
+                MessageUtils.send(player, "tax.admin_enable");
+                break;
+            case "disable":
+                plugin.getTaxManager().getTaxRecord().setEnabled(false);
+                MessageUtils.send(player, "tax.admin_disable");
+                break;
+            case "exempt":
+                if (args.length < 4) {
+                    MessageUtils.send(player, "<red>Usage: /dc tax admin exempt <player>");
+                    return;
+                }
+                Player targetExempt = Bukkit.getPlayer(args[3]);
+                if (targetExempt == null) {
+                    MessageUtils.send(player, "general.player_not_found");
+                    return;
+                }
+                plugin.getTaxManager().setExempt(targetExempt.getUniqueId(), targetExempt.getName(), true);
+                MessageUtils.send(player, "<green>" + targetExempt.getName() + " is now tax exempt.");
+                break;
+            case "unexempt":
+                if (args.length < 4) {
+                    MessageUtils.send(player, "<red>Usage: /dc tax admin unexempt <player>");
+                    return;
+                }
+                Player targetUnexempt = Bukkit.getPlayer(args[3]);
+                if (targetUnexempt == null) {
+                    MessageUtils.send(player, "general.player_not_found");
+                    return;
+                }
+                plugin.getTaxManager().setExempt(targetUnexempt.getUniqueId(), targetUnexempt.getName(), false);
+                MessageUtils.send(player, "<green>" + targetUnexempt.getName() + " is no longer tax exempt.");
+                break;
+            case "forgive":
+                if (args.length < 4) {
+                    MessageUtils.send(player, "<red>Usage: /dc tax admin forgive <player>");
+                    return;
+                }
+                Player targetForgive = Bukkit.getPlayer(args[3]);
+                if (targetForgive == null) {
+                    MessageUtils.send(player, "general.player_not_found");
+                    return;
+                }
+                plugin.getTaxManager().forgiveDebt(targetForgive.getUniqueId(), targetForgive.getName());
+                MessageUtils.send(player, "<green>Forgave " + targetForgive.getName() + "'s tax debt.");
+                break;
+            case "setamount":
+                if (args.length < 4) {
+                    MessageUtils.send(player, "<red>Usage: /dc tax admin setamount <amount>");
+                    return;
+                }
+                try {
+                    double newAmount = Double.parseDouble(args[3]);
+                    if (newAmount <= 0) {
+                        MessageUtils.send(player, "<red>Amount must be positive!");
+                        return;
+                    }
+                    plugin.getConfig().set("global-tax.amount", newAmount);
+                    plugin.saveConfig();
+                    MessageUtils.send(player, "<green>Tax amount set to <gold>$" + MessageUtils.formatNumber(newAmount));
+                } catch (NumberFormatException e) {
+                    MessageUtils.send(player, "<red>Invalid amount!");
+                }
+                break;
+            default:
+                MessageUtils.send(player, "<red>Unknown tax admin command.");
+                break;
+        }
     }
 
     // === HELPER METHODS ===

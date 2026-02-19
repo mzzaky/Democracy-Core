@@ -21,6 +21,7 @@ public enum GUIAction {
     OPEN_GUI_HISTORY("open_gui_history"),
     OPEN_GUI_LEADERBOARD("open_gui_leaderboard"),
     OPEN_GUI_HELP("open_gui_help"),
+    OPEN_GUI_TAX("open_gui_tax"),
 
     // Specific Actions
     ACTION_REGISTER_CANDIDATE("action_register_candidate"),

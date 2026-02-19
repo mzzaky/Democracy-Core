@@ -26,6 +26,7 @@ import id.democracycore.models.Government;
 import id.democracycore.models.PlayerData;
 import id.democracycore.models.PresidentHistory;
 import id.democracycore.models.RecallPetition;
+import id.democracycore.models.TaxRecord;
 import id.democracycore.models.Treasury;
 
 public class DataManager {
@@ -43,6 +44,7 @@ public class DataManager {
     private List<CabinetDecision> activeDecisions;
     private ArenaSession arenaSession;
     private RecallPetition recallPetition;
+    private TaxRecord taxRecord;
     private long lastExecutiveOrderTime;
     private int gamesThisTerm;
 
@@ -61,6 +63,7 @@ public class DataManager {
         this.playerDataMap = new HashMap<>();
         this.activeOrders = new ArrayList<>();
         this.activeDecisions = new ArrayList<>();
+        this.taxRecord = new TaxRecord();
     }
 
     public void loadAll() {
@@ -73,6 +76,7 @@ public class DataManager {
         loadActiveDecisions();
         loadArenaSession();
         loadRecallPetition();
+        loadTaxRecord();
         loadMiscData();
     }
 
@@ -86,6 +90,7 @@ public class DataManager {
         saveActiveDecisions();
         saveArenaSession();
         saveRecallPetition();
+        saveTaxRecord();
         saveMiscData();
     }
 
@@ -308,6 +313,30 @@ public class DataManager {
         }
     }
 
+    // Tax Record
+    private void loadTaxRecord() {
+        File file = new File(dataFolder, "tax_record.json");
+        if (file.exists()) {
+            try (Reader reader = new FileReader(file)) {
+                taxRecord = gson.fromJson(reader, TaxRecord.class);
+                if (taxRecord == null)
+                    taxRecord = new TaxRecord();
+            } catch (IOException e) {
+                plugin.getLogger().warning("Failed to load tax record: " + e.getMessage());
+                taxRecord = new TaxRecord();
+            }
+        }
+    }
+
+    private void saveTaxRecord() {
+        File file = new File(dataFolder, "tax_record.json");
+        try (Writer writer = new FileWriter(file)) {
+            gson.toJson(taxRecord, writer);
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to save tax record: " + e.getMessage());
+        }
+    }
+
     // Misc Data
     private void loadMiscData() {
         File file = new File(dataFolder, "misc.json");
@@ -376,6 +405,10 @@ public class DataManager {
 
     public RecallPetition getRecallPetition() {
         return recallPetition;
+    }
+
+    public TaxRecord getTaxRecord() {
+        return taxRecord;
     }
 
     public void setRecallPetition(RecallPetition recallPetition) {

@@ -492,6 +492,22 @@ gui:
         click_sound: "block.chest.close"
         on_click: "<action_close_inventory>"
 
+      # Global Tax System (Slot 37)
+      tax_item:
+        gui_slot: 37
+        material: SUNFLOWER
+        custom_model_data: 0
+        display_name: "§e§l💲 GLOBAL TAX"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Tax Amount: §6{tax_amount}"
+          - "§7Next Collection: §f{next_collection}"
+          - "§7Your Debt: {debt_status}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§aClick to open tax menu"
+        click_sound: "block.note_block.pling"
+        on_click: "<open_gui_tax>"
+
       # Glass Pane Filler
       glass_pane:
         material: AIR

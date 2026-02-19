@@ -30,6 +30,7 @@ public class GUIListener implements Listener {
     private final PlayerStatsGUI playerStatsGUI;
     private final HelpGUI helpGUI;
     private final RecallGUI recallGUI;
+    private final TaxGUI taxGUI;
 
     // Track which candidate a player is viewing
     private final Map<UUID, UUID> viewingCandidate = new HashMap<>();
@@ -46,6 +47,7 @@ public class GUIListener implements Listener {
         this.playerStatsGUI = new PlayerStatsGUI(plugin);
         this.helpGUI = new HelpGUI(plugin);
         this.recallGUI = new RecallGUI(plugin);
+        this.taxGUI = new TaxGUI(plugin);
     }
 
     @EventHandler
@@ -125,6 +127,15 @@ public class GUIListener implements Listener {
         } else if (title.equals(RecallGUI.RECALL_VOTE_TITLE)) {
             event.setCancelled(true);
             handleRecallVoteGUI(player, clicked);
+        } else if (title.equals(TaxGUI.TAX_MENU_TITLE)) {
+            event.setCancelled(true);
+            handleTaxMenuGUI(player, clicked, event.getSlot());
+        } else if (title.equals(TaxGUI.TAX_HISTORY_TITLE)) {
+            event.setCancelled(true);
+            handleTaxHistoryGUI(player, clicked);
+        } else if (title.equals(TaxGUI.TAX_DEBTORS_TITLE)) {
+            event.setCancelled(true);
+            handleTaxDebtorsGUI(player, clicked);
         }
     }
 
@@ -150,7 +161,10 @@ public class GUIListener implements Listener {
                 title.contains("PANDUAN") ||
                 title.equals(RecallGUI.RECALL_MENU_TITLE) ||
                 title.equals(RecallGUI.RECALL_CONFIRM_TITLE) ||
-                title.equals(RecallGUI.RECALL_VOTE_TITLE)) {
+                title.equals(RecallGUI.RECALL_VOTE_TITLE) ||
+                title.equals(TaxGUI.TAX_MENU_TITLE) ||
+                title.equals(TaxGUI.TAX_HISTORY_TITLE) ||
+                title.equals(TaxGUI.TAX_DEBTORS_TITLE)) {
             event.setCancelled(true);
         }
     }
@@ -338,6 +352,15 @@ public class GUIListener implements Listener {
             if (handleConfiguredAction(player, "help_item", null))
                 return;
             helpGUI.openHelpMenu(player);
+            return;
+        }
+
+        // Global Tax
+        int taxSlot = mainMenuGUI.getItemSlot("tax_item", 37);
+        if (slot == taxSlot && clicked.getType() == Material.SUNFLOWER) {
+            if (handleConfiguredAction(player, "tax_item", null))
+                return;
+            taxGUI.openTaxMenu(player);
             return;
         }
 
@@ -835,6 +858,60 @@ public class GUIListener implements Listener {
         }
     }
 
+    // === TAX MENU GUI ===
+
+    private void handleTaxMenuGUI(Player player, ItemStack clicked, int slot) {
+        // Close button
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
+        // Back to Main Menu
+        if (clicked.getType() == Material.ARROW) {
+            mainMenuGUI.openMainMenu(player);
+            return;
+        }
+
+        // Refresh
+        if (clicked.getType() == Material.CLOCK) {
+            taxGUI.openTaxMenu(player);
+            return;
+        }
+
+        // Pay Debt (Slot 30 - EMERALD_BLOCK)
+        if (slot == 30 && clicked.getType() == Material.EMERALD_BLOCK) {
+            player.closeInventory();
+            plugin.getTaxManager().payDebt(player);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> taxGUI.openTaxMenu(player), 10L);
+            return;
+        }
+
+        // Tax History (Slot 24 - BOOK)
+        if (slot == 24 && clicked.getType() == Material.BOOK) {
+            taxGUI.openTaxHistory(player);
+            return;
+        }
+
+        // Debtor List (Slot 32 - SKELETON_SKULL)
+        if (slot == 32 && clicked.getType() == Material.SKELETON_SKULL) {
+            taxGUI.openDebtorList(player);
+            return;
+        }
+    }
+
+    private void handleTaxHistoryGUI(Player player, ItemStack clicked) {
+        if (clicked.getType() == Material.ARROW) {
+            taxGUI.openTaxMenu(player);
+        }
+    }
+
+    private void handleTaxDebtorsGUI(Player player, ItemStack clicked) {
+        if (clicked.getType() == Material.ARROW) {
+            taxGUI.openTaxMenu(player);
+        }
+    }
+
     // === HELPER METHODS ===
 
     private void showArenaInfo(Player player) {
@@ -963,6 +1040,10 @@ public class GUIListener implements Listener {
         recallGUI.openRecallMenu(player);
     }
 
+    public void openTaxGUI(Player player) {
+        taxGUI.openTaxMenu(player);
+    }
+
     /**
      * Execute a GUI action generically based on GUIAction enum
      * 
@@ -1008,6 +1089,9 @@ public class GUIListener implements Listener {
                 break;
             case OPEN_GUI_HELP:
                 helpGUI.openHelpMenu(player);
+                break;
+            case OPEN_GUI_TAX:
+                taxGUI.openTaxMenu(player);
                 break;
 
             // Specific Actions
@@ -1060,6 +1144,8 @@ public class GUIListener implements Listener {
                         playerStatsGUI.openLeaderboard(player);
                     } else if (currentGUI.equals(HelpGUI.HELP_MENU_TITLE)) {
                         helpGUI.openHelpMenu(player);
+                    } else if (currentGUI.equals(TaxGUI.TAX_MENU_TITLE)) {
+                        taxGUI.openTaxMenu(player);
                     }
                 }, 1L);
                 break;
