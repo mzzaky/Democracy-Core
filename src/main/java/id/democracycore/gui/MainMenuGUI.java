@@ -23,6 +23,7 @@ import id.democracycore.models.ExecutiveOrder;
 import id.democracycore.models.Government;
 import id.democracycore.models.PlayerData;
 import id.democracycore.models.RecallPetition;
+import id.democracycore.models.TaxRecord;
 import id.democracycore.models.Treasury;
 import id.democracycore.utils.MessageUtils;
 
@@ -239,6 +240,11 @@ public class MainMenuGUI {
             int rateSlot = getGUISlot(path + ".gui_slot", 42);
             setItemSafe.accept(rateSlot, rateItem);
         }
+
+        // === Global Tax (Row 5) ===
+        ItemStack taxItem = createTaxItem(player);
+        int taxSlot = getGUISlot("gui.main_menu.items.tax_item.gui_slot", 37);
+        setItemSafe.accept(taxSlot, taxItem);
 
         // === ROW 6: Footer ===
 
@@ -823,6 +829,48 @@ public class MainMenuGUI {
         return item;
     }
 
+    private ItemStack createTaxItem(Player player) {
+        String path = "gui.main_menu.items.tax_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE) material = Material.SUNFLOWER;
+
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
+
+        // Build tax info
+        double taxAmount = plugin.getTaxManager().getTaxAmount();
+        long remaining = plugin.getTaxManager().getTimeUntilNextCollection();
+        String nextCollection = remaining > 0 ? MessageUtils.formatTime(remaining) : "Pending...";
+
+        String uuidStr = player.getUniqueId().toString();
+        TaxRecord record = plugin.getTaxManager().getTaxRecord();
+        TaxRecord.PlayerTaxData taxData = record.getPlayerTaxData(uuidStr);
+        String debtStatus;
+        if (taxData != null && taxData.getOutstandingDebt() > 0) {
+            debtStatus = "\u00a7c$" + MessageUtils.formatNumber(taxData.getOutstandingDebt());
+        } else {
+            debtStatus = "\u00a7a$0";
+        }
+
+        List<String> lore = getGUILore(player, path + ".lore",
+                "tax_amount", "$" + MessageUtils.formatNumber(taxAmount),
+                "next_collection", nextCollection,
+                "debt_status", debtStatus);
+
+        meta.setLore(lore);
+        applyConfigAttributes(meta, path);
+        item.setItemMeta(meta);
+
+        // Glow if player has debt
+        if (taxData != null && taxData.getOutstandingDebt() > 0) {
+            addGlow(item);
+        }
+
+        return item;
+    }
+
     // === Utility Methods ===
 
     private ItemStack createItem(Material material, String name, String... lore) {
@@ -993,6 +1041,8 @@ public class MainMenuGUI {
                 return "gui.main_menu.items.leaderboard_item.click_sound";
             case 34: // Help
                 return "gui.main_menu.items.help_item.click_sound";
+            case 37: // Global Tax
+                return "gui.main_menu.items.tax_item.click_sound";
             case 38: // Register Candidate
                 return "gui.main_menu.items.register_candidate.click_sound";
             case 40: // Vote Now

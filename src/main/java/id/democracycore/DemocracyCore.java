@@ -21,6 +21,7 @@ import id.democracycore.managers.ElectionManager;
 import id.democracycore.managers.ExecutiveOrderManager;
 import id.democracycore.managers.GovernmentManager;
 import id.democracycore.managers.RecallManager;
+import id.democracycore.managers.TaxManager;
 import id.democracycore.managers.TreasuryManager;
 import id.democracycore.utils.MessageUtils;
 import id.democracycore.utils.VaultHook;
@@ -38,6 +39,7 @@ public class DemocracyCore extends JavaPlugin {
     private ArenaManager arenaManager;
     private BuffManager buffManager;
     private RecallManager recallManager;
+    private TaxManager taxManager;
     private VaultHook vaultHook;
     private GUIListener guiListener;
     private YamlConfiguration guiConfig;
@@ -78,6 +80,7 @@ public class DemocracyCore extends JavaPlugin {
         cabinetManager = new CabinetManager(this);
         arenaManager = new ArenaManager(this);
         recallManager = new RecallManager(this);
+        taxManager = new TaxManager(this);
 
         // Load data
         dataManager.loadAll();
@@ -158,6 +161,9 @@ public class DemocracyCore extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             dataManager.saveAll();
         }, 20L * 60 * 5, 20L * 60 * 5);
+
+        // Start global tax collection scheduler
+        taxManager.startTaxScheduler();
     }
 
     public static DemocracyCore getInstance() {
@@ -198,6 +204,10 @@ public class DemocracyCore extends JavaPlugin {
 
     public RecallManager getRecallManager() {
         return recallManager;
+    }
+
+    public TaxManager getTaxManager() {
+        return taxManager;
     }
 
     public VaultHook getVaultHook() {

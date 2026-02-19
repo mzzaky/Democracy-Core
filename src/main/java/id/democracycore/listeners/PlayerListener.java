@@ -3,6 +3,7 @@ package id.democracycore.listeners;
 import id.democracycore.DemocracyCore;
 import id.democracycore.models.Government;
 import id.democracycore.models.PlayerData;
+import id.democracycore.models.TaxRecord;
 import id.democracycore.utils.MessageUtils;
 import id.democracycore.utils.VaultHook;
 import org.bukkit.Bukkit;
@@ -66,7 +67,18 @@ public class PlayerListener implements Listener {
         if (plugin.getRecallManager().hasPetitionActive()) {
             MessageUtils.send(player, "<red>📜 A recall petition is active! Use <white>/dc recall <red>for info.");
         }
-        
+
+        // Check for outstanding tax debt
+        if (plugin.getTaxManager().isEnabled()) {
+            TaxRecord.PlayerTaxData taxData = plugin.getTaxManager().getTaxRecord()
+                    .getPlayerTaxData(player.getUniqueId().toString());
+            if (taxData != null && taxData.getOutstandingDebt() > 0) {
+                MessageUtils.send(player, "<red>💲 You have an outstanding tax debt of <gold>$" +
+                        MessageUtils.formatNumber(taxData.getOutstandingDebt()) +
+                        "</gold>! <red>Use <white>/dc tax pay <red>to settle your debt.");
+            }
+        }
+
         plugin.getDataManager().saveAll();
     }
     

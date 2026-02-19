@@ -294,6 +294,37 @@ admin:
   reset_usage: "<red>Usage: /dc admin reset <government|election|treasury|all>"
   reset_invalid: "<red>Invalid data!"
 
+# Global Tax
+tax:
+  header: "<gold>═══════════════════════════════════════"
+  title: "<yellow>     💲 GLOBAL TAX SYSTEM 💲"
+  footer: "<gold>═══════════════════════════════════════"
+  status_enabled: "<white>Status: <green>Enabled"
+  status_disabled: "<white>Status: <red>Disabled"
+  tax_amount: "<gray>Tax Amount: <gold>${amount}"
+  collection_interval: "<gray>Collection Interval: <white>{hours} hours"
+  next_collection: "<gray>Next Collection: <white>{time}"
+  inactive_exempt: "<gray>Inactive Exempt: <white>{days} days"
+  late_penalty: "<gray>Late Penalty: <white>{rate}% of debt"
+  punishment_threshold: "<gray>Punishment Threshold: <white>{count} missed payments"
+  total_collected: "<gray>Total Collected: <green>${amount}"
+  total_penalties: "<gray>Total Penalties: <red>${amount}"
+  collection_cycles: "<gray>Collection Cycles: <white>{count}"
+  taxable_players: "<gray>Taxable Players: <white>{count}"
+  your_debt: "<gray>Your Debt: <red>${amount}"
+  no_debt: "<gray>Your Debt: <green>$0 (Good standing!)"
+  paid_success: "<green>Successfully paid your tax debt of <gold>${amount}</gold>!"
+  no_outstanding_debt: "<green>You have no outstanding tax debt!"
+  insufficient_funds: "<red>You need <gold>${amount}</gold> to pay your debt."
+  admin_collect: "<green>Forced tax collection completed."
+  admin_exempt: "<green>{player} is now tax exempt."
+  admin_unexempt: "<green>{player} is no longer tax exempt."
+  admin_forgive: "<green>Forgave {player}'s tax debt of <gold>${amount}</gold>."
+  admin_enable: "<green>Global tax system has been enabled."
+  admin_disable: "<yellow>Global tax system has been disabled."
+  admin_set_amount: "<green>Tax amount set to <gold>${amount}</gold>."
+  collection_broadcast: "<yellow>Global taxes have been collected! Check /dc tax for details."
+
 # Managers
 managers:
   government:

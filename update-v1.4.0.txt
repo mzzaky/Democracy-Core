@@ -1,0 +1,142 @@
+============================================
+  DemocracyCore v1.4.0 - Update Notes
+  Global Tax System
+============================================
+
+Release Date: February 2026
+
+============================================
+  NEW FEATURE: Global Tax System
+============================================
+
+A comprehensive global tax system has been added to DemocracyCore.
+This system automatically collects taxes from all active players
+on the server and deposits the revenue into the national treasury.
+
+--- Core Mechanics ---
+
+- Automatic tax collection at configurable intervals (default: every 24 hours)
+- Configurable tax amount (default: $50 per collection cycle)
+- Players offline for 3+ days are automatically exempt from taxation
+- All collected taxes are deposited directly into the national treasury
+- Full integration with the existing Treasury system
+
+--- Late Payment & Penalty System ---
+
+- Players who cannot afford their taxes accumulate debt
+- Outstanding debt incurs a late penalty rate (default: 10% per cycle)
+- Partial payments are accepted - remaining balance becomes debt
+- Missed payment counter tracks delinquent taxpayers
+- Configurable punishment threshold (default: 3 missed payments)
+- Customizable punishment commands for tax evasion
+
+--- Punishment System ---
+
+- After exceeding the missed payment threshold, punishments are applied
+- Fully configurable punishment commands via config.yml
+- Supports placeholders: {player}, {debt}, {missed}
+- Players receive on-screen title warnings when punished
+- Punishment history tracked per player
+
+--- Custom GUI ---
+
+- New "Global Tax" button added to the main menu (Slot 37, Sunflower icon)
+- Dedicated Tax GUI with comprehensive information:
+  * Tax System Status (enabled/disabled, total collected, cycles)
+  * Tax Rate Information (amount, interval, penalty rate, exemption rules)
+  * Treasury Tax Income (revenue breakdown)
+  * Next Collection Countdown (time remaining, expected revenue)
+  * Collection Statistics (debtors, outstanding debt)
+  * Personal Tax Status (player head with full tax history)
+  * Debt Status (outstanding debt with warning indicators)
+  * Pay Debt Button (one-click debt payment)
+  * Tax Transaction History (searchable log)
+  * Debtor List (server-wide debtor overview)
+- Glowing indicators for players with outstanding debt
+- Navigation between Tax GUI and Main Menu
+
+--- Commands ---
+
+Player Commands:
+  /dc tax              - Open the Tax GUI
+  /dc tax info         - View tax system information
+  /dc tax pay          - Pay outstanding tax debt
+  /dc tax gui          - Open the Tax GUI
+
+Admin Commands:
+  /dc tax admin collect       - Force immediate tax collection
+  /dc tax admin enable        - Enable the tax system
+  /dc tax admin disable       - Disable the tax system
+  /dc tax admin exempt <p>    - Exempt a player from taxes
+  /dc tax admin unexempt <p>  - Remove tax exemption
+  /dc tax admin forgive <p>   - Forgive a player's tax debt
+  /dc tax admin setamount <n> - Set the tax amount
+
+--- Configuration (config.yml) ---
+
+New section added under "global-tax":
+  - enabled: true/false
+  - amount: Tax amount per cycle (default: 50)
+  - collection-interval-hours: Hours between collections (default: 24)
+  - inactive-days-exempt: Days offline before exempt (default: 3)
+  - late-penalty-rate: Penalty rate on debt (default: 0.10 / 10%)
+  - punishment.missed-threshold: Missed payments before punishment (default: 3)
+  - punishment.description: Description text for punishment
+  - punishment.reset-missed-after-punishment: Reset counter after punishment
+  - punishment.commands: List of commands to execute as punishment
+
+--- Permissions ---
+
+New permissions:
+  - democracy.tax: View tax information (default: true)
+  - democracy.tax.exempt: Exempt from global taxes (default: false)
+
+--- Data Persistence ---
+
+- Tax data saved to data/tax_record.json
+- Automatic saving with existing 5-minute autosave cycle
+- Per-player tax history, debt tracking, and payment records
+- Transaction log (up to 500 entries)
+
+--- Treasury Integration ---
+
+New transaction types added:
+  - GLOBAL_TAX_INCOME: Revenue from tax collection
+  - TAX_PENALTY_INCOME: Revenue from late penalties
+
+All tax revenue flows directly into the national treasury,
+supporting government operations and public spending.
+
+--- Player Notifications ---
+
+- On-join notification if player has outstanding tax debt
+- Real-time notification when taxes are collected
+- Warning messages for insufficient funds
+- Title screen alert for tax evasion punishment
+- Server-wide broadcast after each collection cycle
+
+============================================
+  Technical Changes
+============================================
+
+New Files:
+  - models/TaxRecord.java (data model)
+  - managers/TaxManager.java (business logic)
+  - gui/TaxGUI.java (GUI interface)
+
+Modified Files:
+  - DemocracyCore.java (TaxManager initialization)
+  - DataManager.java (tax data persistence)
+  - Treasury.java (new transaction types)
+  - GUIAction.java (OPEN_GUI_TAX action)
+  - GUIListener.java (tax GUI event handling)
+  - MainMenuGUI.java (tax item in main menu)
+  - PlayerListener.java (join debt notification)
+  - DemocracyCommand.java (tax commands + tab completion)
+  - config.yml (global-tax section)
+  - gui.yml (tax_item configuration)
+  - language.yml (tax messages)
+  - plugin.yml (version bump, new permissions)
+
+Version: 1.3.0 -> 1.4.0
+============================================

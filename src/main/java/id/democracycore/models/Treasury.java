@@ -64,7 +64,9 @@ public class Treasury {
         STIMULUS("Economic Stimulus"),
         MISC_EXPENSE("Miscellaneous"),
         DEPOSIT_REFUND("Candidate Deposit Refund"),
-        PRESIDENT_SALARY("President Salary");
+        PRESIDENT_SALARY("President Salary"),
+        GLOBAL_TAX_INCOME("Global Tax Income"),
+        TAX_PENALTY_INCOME("Tax Penalty Income");
 
         private final String displayName;
 
