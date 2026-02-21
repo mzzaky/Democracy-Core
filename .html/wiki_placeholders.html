@@ -532,6 +532,7 @@
                 <li><a href="#treasury"><span class="nav-dot"></span>Treasury</a></li>
                 <li><a href="#player"><span class="nav-dot"></span>Player Stats</a></li>
                 <li><a href="#arena"><span class="nav-dot"></span>Arena PvP</a></li>
+                <li><a href="#tax"><span class="nav-dot"></span>Tax System</a></li>
                 <li><a href="#examples"><span class="nav-dot"></span>Examples</a></li>
                 <li><a href="#troubleshooting"><span class="nav-dot"></span>Troubleshooting</a></li>
             </ul>
@@ -552,7 +553,7 @@
                     <div class="info-box-content">
                         <ul>
                             <li><strong>PlaceholderAPI</strong> v2.11.6+</li>
-                            <li><strong>DemocracyCore</strong> v1.3.0+</li>
+                            <li><strong>DemocracyCore</strong> v1.4.0+</li>
                         </ul>
                     </div>
                 </div>
@@ -858,6 +859,128 @@
                         </tr>
                     </tbody>
                 </table>
+            </section>
+
+            <section class="content-section" id="tax">
+                <div class="section-title">
+                    <h2>Tax System Placeholders</h2>
+                    <span class="section-badge">v1.4.0</span>
+                </div>
+                <p>These placeholders expose the Global Tax System data added in v1.4.0. Global placeholders work
+                    server-wide, while player-specific ones require a player context (e.g. scoreboard lines, tab list).
+                </p>
+
+                <h3>Global (Server-Wide)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_tax_enabled%</td>
+                            <td>Whether the tax system is currently active</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_amount%</td>
+                            <td>Configured tax amount per collection cycle</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_interval%</td>
+                            <td>Hours between automatic tax collections</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_next_collection%</td>
+                            <td>Formatted countdown to the next collection (e.g. 8h 30m)</td>
+                            <td>Formatted String</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_total_collected%</td>
+                            <td>Total taxes collected into the treasury (all-time)</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_cycle_count%</td>
+                            <td>Total number of collection cycles completed</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_debtor_count%</td>
+                            <td>Number of players currently carrying tax debt</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_outstanding_debt%</td>
+                            <td>Total outstanding debt across all players</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_penalty_rate%</td>
+                            <td>Late payment penalty rate applied per cycle (e.g. 10%)</td>
+                            <td>Formatted String</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Player-Specific <span class="section-badge" style="font-size:10px;vertical-align:middle;">Context
+                        Required</span></h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_tax_status%</td>
+                            <td>Player's current tax status</td>
+                            <td>Paid / In Debt / Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_debt%</td>
+                            <td>Player's outstanding tax debt amount</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_missed%</td>
+                            <td>Number of missed tax payment cycles</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_is_exempt%</td>
+                            <td>Whether the player is exempt from taxes</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_last_paid%</td>
+                            <td>Formatted date of the player's last tax payment</td>
+                            <td>Formatted String</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_tax_total_paid%</td>
+                            <td>Lifetime total taxes paid by the player</td>
+                            <td>Decimal</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <div class="info-box-title">✅ Implemented in v1.4.0</div>
+                    <div class="info-box-content">
+                        All tax placeholders listed above are fully implemented in
+                        <code>DemocracyExpansion.java</code> as of v1.4.0. Test them with:<br><br>
+                        <code>/papi parse me %democracy_tax_status%</code><br>
+                        <code>/papi parse me %democracy_tax_total_collected%</code>
+                    </div>
+                </div>
             </section>
 
             <section class="content-section" id="examples">

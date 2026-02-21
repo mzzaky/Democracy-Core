@@ -91,11 +91,14 @@ public class TaxGUI {
             ItemMeta payMeta = payItem.getItemMeta();
             payMeta.setDisplayName("\u00a7a\u00a7l\ud83d\udcb5 PAY TAX DEBT");
             List<String> payLore = new ArrayList<>();
-            payLore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
-            payLore.add("\u00a77Outstanding Debt: \u00a7c$" + MessageUtils.formatNumber(playerTax.getOutstandingDebt()));
+            payLore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            payLore.add(
+                    "\u00a77Outstanding Debt: \u00a7c$" + MessageUtils.formatNumber(playerTax.getOutstandingDebt()));
             payLore.add("\u00a77Your Balance: \u00a76$" + MessageUtils.formatNumber(
                     plugin.getVaultHook().getBalance(player.getUniqueId())));
-            payLore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            payLore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             payLore.add("\u00a7e\u26a0 Click to pay your debt!");
             payMeta.setLore(payLore);
             payItem.setItemMeta(payMeta);
@@ -107,7 +110,8 @@ public class TaxGUI {
         ItemStack debtorsItem = createItem(Material.SKELETON_SKULL, "\u00a7c\u00a7l\u26a0 TAX DEBTORS",
                 "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac",
                 "\u00a77Debtors: \u00a7c" + plugin.getTaxManager().getDebtorCount(),
-                "\u00a77Total Debt: \u00a7c$" + MessageUtils.formatNumber(plugin.getTaxManager().getTotalOutstandingDebt()),
+                "\u00a77Total Debt: \u00a7c$"
+                        + MessageUtils.formatNumber(plugin.getTaxManager().getTotalOutstandingDebt()),
                 "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac",
                 "\u00a7aClick to view debtors");
         inv.setItem(32, debtorsItem);
@@ -144,7 +148,8 @@ public class TaxGUI {
 
         int slot = 0;
         for (TaxTransaction tx : recent) {
-            if (slot >= 45) break;
+            if (slot >= 45)
+                break;
 
             Material mat;
             String color;
@@ -223,7 +228,8 @@ public class TaxGUI {
 
         int slot = 0;
         for (Map.Entry<String, PlayerTaxData> entry : debtors) {
-            if (slot >= 45) break;
+            if (slot >= 45)
+                break;
 
             PlayerTaxData taxData = entry.getValue();
 
@@ -239,13 +245,15 @@ public class TaxGUI {
             meta.setDisplayName("\u00a7c" + taxData.getPlayerName());
 
             List<String> lore = new ArrayList<>();
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             lore.add("\u00a77Outstanding Debt: \u00a7c$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()));
             lore.add("\u00a77Missed Payments: \u00a7c" + taxData.getMissedPayments());
             lore.add("\u00a77Total Paid: \u00a7a$" + MessageUtils.formatNumber(taxData.getTotalAmountPaid()));
             lore.add("\u00a77Penalties Paid: \u00a7e$" + MessageUtils.formatNumber(taxData.getTotalPenaltiesPaid()));
             lore.add("\u00a77Punishments: \u00a74" + taxData.getPunishmentHistory().size());
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             if (taxData.isExempt()) {
                 lore.add("\u00a76\u2605 Tax Exempt");
             }
@@ -257,14 +265,16 @@ public class TaxGUI {
         }
 
         if (debtors.isEmpty()) {
-            ItemStack noDebtors = createItem(Material.LIME_STAINED_GLASS_PANE, "\u00a7aNo debtors! Everyone is paid up.");
+            ItemStack noDebtors = createItem(Material.LIME_STAINED_GLASS_PANE,
+                    "\u00a7aNo debtors! Everyone is paid up.");
             inv.setItem(22, noDebtors);
         }
 
         // Summary (Slot 49)
         ItemStack summaryItem = createItem(Material.GOLD_INGOT, "\u00a76\u00a7lDEBT SUMMARY",
                 "\u00a77Total Debtors: \u00a7c" + debtors.size(),
-                "\u00a77Total Debt: \u00a7c$" + MessageUtils.formatNumber(plugin.getTaxManager().getTotalOutstandingDebt()));
+                "\u00a77Total Debt: \u00a7c$"
+                        + MessageUtils.formatNumber(plugin.getTaxManager().getTotalOutstandingDebt()));
         inv.setItem(48, summaryItem);
 
         // Navigation
@@ -281,19 +291,23 @@ public class TaxGUI {
 
         ItemStack item = new ItemStack(enabled ? Material.BEACON : Material.BEDROCK);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(enabled ? "\u00a7a\u00a7l\u2714 TAX SYSTEM ACTIVE" : "\u00a7c\u00a7l\u2716 TAX SYSTEM DISABLED");
+        meta.setDisplayName(
+                enabled ? "\u00a7a\u00a7l\u2714 TAX SYSTEM ACTIVE" : "\u00a7c\u00a7l\u2716 TAX SYSTEM DISABLED");
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Status: " + (enabled ? "\u00a7aEnabled" : "\u00a7cDisabled"));
         lore.add("\u00a77Collection Cycles: \u00a7f" + record.getTotalCollectionCycles());
         lore.add("\u00a77Total Tax Collected: \u00a7a$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
         lore.add("\u00a77Total Penalties: \u00a7c$" + MessageUtils.formatNumber(record.getTotalPenaltiesCollected()));
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         meta.setLore(lore);
         item.setItemMeta(meta);
 
-        if (enabled) addGlow(item);
+        if (enabled)
+            addGlow(item);
         return item;
     }
 
@@ -308,12 +322,14 @@ public class TaxGUI {
         int inactiveDays = (int) plugin.getTaxManager().getInactiveDaysThreshold();
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Tax Amount: \u00a76$" + MessageUtils.formatNumber(amount));
         lore.add("\u00a77Collection Interval: \u00a7f" + intervalHours + " hours");
         lore.add("\u00a77Late Penalty: \u00a7c" + String.format("%.0f", penaltyRate * 100) + "% of debt");
         lore.add("\u00a77Inactive Exempt: \u00a7f" + inactiveDays + "+ days offline");
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
@@ -325,12 +341,14 @@ public class TaxGUI {
         meta.setDisplayName("\u00a76\u00a7l\ud83c\udfe6 TREASURY TAX INCOME");
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Tax Revenue: \u00a7a$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
         lore.add("\u00a77Penalty Revenue: \u00a7e$" + MessageUtils.formatNumber(record.getTotalPenaltiesCollected()));
         lore.add("\u00a77Total Revenue: \u00a76$" + MessageUtils.formatNumber(
                 record.getTotalTaxCollected() + record.getTotalPenaltiesCollected()));
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77All tax goes to the");
         lore.add("\u00a77national treasury");
         meta.setLore(lore);
@@ -347,7 +365,8 @@ public class TaxGUI {
         int taxable = plugin.getTaxManager().getTaxablePlayerCount();
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         if (remaining > 0) {
             lore.add("\u00a77Time Remaining: \u00a7f" + MessageUtils.formatTime(remaining));
         } else {
@@ -356,7 +375,8 @@ public class TaxGUI {
         lore.add("\u00a77Taxable Players: \u00a7f" + taxable);
         lore.add("\u00a77Expected Revenue: \u00a76$" + MessageUtils.formatNumber(
                 taxable * plugin.getTaxManager().getTaxAmount()));
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
@@ -368,14 +388,16 @@ public class TaxGUI {
         meta.setDisplayName("\u00a7d\u00a7l\ud83d\udcca COLLECTION STATISTICS");
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Total Cycles: \u00a7f" + record.getTotalCollectionCycles());
         lore.add("\u00a77Active Debtors: \u00a7c" + plugin.getTaxManager().getDebtorCount());
         lore.add("\u00a77Outstanding Debt: \u00a7c$" + MessageUtils.formatNumber(
                 plugin.getTaxManager().getTotalOutstandingDebt()));
         lore.add("\u00a77Punishment Threshold: \u00a74" +
                 plugin.getTaxManager().getMaxMissedBeforePunishment() + " missed payments");
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
@@ -388,12 +410,14 @@ public class TaxGUI {
         meta.setDisplayName("\u00a7b\u00a7l\ud83d\udc64 MY TAX STATUS");
 
         List<String> lore = new ArrayList<>();
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Total Taxes Paid: \u00a7f" + taxData.getTotalTaxesPaid());
         lore.add("\u00a77Total Amount Paid: \u00a7a$" + MessageUtils.formatNumber(taxData.getTotalAmountPaid()));
         lore.add("\u00a77Missed Payments: \u00a7c" + taxData.getMissedPayments());
-        lore.add("\u00a77Outstanding Debt: " + (taxData.getOutstandingDebt() > 0 ?
-                "\u00a7c$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()) : "\u00a7a$0"));
+        lore.add("\u00a77Outstanding Debt: " + (taxData.getOutstandingDebt() > 0
+                ? "\u00a7c$" + MessageUtils.formatNumber(taxData.getOutstandingDebt())
+                : "\u00a7a$0"));
         lore.add("\u00a77Penalties Paid: \u00a7e$" + MessageUtils.formatNumber(taxData.getTotalPenaltiesPaid()));
 
         if (taxData.isExempt()) {
@@ -407,7 +431,8 @@ public class TaxGUI {
                     System.currentTimeMillis() - taxData.getLastPaymentTime()) + " ago");
         }
 
-        lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        lore.add(
+                "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         meta.setLore(lore);
         head.setItemMeta(meta);
         return head;
@@ -423,24 +448,28 @@ public class TaxGUI {
         if (hasDebt) {
             meta.setDisplayName("\u00a7c\u00a7l\u26a0 OUTSTANDING DEBT");
             List<String> lore = new ArrayList<>();
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             lore.add("\u00a77Debt: \u00a7c$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()));
             lore.add("\u00a77Missed Payments: \u00a7c" + taxData.getMissedPayments());
             lore.add("");
             lore.add("\u00a7cPay your debt to avoid");
             lore.add("\u00a7cfurther penalties!");
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             int threshold = plugin.getTaxManager().getMaxMissedBeforePunishment();
             lore.add("\u00a74Punishment at " + threshold + " missed payments");
             meta.setLore(lore);
         } else {
             meta.setDisplayName("\u00a7a\u00a7l\u2714 NO OUTSTANDING DEBT");
             List<String> lore = new ArrayList<>();
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             lore.add("\u00a7aYou are in good standing!");
             lore.add("\u00a77Keep paying your taxes");
             lore.add("\u00a77to stay debt-free.");
-            lore.add("\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
             meta.setLore(lore);
         }
 

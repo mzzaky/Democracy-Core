@@ -494,7 +494,7 @@ gui:
 
       # Global Tax System (Slot 37)
       tax_item:
-        gui_slot: 37
+        gui_slot: 22
         material: SUNFLOWER
         custom_model_data: 0
         display_name: "§e§l💲 GLOBAL TAX"

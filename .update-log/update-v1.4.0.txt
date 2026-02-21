@@ -116,6 +116,32 @@ supporting government operations and public spending.
 - Server-wide broadcast after each collection cycle
 
 ============================================
+  PlaceholderAPI Integration
+============================================
+
+New tax-related placeholders are now available for use with
+PlaceholderAPI in scoreboards, holograms, chat formatters, etc.
+
+Global (Server-Wide) Placeholders:
+  %democracy_tax_enabled%          - Whether the tax system is enabled (Yes/No)
+  %democracy_tax_amount%           - Current tax amount per cycle
+  %democracy_tax_interval%         - Collection interval in hours
+  %democracy_tax_next_collection%  - Formatted time until next collection
+  %democracy_tax_total_collected%  - Total taxes collected (all-time)
+  %democracy_tax_cycle_count%      - Total number of collection cycles run
+  %democracy_tax_debtor_count%     - Number of players currently in debt
+  %democracy_tax_outstanding_debt% - Total outstanding debt across all players
+  %democracy_tax_penalty_rate%     - Late penalty rate (e.g. 10%)
+
+Player-Specific Placeholders (requires player context):
+  %democracy_tax_status%           - Player tax status (Paid / In Debt / Exempt)
+  %democracy_tax_debt%             - Player's current outstanding tax debt
+  %democracy_tax_missed%           - Number of missed tax payments
+  %democracy_tax_is_exempt%        - Whether player is tax-exempt (Yes/No)
+  %democracy_tax_last_paid%        - Formatted date of last tax payment
+  %democracy_tax_total_paid%       - Total taxes paid by the player (lifetime)
+
+============================================
   Technical Changes
 ============================================
 

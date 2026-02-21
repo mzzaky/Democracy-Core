@@ -1,9 +1,14 @@
 package id.democracycore.placeholders;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.bukkit.OfflinePlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import id.democracycore.DemocracyCore;
 import id.democracycore.models.Government.CabinetPosition;
+import id.democracycore.models.TaxRecord.PlayerTaxData;
 
 public class DemocracyExpansion extends PlaceholderExpansion {
 
@@ -117,6 +122,47 @@ public class DemocracyExpansion extends PlaceholderExpansion {
             return String.format("%.2f", plugin.getTreasuryManager().getTotalExpenses());
         }
 
+        // === TAX SYSTEM PLACEHOLDERS (Global) ===
+        var taxManager = plugin.getTaxManager();
+        var taxRecord = taxManager.getTaxRecord();
+
+        if (params.equalsIgnoreCase("tax_enabled")) {
+            return taxManager.isEnabled() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("tax_amount")) {
+            return String.format("%.2f", taxManager.getTaxAmount());
+        }
+
+        if (params.equalsIgnoreCase("tax_interval")) {
+            long hours = plugin.getConfig().getLong("global-tax.collection-interval-hours", 24);
+            return String.valueOf(hours);
+        }
+
+        if (params.equalsIgnoreCase("tax_next_collection")) {
+            return formatTime(taxManager.getTimeUntilNextCollection());
+        }
+
+        if (params.equalsIgnoreCase("tax_total_collected")) {
+            return String.format("%.2f", taxRecord.getTotalTaxCollected());
+        }
+
+        if (params.equalsIgnoreCase("tax_cycle_count")) {
+            return String.valueOf(taxRecord.getTotalCollectionCycles());
+        }
+
+        if (params.equalsIgnoreCase("tax_debtor_count")) {
+            return String.valueOf(taxManager.getDebtorCount());
+        }
+
+        if (params.equalsIgnoreCase("tax_outstanding_debt")) {
+            return String.format("%.2f", taxManager.getTotalOutstandingDebt());
+        }
+
+        if (params.equalsIgnoreCase("tax_penalty_rate")) {
+            return String.format("%.0f%%", taxManager.getLatePenaltyRate() * 100);
+        }
+
         // === PLAYER-SPECIFIC PLACEHOLDERS ===
         if (player != null) {
             var playerData = plugin.getDataManager().getPlayerData(player.getUniqueId());
@@ -191,6 +237,43 @@ public class DemocracyExpansion extends PlaceholderExpansion {
 
                 if (params.equalsIgnoreCase("best_killstreak")) {
                     return String.valueOf(playerData.getBestKillstreak());
+                }
+
+                // === TAX SYSTEM PLACEHOLDERS (Player-specific) ===
+                PlayerTaxData taxData = taxRecord.getPlayerTaxData(player.getUniqueId().toString());
+
+                if (params.equalsIgnoreCase("tax_status")) {
+                    if (taxData == null)
+                        return "N/A";
+                    if (taxData.isExempt())
+                        return "Exempt";
+                    if (taxData.getOutstandingDebt() > 0)
+                        return "In Debt";
+                    return "Paid";
+                }
+
+                if (params.equalsIgnoreCase("tax_debt")) {
+                    return taxData != null ? String.format("%.2f", taxData.getOutstandingDebt()) : "0.00";
+                }
+
+                if (params.equalsIgnoreCase("tax_missed")) {
+                    return taxData != null ? String.valueOf(taxData.getMissedPayments()) : "0";
+                }
+
+                if (params.equalsIgnoreCase("tax_is_exempt")) {
+                    return taxData != null && taxData.isExempt() ? "Yes" : "No";
+                }
+
+                if (params.equalsIgnoreCase("tax_last_paid")) {
+                    if (taxData == null || taxData.getLastPaymentTime() == 0)
+                        return "Never";
+                    return DateTimeFormatter.ofPattern("dd MMM yyyy")
+                            .withZone(ZoneId.systemDefault())
+                            .format(Instant.ofEpochMilli(taxData.getLastPaymentTime()));
+                }
+
+                if (params.equalsIgnoreCase("tax_total_paid")) {
+                    return taxData != null ? String.format("%.2f", taxData.getTotalAmountPaid()) : "0.00";
                 }
             }
 
