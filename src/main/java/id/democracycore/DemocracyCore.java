@@ -1,6 +1,7 @@
 package id.democracycore;
 
 import java.io.File;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -57,11 +58,8 @@ public class DemocracyCore extends JavaPlugin {
         }
         languageConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "language.yml"));
 
-        if (!new File(getDataFolder(), "gui.yml").exists()) {
-            saveResource("gui.yml", false);
-        }
         MessageUtils.loadLanguage();
-        guiConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "gui.yml"));
+        loadGUIConfigs();
         id.democracycore.gui.MainMenuGUI.loadGUITitles(this);
 
         // Initialize Vault
@@ -274,7 +272,56 @@ public class DemocracyCore extends JavaPlugin {
     }
 
     public void reloadGUI() {
-        guiConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "gui.yml"));
+        loadGUIConfigs();
         id.democracycore.gui.MainMenuGUI.loadGUITitles(this);
+    }
+
+    private void loadGUIConfigs() {
+        saveResourceIfMissing("custom_gui/main_gui.yml");
+        saveResourceIfMissing("custom_gui/history_gui.yml");
+        saveResourceIfMissing("custom_gui/cabinet_gui.yml");
+
+        File mainGuiFile = new File(getDataFolder(), "custom_gui/main_gui.yml");
+        File legacyGuiFile = new File(getDataFolder(), "gui.yml");
+
+        if (!mainGuiFile.exists() && legacyGuiFile.exists()) {
+            guiConfig = YamlConfiguration.loadConfiguration(legacyGuiFile);
+            return;
+        }
+
+        guiConfig = YamlConfiguration.loadConfiguration(mainGuiFile);
+
+        mergeConfigurationIntoGui("custom_gui/history_gui.yml");
+        mergeConfigurationIntoGui("custom_gui/cabinet_gui.yml");
+    }
+
+    private void mergeConfigurationIntoGui(String relativePath) {
+        File file = new File(getDataFolder(), relativePath);
+        if (!file.exists()) {
+            return;
+        }
+
+        YamlConfiguration additionalConfig = YamlConfiguration.loadConfiguration(file);
+        mergeSections(additionalConfig.getValues(true), false);
+    }
+
+    private void mergeSections(Map<String, Object> values, boolean overwrite) {
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String key = entry.getKey();
+            if (key.isEmpty()) {
+                continue;
+            }
+
+            if (overwrite || !guiConfig.contains(key)) {
+                guiConfig.set(key, entry.getValue());
+            }
+        }
+    }
+
+    private void saveResourceIfMissing(String resourcePath) {
+        File resourceFile = new File(getDataFolder(), resourcePath);
+        if (!resourceFile.exists()) {
+            saveResource(resourcePath, false);
+        }
     }
 }
