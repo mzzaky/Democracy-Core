@@ -3,6 +3,8 @@ package id.democracycore;
 import java.io.File;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -100,7 +102,7 @@ public class DemocracyCore extends JavaPlugin {
             getLogger().info("PlaceholderAPI found! Registered placeholders.");
         }
 
-        getLogger().info("DemocracyCore has been enabled!");
+        sendSplashScreen();
     }
 
     @Override
@@ -109,6 +111,42 @@ public class DemocracyCore extends JavaPlugin {
             dataManager.saveAll();
         }
         getLogger().info("DemocracyCore has been disabled!");
+    }
+
+    private void sendSplashScreen() {
+        ConsoleCommandSender console = Bukkit.getConsoleSender();
+        String version = getDescription().getVersion();
+
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', ""));
+        console.sendMessage(
+                ChatColor.translateAlternateColorCodes('&', "  &b_____                                              "));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &b|  __ \\                                            "));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &b| |  | | ___ _ __ ___   ___   ___ _ __ __ _  ___ _   _ "));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &b| |  | |/ _ \\ '_ ` _ \\ / _ \\ / __| '__/ _` |/ __| | | |"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &b| |__| |  __/ | | | | | (_) | (__| | | (_| | (__| |_| |"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &b|_____/ \\___|_| |_| |_|\\___/ \\___|_|  \\__,_|\\___|\\__, |"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "            &3Core                 &fPlugin          &b__/ |"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "                                                  &b|___/ "));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', ""));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &7===================================================="));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', "  &ePlugin Info:"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', "  &8• &aVersion: &f" + version));
+        console.sendMessage(
+                ChatColor.translateAlternateColorCodes('&', "  &8• &aServer: &f" + getServer().getVersion()));
+        console.sendMessage(
+                ChatColor.translateAlternateColorCodes('&', "  &8• &aStatus: &a&lSUCCESSFULLY LOADED \u2714"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "  &7===================================================="));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', "  &3Thank you for using DemocracyCore!"));
+        console.sendMessage(ChatColor.translateAlternateColorCodes('&', ""));
     }
 
     private void registerListeners() {
