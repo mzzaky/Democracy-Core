@@ -1,0 +1,99 @@
+# Cabinet GUI configuration (split from main_gui.yml)
+
+gui:
+  cabinet_menu:
+    title: "§e§l📋 CABINET 📋"
+    inventory_slot: 54
+    items:
+      # Header / Overview (Slot 4)
+      header_item:
+        gui_slot: 4
+        material: ENCHANTED_BOOK
+        custom_model_data: 0
+        display_name: "§e§l📋 Cabinet Overview"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Total Positions: §f{total}"
+          - "§7Filled: §a{filled} §7/ §f{total}"
+          - "§7Vacant: §c{vacant}"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Click a position to view or appoint."
+        click_sound: "item.book.page_turn"
+
+      # President Head (Slot 31)
+      president_head:
+        gui_slot: 31
+        material: PLAYER_HEAD
+        custom_model_data: 0
+        display_name: "§6§l👑 PRESIDENT"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Name: §f{president_name}"
+          - "§7Term: §f{term}"
+          - "§7Approval: §e{rating} ⭐"
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        click_sound: "block.anvil.use"
+        on_click: "<open_gui_government>"
+
+      # Active Decisions Summary (Slot 29)
+      active_decisions:
+        gui_slot: 29
+        # When decisions are active
+        active:
+          material: BEACON
+          custom_model_data: 0
+          display_name: "§d§lActive Cabinet Decisions: {decisions_count}"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7Click to view the first active"
+            - "§7position's decisions."
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          click_sound: "block.beacon.activate"
+        # When no decisions are active
+        inactive:
+          material: GLASS
+          custom_model_data: 0
+          display_name: "§7§lNo Active Decisions"
+          lore:
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            - "§7No cabinet decisions are"
+            - "§7currently active."
+            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          click_sound: "block.glass.break"
+
+      # My Position Button (Slot 33) — only visible if the viewer is a minister
+      my_position:
+        gui_slot: 33
+        material: DIAMOND
+        custom_model_data: 0
+        display_name: "§b§lYour Position"
+        lore:
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+          - "§7Click to manage your"
+          - "§7ministerial decisions."
+          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        click_sound: "block.amethyst_block.chime"
+
+      # Back Button (Slot 45)
+      back_button:
+        gui_slot: 45
+        material: ARROW
+        custom_model_data: 0
+        display_name: "§7§l← Back"
+        lore:
+          - "§7Return to Government Menu"
+        click_sound: "ui.button.click"
+        on_click: "<open_gui_government>"
+
+      # Close Button (Slot 53)
+      close_button:
+        gui_slot: 53
+        material: BARRIER
+        custom_model_data: 0
+        display_name: "§c§lClose"
+        lore:
+          - "§7Click to close"
+        click_sound: "block.chest.close"
+        on_click: "<action_close_inventory>"
+
+
