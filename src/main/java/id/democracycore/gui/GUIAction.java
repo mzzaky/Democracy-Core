@@ -22,6 +22,10 @@ public enum GUIAction {
     OPEN_GUI_LEADERBOARD("open_gui_leaderboard"),
     OPEN_GUI_HELP("open_gui_help"),
     OPEN_GUI_TAX("open_gui_tax"),
+    OPEN_GUI_ARENA("open_gui_arena"),
+    OPEN_GUI_ARENA_LEADERBOARD("open_gui_arena_leaderboard"),
+    OPEN_GUI_ARENA_KIT("open_gui_arena_kit"),
+    OPEN_GUI_CABINET_APPOINT("open_gui_cabinet_appoint"),
 
     // Specific Actions
     ACTION_REGISTER_CANDIDATE("action_register_candidate"),
@@ -31,6 +35,9 @@ public enum GUIAction {
     ACTION_ENDORSE_CANDIDATE("action_endorse_candidate"),
     ACTION_DONATE_TREASURY("action_donate_treasury"),
     ACTION_JOIN_ARENA("action_join_arena"),
+    ACTION_ARENA_START("action_arena_start"),
+    ACTION_ARENA_END("action_arena_end"),
+    ACTION_ARENA_LEAVE("action_arena_leave"),
     ACTION_REFRESH_GUI("action_refresh_gui"),
     ACTION_CONSOLE_COMMAND("action_console_command"),
 

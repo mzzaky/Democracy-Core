@@ -55,6 +55,10 @@ government:
   active_order: "<gray>- {type} ({time})"
   active_decisions_title: "<yellow>⚖ ACTIVE CABINET DECISIONS:"
   active_decision: "<gray>- {type} ({time})"
+  broadcast_type_prompt: "<yellow>Please type your broadcast message in chat. Your next message will be sent as a Global Broadcast."
+  broadcast_cooldown: "<red>The broadcast feature is still on cooldown."
+  broadcast_not_president: "<red>Only the President can send a broadcast message."
+  broadcast_header: "<gold><bold>📢 PRESIDENTIAL BROADCAST 📢"
 
 # Election Messages
 election:

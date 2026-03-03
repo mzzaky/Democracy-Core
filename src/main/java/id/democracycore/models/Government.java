@@ -14,12 +14,15 @@ public class Government {
     private List<ApprovalRating> approvalRatings;
     private double currentApprovalRating;
 
+    private long lastBroadcastTime;
+
     public Government() {
         this.cabinet = new EnumMap<>(CabinetPosition.class);
         this.approvalRatings = new ArrayList<>();
         this.consecutiveTerms = 0;
         this.currentApprovalRating = 3.0;
         this.totalSalaryPayouts = 0.0;
+        this.lastBroadcastTime = 0;
     }
 
     private double totalSalaryPayouts;
@@ -236,6 +239,14 @@ public class Government {
 
     public void setCurrentApprovalRating(double currentApprovalRating) {
         this.currentApprovalRating = currentApprovalRating;
+    }
+
+    public long getLastBroadcastTime() {
+        return lastBroadcastTime;
+    }
+
+    public void setLastBroadcastTime(long lastBroadcastTime) {
+        this.lastBroadcastTime = lastBroadcastTime;
     }
 
     public boolean hasPresident() {

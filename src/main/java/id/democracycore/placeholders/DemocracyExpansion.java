@@ -3,10 +3,14 @@ package id.democracycore.placeholders;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.bukkit.OfflinePlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import id.democracycore.DemocracyCore;
+import id.democracycore.models.CabinetDecision;
+import id.democracycore.models.ExecutiveOrder;
+import id.democracycore.models.ExecutiveOrder.ExecutiveOrderType;
 import id.democracycore.models.Government.CabinetPosition;
 import id.democracycore.models.TaxRecord.PlayerTaxData;
 
@@ -82,6 +86,164 @@ public class DemocracyExpansion extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("culture_minister")) {
             return getCabinetMemberName(CabinetPosition.CULTURE);
+        }
+
+        if (params.equalsIgnoreCase("president_uuid")) {
+            java.util.UUID uuid = plugin.getGovernmentManager().getGovernment().getPresidentUUID();
+            return uuid != null ? uuid.toString() : "None";
+        }
+
+        if (params.equalsIgnoreCase("president_online")) {
+            java.util.UUID uuid = plugin.getGovernmentManager().getGovernment().getPresidentUUID();
+            if (uuid == null)
+                return "No";
+            return org.bukkit.Bukkit.getPlayer(uuid) != null ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("cabinet_count")) {
+            return String.valueOf(plugin.getGovernmentManager().getGovernment().getCabinet().size());
+        }
+
+        if (params.equalsIgnoreCase("cabinet_salary_total")) {
+            return String.format("%.2f", plugin.getGovernmentManager().getGovernment().getTotalSalaryPayouts());
+        }
+
+        // === EXECUTIVE ORDER PLACEHOLDERS ===
+        var eoManager = plugin.getExecutiveOrderManager();
+
+        if (params.equalsIgnoreCase("order_active")) {
+            List<ExecutiveOrder> orders = eoManager.getActiveOrders();
+            return orders.isEmpty() ? "No" : "Yes";
+        }
+
+        if (params.equalsIgnoreCase("order_count")) {
+            return String.valueOf(eoManager.getActiveOrders().size());
+        }
+
+        if (params.equalsIgnoreCase("order_name")) {
+            List<ExecutiveOrder> orders = eoManager.getActiveOrders();
+            if (orders.isEmpty())
+                return "None";
+            return orders.get(0).getType().getDisplayName();
+        }
+
+        if (params.equalsIgnoreCase("order_time")) {
+            List<ExecutiveOrder> orders = eoManager.getActiveOrders();
+            if (orders.isEmpty())
+                return "0s";
+            return formatTime(orders.get(0).getRemainingTime());
+        }
+
+        if (params.equalsIgnoreCase("order_effect")) {
+            List<ExecutiveOrder> orders = eoManager.getActiveOrders();
+            if (orders.isEmpty())
+                return "None";
+            return orders.get(0).getType().getEffectDescription();
+        }
+
+        if (params.equalsIgnoreCase("order_cooldown")) {
+            long remaining = eoManager.getOrderCooldownRemaining(null);
+            return remaining <= 0 ? "Ready" : formatTime(remaining);
+        }
+
+        if (params.equalsIgnoreCase("order_pvp_disabled")) {
+            return eoManager.isPvPDisabled() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("order_purge_active")) {
+            return eoManager.isPurgeActive() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("order_xp_multiplier")) {
+            return String.format("%.2f", eoManager.getXPMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("order_vault_multiplier")) {
+            return String.format("%.2f", eoManager.getVaultMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("order_farming_multiplier")) {
+            return String.format("%.2f", eoManager.getFarmingMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("order_pvp_damage_multiplier")) {
+            return String.format("%.2f", eoManager.getPvPDamageMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("order_shop_discount")) {
+            double discount = eoManager.getShopDiscount();
+            return discount > 0 ? String.format("%.0f%%", discount * 100) : "0%";
+        }
+
+        // Specific executive order status checkers (%democracy_order_GOLDEN_AGE%, etc.)
+        for (ExecutiveOrderType type : ExecutiveOrderType.values()) {
+            String key = "order_" + type.name().toLowerCase();
+            if (params.equalsIgnoreCase(key)) {
+                return eoManager.isOrderActive(type) ? "Yes" : "No";
+            }
+            String timeKey = "order_" + type.name().toLowerCase() + "_time";
+            if (params.equalsIgnoreCase(timeKey)) {
+                ExecutiveOrder order = eoManager.getActiveOrder(type);
+                return order != null ? formatTime(order.getRemainingTime()) : "0s";
+            }
+        }
+
+        // === CABINET MINISTER ORDER (DECISION) PLACEHOLDERS ===
+        var cabinetManager = plugin.getCabinetManager();
+
+        if (params.equalsIgnoreCase("minister_order_active")) {
+            return cabinetManager.getAllActiveDecisions().isEmpty() ? "No" : "Yes";
+        }
+
+        if (params.equalsIgnoreCase("minister_order_count")) {
+            return String.valueOf(cabinetManager.getAllActiveDecisions().size());
+        }
+
+        if (params.equalsIgnoreCase("minister_order_drop_multiplier")) {
+            return String.format("%.2f", cabinetManager.getGlobalDropMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("minister_order_xp_multiplier")) {
+            return String.format("%.2f", cabinetManager.getGlobalXpMultiplier());
+        }
+
+        if (params.equalsIgnoreCase("minister_order_tax_holiday")) {
+            return cabinetManager.isTaxHolidayActive() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("minister_order_trade_fair")) {
+            return cabinetManager.isTradeFairActive() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("minister_order_resource_boom")) {
+            return cabinetManager.isResourceBoomActive() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("minister_order_construction_boom")) {
+            return cabinetManager.isConstructionBoomActive() ? "Yes" : "No";
+        }
+
+        if (params.equalsIgnoreCase("minister_order_festival")) {
+            return cabinetManager.isFestivalActive() ? "Yes" : "No";
+        }
+
+        // Per-minister active decision name and time
+        // (%democracy_minister_defense_order%, etc.)
+        for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
+            String posKey = "minister_" + pos.name().toLowerCase() + "_order";
+            if (params.equalsIgnoreCase(posKey)) {
+                var decisions = cabinetManager.getActiveDecisionsByPosition(pos);
+                if (decisions == null || decisions.isEmpty())
+                    return "None";
+                return decisions.get(0).getType().getDisplayName();
+            }
+            String posTimeKey = "minister_" + pos.name().toLowerCase() + "_order_time";
+            if (params.equalsIgnoreCase(posTimeKey)) {
+                var decisions = cabinetManager.getActiveDecisionsByPosition(pos);
+                if (decisions == null || decisions.isEmpty())
+                    return "0s";
+                return formatTime(decisions.get(0).getRemainingTime());
+            }
         }
 
         // === ELECTION PLACEHOLDERS ===

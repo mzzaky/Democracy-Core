@@ -1,0 +1,225 @@
+====================================================
+  DEMOCRACY CORE - UPDATE LOG v1.4.1
+====================================================
+
+[FITUR BARU]
+- Tambah command admin baru: /dc admin action <action_id> <player>
+  → Dapat digunakan oleh admin / console untuk mengeksekusi semua
+    GUI action (open_gui_* dan action_*) pada player target
+  → Mendukung semua 21 action yang terdaftar di gui.yml
+  → Berjalan dari console, RCON, atau in-game admin
+
+- Tab completion lengkap untuk /dc admin action:
+  → Arg 3: autocomplete semua action_id yang tersedia
+  → Arg 4: autocomplete nama player yang online
+
+- Tambah "action" ke daftar sub-command admin di tab completion
+
+[PERBAIKAN BUG]
+- Fix: Command `/dc admin set president <player>` selalu mengembalikan
+  "player not found" meskipun player sedang online
+  → Root cause: `Bukkit.getOfflinePlayer()` di 1.20+ selalu mengembalikan
+    objek OfflinePlayer (dengan offline UUID) bahkan untuk player yang
+    belum pernah bermain, sehingga `hasPlayedBefore()` selalu false
+  → Fix: Mengubah logika pencarian: pertama coba `Bukkit.getPlayer()`
+    untuk player online, baru fallback ke `getOfflinePlayer()` dengan
+    pengecekan `hasPlayedBefore()` untuk player offline
+
+- Fix: Mengganti Material kustom di gui.yml tidak berpengaruh (GUI tetap
+  menampilkan material lama / item tidak bisa diklik)
+  → Root cause #1: GUIListener memeriksa tipe material secara hardcode
+    (misal: clicked.getType() == Material.LECTERN) — jika material
+    diganti di config, klik tidak akan pernah ter-trigger
+  → Root cause #2: Metode createCabinetItem, createTreasuryItem,
+    createElectionItem, createArenaItem, createHistoryItem,
+    createMyStatsItem, createLeaderboardItem, createHelpItem, dan
+    createExecutiveOrdersItem membuat item dengan Material hardcode,
+    bukan membaca dari gui.yml
+  → Root cause #3: playClickSound() menggunakan nomor slot hardcode
+    (case 4, 10, 12...) — jika gui_slot diubah di config, sound
+    tidak terpicu
+
+  → Fix GUIListener: semua click handler di handleMainMenuGUI()
+    sekarang hanya mengecek SLOT (dari config), tidak lagi mengecek
+    tipe material
+  → Fix MainMenuGUI: semua create*Item() sekarang membaca material
+    dari gui.yml via getGUIMaterial(), dengan fallback ke default jika
+    config tidak ada
+  → Fix playClickSound(): diganti dari switch hardcoded menjadi loop
+    dinamis yang membaca slot dari config secara real-time
+  → Fix: tax_item sekarang terdeteksi berdasarkan gui_slot (slot 22
+    sesuai config), bukan slot 37 yang lama
+
+[TEKNIKAL]
+- Seluruh item di Main Menu GUI kini sepenuhnya dikontrol oleh gui.yml
+  (material, display_name, lore, custom_model_data, hide_attributes,
+  click_sound, gui_slot, on_click)
+- Tidak ada lagi material atau slot yang hardcoded di click handler
+
+[PLACEHOLDER BARU - DemocracyExpansion.java]
+Tambah grup placeholder baru untuk Executive Order Presiden:
+  - %democracy_order_active%            → Apakah ada executive order aktif?
+  - %democracy_order_count%             → Jumlah executive order yang aktif
+  - %democracy_order_name%              → Nama order pertama yang aktif
+  - %democracy_order_time%              → Sisa waktu order pertama
+  - %democracy_order_effect%            → Deskripsi efek order pertama
+  - %democracy_order_cooldown%          → Waktu cooldown sebelum order berikutnya
+  - %democracy_order_pvp_disabled%      → Apakah PvP nonaktif (State of Emergency)?
+  - %democracy_order_purge_active%      → Apakah Purge Protocol aktif?
+  - %democracy_order_xp_multiplier%     → Multiplier XP dari order aktif
+  - %democracy_order_vault_multiplier%  → Multiplier vault points
+  - %democracy_order_farming_multiplier%→ Multiplier drop farming/fishing
+  - %democracy_order_pvp_damage_multiplier% → Multiplier damage PvP
+  - %democracy_order_shop_discount%     → Diskon shop (format %)
+  - %democracy_order_<TYPE_NAME>%       → Status tiap order by enum name (Yes/No)
+  - %democracy_order_<TYPE_NAME>_time%  → Sisa waktu tiap order by enum name
+
+Tambah grup placeholder baru untuk Order Menteri (Cabinet Decision):
+  - %democracy_minister_order_active%          → Ada keputusan menteri aktif?
+  - %democracy_minister_order_count%           → Jumlah keputusan menteri aktif
+  - %democracy_minister_order_drop_multiplier% → Multiplier drop global dari menteri
+  - %democracy_minister_order_xp_multiplier%   → Multiplier XP global dari menteri
+  - %democracy_minister_order_tax_holiday%     → Apakah Tax Holiday aktif?
+  - %democracy_minister_order_trade_fair%      → Apakah Trade Fair aktif?
+  - %democracy_minister_order_resource_boom%   → Apakah Resource Boom aktif?
+  - %democracy_minister_order_construction_boom% → Apakah Construction Boom aktif?
+  - %democracy_minister_order_festival%        → Apakah Festival Week aktif?
+  - %democracy_minister_<POS>_order%           → Nama keputusan menteri per posisi
+  - %democracy_minister_<POS>_order_time%      → Sisa waktu keputusan per posisi
+    (POS: defense, treasury, commerce, infrastructure, culture)
+
+Tambah placeholder utility pemerintahan:
+  - %democracy_president_uuid%          → UUID presiden saat ini
+  - %democracy_president_online%        → Apakah presiden sedang online?
+  - %democracy_cabinet_count%           → Jumlah posisi kabinet terisi
+  - %democracy_cabinet_salary_total%    → Total gaji kabinet yang sudah dibayar
+
+Dokumentasi wiki diperbarui:
+  - Tambah dua seksi baru di wiki_placeholders.html:
+    → "Executive Order Placeholders" (#executive_orders)
+    → "Minister Order Placeholders" (#minister_orders)
+  - Tambah tabel Government Utility di seksi Government
+  - Nav sidebar diperbarui dengan 2 link baru
+
+[FITUR BARU - Presidential Arena GUI]
+- Tambah GUI khusus manajemen Presidential Arena Games (ArenaGUI.java)
+  → Dapat diakses dari Main Menu dengan klik item Arena (slot 23)
+  → Sebelumnya hanya menampilkan pesan chat; kini membuka GUI lengkap
+
+- Arena Manager GUI (54 slot) mencakup:
+  → Status sesi real-time (ACTIVE/INACTIVE) dengan detail sisa waktu,
+    hari ke-berapa, dan jumlah pemain dalam arena
+  → Info ekonomi: kill reward ($5k), death penalty ($5k)
+  → Info killstreak bonuses: +$10k (5), +$25k (10), +$50k (25), +$100k (50)
+  → Prize pool overview: daily rewards top 10 + grand prize champion
+  → Statistik pribadi pemain: kills, deaths, KDR, streak, vault earned, rank
+  → Preview top 5 leaderboard (klik → full leaderboard)
+  → Info arena kit (klik → detail view)
+
+- Arena Leaderboard GUI (54 slot):
+  → Menampilkan top 10 pemain dengan player head masing-masing
+  → Per entri: kills, deaths, KDR, best streak, vault earned
+  → Menampilkan daily reward dan netherite reward sesuai rank
+  → Grand prize indicator untuk pemain di posisi #1
+  → Daily reward breakdown & grand prize summary (slot bawah)
+
+- Arena Kit Info GUI (27 slot):
+  → Menampilkan semua item kit (Full Iron Armor, Sword, Bow, Arrows,
+    Golden Apple, Cooked Beef) sebagai item visual
+  → Menampilkan daftar killstreak upgrade: 5/10/25/50 kills
+
+- Tombol aksi dinamis (berubah sesuai state):
+  → JOIN ARENA (LIME_CONCRETE)  — muncul jika sesi aktif & belum di arena
+  → LEAVE ARENA (RED_CONCRETE)  — muncul jika sedang dalam arena
+  → Grayed out (GRAY_CONCRETE)  — jika tidak ada sesi aktif
+
+- Kontrol khusus Presiden (slot 43, hanya muncul jika player = Presiden):
+  → START ARENA (BEACON)  — dengan validasi: treasury, limit game per masa jabatan
+  → END ARENA (TNT)       — mengakhiri sesi dan distribute final rewards
+  → CANNOT START (BARRIER) — jika kondisi belum terpenuhi, ditampilkan alasannya
+
+- Tombol navigasi:
+  → Back (ARROW, slot 45) → kembali ke Main Menu
+  → Refresh (CLOCK, slot 49) → re-open GUI dengan data terbaru
+  → Close (BARRIER, slot 53) → tutup inventori
+
+[TEKNIKAL - Arena GUI]
+- ArenaGUI.java: kelas GUI baru dengan 3 public method:
+    openArenaMenu(Player), openLeaderboard(Player), openKitInfo(Player)
+- GUIListener.java:
+  → Field + instantiasi ArenaGUI ditambahkan
+  → Title handler baru: ARENA_MENU_TITLE, ARENA_LEADERBOARD_TITLE, ARENA_KIT_TITLE
+  → handleArenaGUI(), handleArenaLeaderboardGUI(), handleArenaKitGUI() methods
+  → Main menu arena slot kini membuka GUI (tidak lagi menampilkan pesan chat)
+  → showArenaInfo() diredirect ke arenaGUI.openArenaMenu()
+  → Public method openArenaGUI(Player) tersedia untuk akses eksternal
+  → executeGUIAction() menangani 6 action baru
+
+- GUIAction.java: 6 enum baru ditambahkan:
+  → OPEN_GUI_ARENA, OPEN_GUI_ARENA_LEADERBOARD, OPEN_GUI_ARENA_KIT
+  → ACTION_ARENA_START, ACTION_ARENA_END, ACTION_ARENA_LEAVE
+
+- gui.yml:
+  → arena_item (main menu) on_click diubah: <action_arena_info> → <open_gui_arena>
+  → Seksi baru: gui.arena_menu dengan semua item terkonfigurasi
+  → 6 action baru didokumentasikan di header AVAILABLE GUI ACTIONS
+  → Admin commands baru: open_gui_arena, open_gui_arena_leaderboard
+    (akses via /dc gui open_gui_arena)
+
+[REWORK & PENAMBAHAN FITUR - GUVERNMENT GUI]
+- Merapikan ulang slot item pada menu Government (GovernmentGUI.java) agar letaknya tersusun asimetris dan jelas.
+- Menambahkan menu/shortcut cepat untuk Presidential Games di slot 32 (Item: Nether Star)
+  → Fitur ini sekarang bisa diawali/dimulai oleh Presiden melalui satu kali klik antarmuka.
+  → Dilengkapi validasi: apabila permainan tidak dapat dimulai sesuai ketentuan limit per masa jabatan atau karena treasury tidak cukup.
+- Menambahkan mode Pengumuman/Pesan Siaran Global (Broadcast Message) bagi Presiden.
+  → Shortcut ditempatkan pada Menu Pemerintahan menggunakan item (BELL).
+  → Sesudah di-klik, sistem "pending broadcast" di ChatListener akan mencegat (intercept) antrian chat Presiden berikutnya dan menyitanya sebagai pesan global yang disertai dengan alarm sirine (Sound effect).
+  → Menambahkan `lastBroadcastTime` pada kelas model Government yang persisten dengan database.
+  → Fitur Global Broadcast ditenagai dengan cooldown (waktu jeda) eksklusif selama 8 jam dunia nyata.
+  → Antarmuka GUI sudah mendukung notifikasi visual sisa waktu cooldown secara terperinci.
+
+[FITUR BARU - President Term Limit & Cooldown System]
+- Implementasi konfigurasi config.yml:
+  → president.term-length-days: 30 (sudah ada, digunakan untuk auto-election)
+  → president.max-consecutive-terms: 2 (limit masa jabatan berturut-turut)
+  → president.cooldown-after-max-terms: 1 (term yang harus ditunggu setelah max)
+
+- PlayerData.java:
+  → Tambah field presidentCooldownTerms untuk tracking cooldown per player
+  → Tambah method decrementPresidentCooldown() untuk mengurangi cooldown
+
+- GovernmentManager.java:
+  → canRunForPresident(): Sekarang memeriksa cooldown tracking dan max consecutive terms
+  → getRemainingCooldownTerms(): Helper method untuk mendapatkan sisa cooldown player
+  → setPresident(): Diperbarui untuk:
+    * Set cooldown untuk president yang lengser jika mencapai max consecutive terms
+    * Decrement cooldown untuk semua player saat term baru dimulai
+    * Tracking consecutive terms yang lebih akurat
+
+- ElectionManager.java:
+  → Pesan error saat registrasi diperbarui untuk menampilkan sisa cooldown
+    (contoh: "You must wait 1 more term(s) before running for president again.")
+
+- Logika kerja:
+  1. President yang mencapai max consecutive terms (2) akan mendapat cooldown
+     sesuai config (default 1 term) saat lengser
+  2. Setiap kali president baru dilantik, cooldown berkurang 1 untuk semua player
+  3. Player dengan cooldown aktif tidak bisa mendaftar sebagai kandidat
+
+ ====================================================
+
+[PERBAIKAN BUG & QoL - SALARY GUI]
+- Fix: Judul GUI Salary yang tidak sesuai antara pembuatan (GovernmentGUI) dan
+  pengecekan event drag/click (GUIListener) telah disamakan menggunakan
+  konstanta terpusat SALARY_GUI_TITLE.
+  -> Ini memperbaiki bug di mana item di dalam menu gaji (SALARY & REWARDS)
+     bisa ditarik ke inventori pemain dan fungsinya tidak bekerja/error.
+
+- Peningkatan Info Salary (Lore):
+  -> Menambahkan visualisasi daftar hadiah dan uang (Vault Points) secara rinci
+     langsung ke lore tombol CLAIM SALARY.
+  -> Lore tersebut membaca jumlah hadiah secara dinamis dari section
+     president.daily-rewards pada config.yml untuk Presiden.
+  -> Nama item hadiah kini secara otomatis diformat dengan huruf kapital yang
+     rapi (contoh: diamond-blocks menjadi Diamond Blocks) berbasis config.
+

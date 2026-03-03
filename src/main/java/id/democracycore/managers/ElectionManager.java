@@ -270,10 +270,17 @@ public class ElectionManager {
             return false;
         }
 
-        // Check consecutive terms
+        // Check consecutive terms and cooldown
         if (!plugin.getGovernmentManager().canRunForPresident(uuid)) {
-            MessageUtils.send(player,
-                    "<red>You have reached the maximum consecutive terms. Wait one term before running again.</red>");
+            int remainingCooldown = plugin.getGovernmentManager().getRemainingCooldownTerms(uuid);
+            if (remainingCooldown > 0) {
+                MessageUtils.send(player,
+                        "<red>You must wait " + remainingCooldown
+                                + " more term(s) before running for president again.</red>");
+            } else {
+                MessageUtils.send(player,
+                        "<red>You have reached the maximum consecutive terms. Wait one term before running again.</red>");
+            }
             return false;
         }
 

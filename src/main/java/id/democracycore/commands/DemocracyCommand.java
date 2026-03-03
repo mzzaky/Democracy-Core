@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import id.democracycore.gui.GUIAction;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -1006,6 +1008,9 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             case "stoporder":
                 handleAdminStopOrder(sender, args);
                 break;
+            case "action":
+                handleAdminAction(sender, args);
+                break;
             default:
                 showAdminHelp(sender);
                 break;
@@ -1021,6 +1026,59 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "admin.help_addtreasury");
         MessageUtils.send(sender, "admin.help_reload");
         MessageUtils.send(sender, "admin.help_reset");
+        MessageUtils.send(sender,
+                "<gold>/dc admin action <action_id> <player> <gray>- Execute a GUI action on a player");
+    }
+
+    // === ADMIN GUI ACTION ===
+
+    /**
+     * Executes any GUI action (open_gui_* or action_*) on a target player.
+     * Usage: /dc admin action <action_id> <player>
+     * Works from console, RCON, or any admin sender.
+     */
+    private void handleAdminAction(CommandSender sender, String[] args) {
+        if (args.length < 4) {
+            MessageUtils.send(sender, "<gold>═══ ADMIN ACTION COMMAND ═══");
+            MessageUtils.send(sender, "<white>/dc admin action <action_id> <player>");
+            MessageUtils.send(sender, "");
+            MessageUtils.send(sender, "<yellow>--- Open GUI Actions ---");
+            for (GUIAction action : GUIAction.values()) {
+                if (action == GUIAction.UNKNOWN)
+                    continue;
+                MessageUtils.send(sender, "<gray>  " + action.getConfigKey());
+            }
+            return;
+        }
+
+        String actionId = args[2].toLowerCase();
+        String playerName = args[3];
+
+        // Resolve target player
+        Player target = Bukkit.getPlayer(playerName);
+        if (target == null || !target.isOnline()) {
+            MessageUtils.send(sender, "<red>Player '" + playerName + "' is not online.");
+            return;
+        }
+
+        // Parse action
+        GUIAction action = GUIAction.fromConfig(actionId);
+        if (action == GUIAction.UNKNOWN) {
+            MessageUtils.send(sender,
+                    "<red>Unknown action: '" + actionId + "'. Use /dc admin action to see valid actions.");
+            return;
+        }
+
+        // Execute action on the target player
+        try {
+            plugin.getGUIListener().executeGUIAction(target, action, actionId, "", null);
+            MessageUtils.send(sender, "<green>Executed action '<gold>" + actionId + "<green>' on player '<gold>"
+                    + target.getName() + "<green>'.");
+        } catch (Exception e) {
+            MessageUtils.send(sender, "<red>Failed to execute action: " + e.getMessage());
+            plugin.getLogger().severe("Error executing admin GUI action '" + actionId + "' on '" + target.getName()
+                    + "': " + e.getMessage());
+        }
     }
 
     private void handleAdminSetPresident(CommandSender sender, String[] args) {
@@ -1029,11 +1087,23 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        var offlinePlayer = Bukkit.getOfflinePlayer(args[3]);
-        if (!offlinePlayer.hasPlayedBefore()) {
-            MessageUtils.send(sender, "general.player_not_found");
-            return;
+        String targetName = args[3];
+        // First try to get online player
+        Player onlinePlayer = Bukkit.getPlayer(targetName);
+
+        org.bukkit.OfflinePlayer targetPlayer;
+        if (onlinePlayer != null) {
+            targetPlayer = onlinePlayer;
+        } else {
+            // If not online, try to get offline player
+            targetPlayer = Bukkit.getOfflinePlayer(targetName);
+            if (!targetPlayer.hasPlayedBefore()) {
+                MessageUtils.send(sender, "general.player_not_found");
+                return;
+            }
         }
+
+        final org.bukkit.OfflinePlayer offlinePlayer = targetPlayer;
 
         if (sender instanceof Player player) {
             pendingConfirmations.put(player.getUniqueId(), () -> {
@@ -1240,7 +1310,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                     if (sender.hasPermission("democracy.admin")) {
                         completions.addAll(Arrays.asList(
                                 "set", "remove", "startelection",
-                                "endelection", "addtreasury", "reload", "reset", "stoporder", "confirm"));
+                                "endelection", "addtreasury", "reload", "reset", "stoporder", "confirm", "action"));
                     }
                     break;
                 case "treasury":
@@ -1290,6 +1360,13 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                     completions.add("president");
                 } else if (sub2.equals("reset")) {
                     completions.addAll(Arrays.asList("government", "election", "treasury", "all"));
+                } else if (sub2.equals("action")) {
+                    // Tab-complete all available GUIAction config keys
+                    for (GUIAction action : GUIAction.values()) {
+                        if (action != GUIAction.UNKNOWN) {
+                            completions.add(action.getConfigKey());
+                        }
+                    }
                 }
             }
         } else if (args.length == 4) {
@@ -1309,6 +1386,13 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             } else if (sub.equals("admin") && sub2.equals("set") && args[2].equalsIgnoreCase("president")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
+                }
+            } else if (sub.equals("admin") && sub2.equals("action")) {
+                // Tab-complete online player names for the target
+                if (sender.hasPermission("democracy.admin")) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        completions.add(p.getName());
+                    }
                 }
             }
         }
@@ -1355,7 +1439,8 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 handleTaxAdmin(player, args);
                 break;
             default:
-                MessageUtils.send(player, "<red>Unknown tax command. Use <yellow>/dc tax</yellow> to open the tax menu.");
+                MessageUtils.send(player,
+                        "<red>Unknown tax command. Use <yellow>/dc tax</yellow> to open the tax menu.");
                 break;
         }
     }
@@ -1387,11 +1472,13 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             MessageUtils.send(player, "<gray>Next Collection: <yellow>Pending...");
         }
 
-        MessageUtils.send(player, "<gray>Total Collected: <green>$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
+        MessageUtils.send(player,
+                "<gray>Total Collected: <green>$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
         MessageUtils.send(player, "<gray>Collection Cycles: <white>" + record.getTotalCollectionCycles());
 
         if (taxData != null && taxData.getOutstandingDebt() > 0) {
-            MessageUtils.send(player, "<red>Your Debt: <gold>$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()));
+            MessageUtils.send(player,
+                    "<red>Your Debt: <gold>$" + MessageUtils.formatNumber(taxData.getOutstandingDebt()));
             MessageUtils.send(player, "<gray>Use <white>/dc tax pay <gray>to pay your debt.");
         } else {
             MessageUtils.send(player, "<green>Your Debt: $0 (Good standing!)");
@@ -1479,7 +1566,8 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                     }
                     plugin.getConfig().set("global-tax.amount", newAmount);
                     plugin.saveConfig();
-                    MessageUtils.send(player, "<green>Tax amount set to <gold>$" + MessageUtils.formatNumber(newAmount));
+                    MessageUtils.send(player,
+                            "<green>Tax amount set to <gold>$" + MessageUtils.formatNumber(newAmount));
                 } catch (NumberFormatException e) {
                     MessageUtils.send(player, "<red>Invalid amount!");
                 }

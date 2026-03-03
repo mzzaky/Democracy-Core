@@ -38,6 +38,33 @@ public class MainMenuGUI {
     // GUI Titles - loaded from config
     public static String MAIN_MENU_TITLE;
 
+    /**
+     * Items that are handled by dedicated Java methods and should NOT be rendered
+     * by the generic config loader. Any item key NOT in this set will be loaded
+     * automatically from gui.yml at runtime — no Java code needed.
+     */
+    private static final java.util.Set<String> HARDCODED_ITEM_KEYS = java.util.Set.of(
+            "player_head",
+            "president_item",
+            "cabinet_item",
+            "treasury_item",
+            "active_effects_item",
+            "election_item",
+            "executive_orders_item",
+            "arena_item",
+            "recall_item",
+            "history_item",
+            "my_stats_item",
+            "leaderboard_item",
+            "help_item",
+            "register_candidate",
+            "vote_now",
+            "rate_president",
+            "tax_item",
+            "close_button",
+            "glass_pane",
+            "corner_decoration");
+
     public MainMenuGUI(DemocracyCore plugin) {
         this.plugin = plugin;
         loadGUITitles();
@@ -253,6 +280,11 @@ public class MainMenuGUI {
         int closeSlot = getGUISlot("gui.main_menu.items.close_button.gui_slot", 49);
         setItemSafe.accept(closeSlot, closeItem);
 
+        // === GENERIC CONFIG ITEMS ===
+        // Any extra item added to gui.yml under gui.main_menu.items that is NOT in
+        // HARDCODED_ITEM_KEYS will be loaded and placed automatically here.
+        loadGenericConfigItems(inv, player, size);
+
         // Fill empty slots with glass
         fillGlass(inv, player);
 
@@ -453,41 +485,68 @@ public class MainMenuGUI {
     }
 
     private ItemStack createCabinetItem(Government gov, Player player) {
-        ItemStack item = createItem(Material.LECTERN, "§e§l📋 CABINET");
+        String path = "gui.main_menu.items.cabinet_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.LECTERN;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        List<String> lore = new ArrayList<>();
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         int filled = 0;
+        List<String> cabinetMembersList = new ArrayList<>();
         for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
             UUID minister = gov.getCabinetMember(pos.toGovernmentPosition());
             if (minister != null) {
                 String name = Bukkit.getOfflinePlayer(minister).getName();
-                lore.add("§7" + pos.getDisplayName() + ": §f" + name);
+                cabinetMembersList.add("§7" + pos.getDisplayName() + ": §f" + name);
                 filled++;
             } else {
-                lore.add("§7" + pos.getDisplayName() + ": §8Empty");
+                cabinetMembersList.add("§7" + pos.getDisplayName() + ": §8Empty");
             }
         }
 
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§7Filled: §f" + filled + "/5");
-        lore.add("");
-        lore.add("");
-        lore.add("");
-        lore.add("§aClick for cabinet details");
+        List<String> configLore = plugin.getGUIConfig().getStringList(path + ".lore");
+        List<String> lore = new ArrayList<>();
+        if (configLore.isEmpty()) {
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.addAll(cabinetMembersList);
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§7Filled: §f" + filled + "/5");
+            lore.add("");
+            lore.add("§aClick for cabinet details");
+        } else {
+            for (String line : configLore) {
+                if (line.contains("{cabinet_members}")) {
+                    lore.addAll(cabinetMembersList);
+                } else {
+                    line = line.replace("{filled}", String.valueOf(filled));
+                    line = line.replace("{total}", "5");
+                    if (player != null) {
+                        line = processPlaceholders(line, player);
+                    }
+                    lore.add(line);
+                }
+            }
+        }
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.cabinet_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
     }
 
     private ItemStack createTreasuryItem(Treasury treasury, Player player) {
-        ItemStack item = createItem(Material.GOLD_BLOCK, "§6§l💰 TREASURY");
+        String path = "gui.main_menu.items.treasury_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.GOLD_BLOCK;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -498,7 +557,7 @@ public class MainMenuGUI {
         lore.add("§aClick for treasury details");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.treasury_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
@@ -572,8 +631,14 @@ public class MainMenuGUI {
     }
 
     private ItemStack createElectionItem(Election election, Player player) {
-        ItemStack item = createItem(Material.PAPER, "§b§l🗳 ELECTION");
+        String path = "gui.main_menu.items.election_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.PAPER;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -607,7 +672,7 @@ public class MainMenuGUI {
         lore.add("§aClick to open voting GUI");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.election_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         if (election.isActive() && election.getPhase() == Election.ElectionPhase.VOTING
@@ -619,8 +684,14 @@ public class MainMenuGUI {
     }
 
     private ItemStack createExecutiveOrdersItem(Government gov, Player player) {
-        ItemStack item = createItem(Material.WRITABLE_BOOK, "§c§l📜 EXECUTIVE ORDERS");
+        String path = "gui.main_menu.items.executive_orders_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.WRITABLE_BOOK;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         var activeOrders = plugin.getExecutiveOrderManager().getActiveOrders();
         boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
@@ -643,6 +714,7 @@ public class MainMenuGUI {
         lore.add("§aClick to view orders");
 
         meta.setLore(lore);
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
@@ -650,16 +722,24 @@ public class MainMenuGUI {
 
     private ItemStack createArenaItem(PlayerData data, Player player) {
         boolean isActive = plugin.getArenaManager().isArenaActive();
-        Material mat = isActive ? Material.DIAMOND_SWORD : Material.IRON_SWORD;
+        String statePath = isActive ? "active" : "inactive";
+        String path = "gui.main_menu.items.arena_item." + statePath;
+
+        Material mat = getGUIMaterial(path + ".material");
+        // Fallback if config missing
+        if (mat == Material.STONE && !plugin.getGUIConfig().contains(path + ".material")) {
+            mat = isActive ? Material.DIAMOND_SWORD : Material.IRON_SWORD;
+        }
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
 
-        meta.setDisplayName("§4§l⚔ PRESIDENTIAL ARENA");
+        String displayName = getGUIString(player, path + ".display_name");
+        if (displayName.isEmpty())
+            displayName = "§4§l⚔ PRESIDENTIAL ARENA";
+        meta.setDisplayName(displayName);
 
-        // Apply attributes from config based on state
-        String statePath = isActive ? "active" : "inactive";
-        applyConfigAttributes(meta, "gui.main_menu.items.arena_item." + statePath);
+        applyConfigAttributes(meta, path);
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -739,8 +819,14 @@ public class MainMenuGUI {
     private ItemStack createHistoryItem(Player player) {
         var history = plugin.getDataManager().getAllPresidentHistory();
 
-        ItemStack item = createItem(Material.BOOK, "§5§l📚 PRESIDENT HISTORY");
+        String path = "gui.main_menu.items.history_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.BOOK;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -761,15 +847,21 @@ public class MainMenuGUI {
         lore.add("§aClick to view history");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.history_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
     }
 
     private ItemStack createMyStatsItem(PlayerData data, Player player) {
-        ItemStack item = createItem(Material.COMPASS, "§b§l📊 MY STATS");
+        String path = "gui.main_menu.items.my_stats_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.COMPASS;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -781,15 +873,21 @@ public class MainMenuGUI {
         lore.add("§aClick for full details");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.my_stats_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
     }
 
     private ItemStack createLeaderboardItem(Player player) {
-        ItemStack item = createItem(Material.GOLDEN_APPLE, "§6§l🏆 LEADERBOARD");
+        String path = "gui.main_menu.items.leaderboard_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.GOLDEN_APPLE;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -801,15 +899,21 @@ public class MainMenuGUI {
         lore.add("§aClick to view leaderboard");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.leaderboard_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
     }
 
     private ItemStack createHelpItem(Player player) {
-        ItemStack item = createItem(Material.KNOWLEDGE_BOOK, "§a§l❓ GUIDE & HELP");
+        String path = "gui.main_menu.items.help_item";
+        Material material = getGUIMaterial(path + ".material");
+        if (material == Material.STONE)
+            material = Material.KNOWLEDGE_BOOK;
+        ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
         List<String> lore = new ArrayList<>();
         lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
@@ -823,7 +927,7 @@ public class MainMenuGUI {
         lore.add("§aClick to open guide");
 
         meta.setLore(lore);
-        applyConfigAttributes(meta, "gui.main_menu.items.help_item");
+        applyConfigAttributes(meta, path);
         item.setItemMeta(meta);
 
         return item;
@@ -832,7 +936,8 @@ public class MainMenuGUI {
     private ItemStack createTaxItem(Player player) {
         String path = "gui.main_menu.items.tax_item";
         Material material = getGUIMaterial(path + ".material");
-        if (material == Material.STONE) material = Material.SUNFLOWER;
+        if (material == Material.STONE)
+            material = Material.SUNFLOWER;
 
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -869,6 +974,125 @@ public class MainMenuGUI {
         }
 
         return item;
+    }
+
+    // === Generic Config Item Loader ===
+
+    /**
+     * Scans ALL items under gui.main_menu.items in gui.yml and places any item
+     * that:
+     * 1) Is NOT in HARDCODED_ITEM_KEYS (those are handled by dedicated methods),
+     * AND
+     * 2) Has a direct "gui_slot" field (not a sub-state parent like
+     * president_item), AND
+     * 3) The target slot is currently empty.
+     *
+     * This means you can add any new custom item to gui.yml and it will appear in
+     * the menu automatically — no Java code required.
+     */
+    private void loadGenericConfigItems(Inventory inv, Player player, int inventorySize) {
+        org.bukkit.configuration.ConfigurationSection itemsSection = plugin.getGUIConfig()
+                .getConfigurationSection("gui.main_menu.items");
+        if (itemsSection == null)
+            return;
+
+        for (String key : itemsSection.getKeys(false)) {
+            // Skip items that have dedicated Java rendering logic
+            if (HARDCODED_ITEM_KEYS.contains(key))
+                continue;
+
+            String basePath = "gui.main_menu.items." + key;
+
+            // Only process items that declare gui_slot at the top level
+            if (!plugin.getGUIConfig().contains(basePath + ".gui_slot"))
+                continue;
+
+            int slot = plugin.getGUIConfig().getInt(basePath + ".gui_slot", -1);
+            if (slot < 0 || slot >= inventorySize)
+                continue;
+
+            // Don't overwrite slots already filled by hardcoded items
+            ItemStack existing = inv.getItem(slot);
+            if (existing != null && existing.getType() != Material.AIR)
+                continue;
+
+            // Build the item purely from config
+            ItemStack item = buildItemFromConfig(player, basePath);
+            if (item != null) {
+                inv.setItem(slot, item);
+            }
+        }
+    }
+
+    /**
+     * Builds an ItemStack entirely from a gui.yml config path.
+     * Supports: material, display_name, lore, custom_model_data, hide_attributes.
+     * Placeholders in display_name and lore are also processed.
+     *
+     * @param player   The player (for placeholder processing)
+     * @param basePath Config path, e.g. "gui.main_menu.items.my_custom_item"
+     * @return Configured ItemStack, or null if material is AIR or invalid
+     */
+    private ItemStack buildItemFromConfig(Player player, String basePath) {
+        String matName = plugin.getGUIConfig().getString(basePath + ".material", "STONE");
+        Material material;
+        try {
+            material = Material.valueOf(matName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("[GUI] Invalid material '" + matName + "' at " + basePath);
+            material = Material.STONE;
+        }
+        if (material == Material.AIR)
+            return null;
+
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null)
+            return item;
+
+        // Display name
+        String displayName = getGUIString(player, basePath + ".display_name");
+        if (!displayName.isEmpty()) {
+            meta.setDisplayName(displayName);
+        }
+
+        // Lore
+        List<String> lore = getGUILore(player, basePath + ".lore");
+        if (!lore.isEmpty()) {
+            meta.setLore(lore);
+        }
+
+        // custom_model_data & hide_attributes
+        applyConfigAttributes(meta, basePath);
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    /**
+     * Returns the item key in gui.yml for the given slot, if it is a generic
+     * (non-hardcoded) item. Used by GUIListener to dispatch click actions.
+     *
+     * @param slot Inventory slot that was clicked
+     * @return The item key (e.g. "my_custom_item") or null if not a generic item
+     */
+    public String getGenericItemKeyForSlot(int slot) {
+        org.bukkit.configuration.ConfigurationSection itemsSection = plugin.getGUIConfig()
+                .getConfigurationSection("gui.main_menu.items");
+        if (itemsSection == null)
+            return null;
+
+        for (String key : itemsSection.getKeys(false)) {
+            if (HARDCODED_ITEM_KEYS.contains(key))
+                continue;
+            String basePath = "gui.main_menu.items." + key;
+            if (!plugin.getGUIConfig().contains(basePath + ".gui_slot"))
+                continue;
+            int configSlot = plugin.getGUIConfig().getInt(basePath + ".gui_slot", -1);
+            if (configSlot == slot)
+                return key;
+        }
+        return null;
     }
 
     // === Utility Methods ===
@@ -969,90 +1193,62 @@ public class MainMenuGUI {
     }
 
     /**
-     * Play click sound for specific GUI slot based on gui.yml configuration
-     * 
-     * @param player The player to play sound for
-     * @param slot   The slot that was clicked
+     * Play click sound for specific GUI slot based on gui.yml configuration.
+     * Slot-to-sound mapping is built dynamically from the config, so custom
+     * gui_slot and click_sound values are always respected.
      */
     public void playClickSound(Player player, int slot) {
-        String soundPath = getClickSoundPath(slot);
-        if (soundPath != null) {
-            Sound sound = getGUISound(soundPath);
-            MessageUtils.playSound(player, sound);
-        }
-    }
+        // Build slot → sound-path mapping from config at runtime
+        String[][] slotItems = {
+                { "player_head", "4" },
+                { "president_item.default", "10" }, // sound paths have sub-states
+                { "president_item.no_president", "10" },
+                { "cabinet_item", "12" },
+                { "treasury_item", "14" },
+                { "active_effects_item.active", "16" },
+                { "active_effects_item.inactive", "16" },
+                { "election_item", "19" },
+                { "executive_orders_item", "21" },
+                { "tax_item", "22" },
+                { "arena_item.active", "23" },
+                { "arena_item.inactive", "23" },
+                { "recall_item.active", "25" },
+                { "recall_item.inactive", "25" },
+                { "history_item", "28" },
+                { "my_stats_item", "30" },
+                { "leaderboard_item", "32" },
+                { "help_item", "34" },
+                { "register_candidate", "38" },
+                { "vote_now", "40" },
+                { "rate_president", "42" },
+                { "close_button", "49" },
+        };
 
-    /**
-     * Get the click_sound configuration path for a specific slot
-     * 
-     * @param slot The inventory slot
-     * @return The path to click_sound in gui.yml, or null if not configured
-     */
-    private String getClickSoundPath(int slot) {
-        // Map slots to their item configuration paths in gui.yml
-        switch (slot) {
-            case 4: // Player Head
-                return "gui.main_menu.items.player_head.click_sound";
-            case 10: // President Item
-                Government gov = plugin.getDataManager().getGovernment();
-                if (gov.hasPresident()) {
-                    return "gui.main_menu.items.president_item.default.click_sound";
-                } else {
-                    return "gui.main_menu.items.president_item.no_president.click_sound";
-                }
-            case 12: // Cabinet
-                return "gui.main_menu.items.cabinet_item.click_sound";
-            case 14: // Treasury
-                return "gui.main_menu.items.treasury_item.click_sound";
-            case 16: // Active Effects
-                var activeOrders = plugin.getExecutiveOrderManager().getActiveOrders();
-                var activeDecisions = plugin.getDataManager().getActiveDecisions();
-                if (activeOrders.size() + activeDecisions.size() > 0) {
-                    return "gui.main_menu.items.active_effects_item.active.click_sound";
-                } else {
-                    return "gui.main_menu.items.active_effects_item.inactive.click_sound";
-                }
-            case 19: // Election
-                return "gui.main_menu.items.election_item.click_sound";
-            case 21: // Executive Orders
-                return "gui.main_menu.items.executive_orders_item.click_sound";
-            case 23: // Arena
-                boolean isActive = plugin.getArenaManager().isArenaActive();
-                if (isActive) {
-                    return "gui.main_menu.items.arena_item.active.click_sound";
-                } else {
-                    return "gui.main_menu.items.arena_item.inactive.click_sound";
-                }
-            case 25: // Recall
-                RecallPetition petition = plugin.getDataManager().getRecallPetition();
-                boolean hasActivePetition = petition != null &&
-                        petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
-                        petition.getPhase() != RecallPetition.RecallPhase.FAILED;
-                if (hasActivePetition) {
-                    return "gui.main_menu.items.recall_item.active.click_sound";
-                } else {
-                    return "gui.main_menu.items.recall_item.inactive.click_sound";
-                }
-            case 28: // History
-                return "gui.main_menu.items.history_item.click_sound";
-            case 30: // My Stats
-                return "gui.main_menu.items.my_stats_item.click_sound";
-            case 32: // Leaderboard
-                return "gui.main_menu.items.leaderboard_item.click_sound";
-            case 34: // Help
-                return "gui.main_menu.items.help_item.click_sound";
-            case 37: // Global Tax
-                return "gui.main_menu.items.tax_item.click_sound";
-            case 38: // Register Candidate
-                return "gui.main_menu.items.register_candidate.click_sound";
-            case 40: // Vote Now
-                return "gui.main_menu.items.vote_now.click_sound";
-            case 42: // Rate President
-                return "gui.main_menu.items.rate_president.click_sound";
-            case 49: // Close Button
-                return "gui.main_menu.items.close_button.click_sound";
-            default:
-                return null; // No sound for this slot
+        for (String[] entry : slotItems) {
+            String itemKey = entry[0];
+            int defaultSlot = Integer.parseInt(entry[1]);
+
+            // The slot key may have a sub-state (e.g. "president_item.default")
+            // Strip the sub-state for the gui_slot lookup (gui_slot is on the parent key)
+            String slotKey = itemKey.contains(".") ? itemKey.substring(0, itemKey.indexOf('.')) : itemKey;
+            int configuredSlot = getGUISlot("gui.main_menu.items." + slotKey + ".gui_slot", defaultSlot);
+
+            if (slot == configuredSlot) {
+                String soundPath = "gui.main_menu.items." + itemKey + ".click_sound";
+                Sound sound = getGUISound(soundPath);
+                MessageUtils.playSound(player, sound);
+                return;
+            }
+        }
+
+        // Fallback: check generic config-driven items for a click_sound
+        String genericKey = getGenericItemKeyForSlot(slot);
+        if (genericKey != null) {
+            String soundPath = "gui.main_menu.items." + genericKey + ".click_sound";
+            if (plugin.getGUIConfig().contains(soundPath)) {
+                Sound sound = getGUISound(soundPath);
+                MessageUtils.playSound(player, sound);
+            }
         }
     }
 

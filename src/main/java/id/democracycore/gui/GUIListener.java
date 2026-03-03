@@ -9,12 +9,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import id.democracycore.DemocracyCore;
+import id.democracycore.managers.ArenaManager;
 import id.democracycore.models.CabinetDecision;
 import id.democracycore.models.ExecutiveOrder;
 import id.democracycore.models.Government;
@@ -26,16 +28,21 @@ public class GUIListener implements Listener {
     private final DemocracyCore plugin;
     private final VotingGUI votingGUI;
     private final GovernmentGUI governmentGUI;
+    private final CabinetGUI cabinetGUI;
     private final MainMenuGUI mainMenuGUI;
     private final PlayerStatsGUI playerStatsGUI;
     private final HelpGUI helpGUI;
     private final RecallGUI recallGUI;
     private final TaxGUI taxGUI;
+    private final PresidentHistoryGUI presidentHistoryGUI;
+    private final ArenaGUI arenaGUI;
 
     // Track which candidate a player is viewing
     private final Map<UUID, UUID> viewingCandidate = new HashMap<>();
     // Track which cabinet position a player is viewing
     private final Map<UUID, CabinetDecision.CabinetPosition> viewingCabinetPosition = new HashMap<>();
+    // Track which cabinet position a player is selecting for appointment
+    private final Map<UUID, Government.CabinetPosition> viewingAppointPosition = new HashMap<>();
     // Track which player stats a player is viewing
     private final Map<UUID, UUID> viewingPlayerStats = new HashMap<>();
 
@@ -43,11 +50,14 @@ public class GUIListener implements Listener {
         this.plugin = plugin;
         this.votingGUI = new VotingGUI(plugin);
         this.governmentGUI = new GovernmentGUI(plugin);
+        this.cabinetGUI = new CabinetGUI(plugin);
         this.mainMenuGUI = new MainMenuGUI(plugin);
         this.playerStatsGUI = new PlayerStatsGUI(plugin);
         this.helpGUI = new HelpGUI(plugin);
         this.recallGUI = new RecallGUI(plugin);
         this.taxGUI = new TaxGUI(plugin);
+        this.presidentHistoryGUI = new PresidentHistoryGUI(plugin);
+        this.arenaGUI = new ArenaGUI(plugin);
     }
 
     @EventHandler
@@ -80,7 +90,7 @@ public class GUIListener implements Listener {
         } else if (title.equals(GovernmentGUI.GOVERNMENT_GUI_TITLE)) {
             event.setCancelled(true);
             handleGovernmentGUI(player, clicked);
-        } else if (title.equals("§2§l💰 SALARY & REWARDS 💰")) {
+        } else if (title.equals(GovernmentGUI.SALARY_GUI_TITLE)) {
             event.setCancelled(true);
             handleSalaryGUI(player, clicked);
         } else if (title.equals(GovernmentGUI.ORDERS_GUI_TITLE)) {
@@ -88,7 +98,10 @@ public class GUIListener implements Listener {
             handleOrdersGUI(player, clicked);
         } else if (title.equals(GovernmentGUI.CABINET_GUI_TITLE)) {
             event.setCancelled(true);
-            handleCabinetGUI(player, clicked, event.getSlot());
+            handleCabinetGUI(player, clicked, event.getSlot(), event.getClick());
+        } else if (title.startsWith(CabinetGUI.CABINET_APPOINT_TITLE)) {
+            event.setCancelled(true);
+            handleCabinetAppointGUI(player, clicked, title);
         } else if (title.equals(GovernmentGUI.CABINET_DECISIONS_TITLE)) {
             event.setCancelled(true);
             handleCabinetDecisionsGUI(player, clicked);
@@ -98,9 +111,12 @@ public class GUIListener implements Listener {
         } else if (title.equals("§6§l📜 TREASURY LOGS 📜")) {
             event.setCancelled(true);
             handleTreasuryTransactionsGUI(player, clicked);
-        } else if (title.contains("SEJARAH")) {
+        } else if (title.equals(PresidentHistoryGUI.HISTORY_TITLE)) {
             event.setCancelled(true);
-            handleHistoryGUI(player, clicked);
+            handleHistoryGUI(player, clicked, event.getSlot(), false);
+        } else if (title.equals(PresidentHistoryGUI.DETAIL_TITLE)) {
+            event.setCancelled(true);
+            handleHistoryGUI(player, clicked, event.getSlot(), true);
         } else if (title.equals(PlayerStatsGUI.STATS_GUI_TITLE)) {
             event.setCancelled(true);
             handlePlayerStatsGUI(player, clicked, event.getSlot());
@@ -136,6 +152,15 @@ public class GUIListener implements Listener {
         } else if (title.equals(TaxGUI.TAX_DEBTORS_TITLE)) {
             event.setCancelled(true);
             handleTaxDebtorsGUI(player, clicked);
+        } else if (title.equals(ArenaGUI.ARENA_MENU_TITLE)) {
+            event.setCancelled(true);
+            handleArenaGUI(player, clicked, event.getSlot());
+        } else if (title.equals(ArenaGUI.ARENA_LEADERBOARD_TITLE)) {
+            event.setCancelled(true);
+            handleArenaLeaderboardGUI(player, clicked);
+        } else if (title.equals(ArenaGUI.ARENA_KIT_TITLE)) {
+            event.setCancelled(true);
+            handleArenaKitGUI(player, clicked);
         }
     }
 
@@ -149,12 +174,14 @@ public class GUIListener implements Listener {
                 title.equals(VotingGUI.VOTING_GUI_TITLE) ||
                 title.startsWith(VotingGUI.CANDIDATE_GUI_TITLE) ||
                 title.equals(GovernmentGUI.GOVERNMENT_GUI_TITLE) ||
-                title.equals("§2§l💰 SALARY & REWARDS 💰") ||
+                title.equals(GovernmentGUI.SALARY_GUI_TITLE) ||
                 title.equals(GovernmentGUI.ORDERS_GUI_TITLE) ||
                 title.equals(GovernmentGUI.CABINET_GUI_TITLE) ||
+                title.startsWith(CabinetGUI.CABINET_APPOINT_TITLE) ||
                 title.equals(GovernmentGUI.CABINET_DECISIONS_TITLE) ||
                 title.contains("TREASURY") ||
-                title.contains("SEJARAH") ||
+                title.equals(PresidentHistoryGUI.HISTORY_TITLE) ||
+                title.equals(PresidentHistoryGUI.DETAIL_TITLE) ||
                 title.equals(PlayerStatsGUI.STATS_GUI_TITLE) ||
                 title.equals(PlayerStatsGUI.LEADERBOARD_TITLE) ||
                 title.equals(HelpGUI.HELP_MENU_TITLE) ||
@@ -164,7 +191,10 @@ public class GUIListener implements Listener {
                 title.equals(RecallGUI.RECALL_VOTE_TITLE) ||
                 title.equals(TaxGUI.TAX_MENU_TITLE) ||
                 title.equals(TaxGUI.TAX_HISTORY_TITLE) ||
-                title.equals(TaxGUI.TAX_DEBTORS_TITLE)) {
+                title.equals(TaxGUI.TAX_DEBTORS_TITLE) ||
+                title.equals(ArenaGUI.ARENA_MENU_TITLE) ||
+                title.equals(ArenaGUI.ARENA_LEADERBOARD_TITLE) ||
+                title.equals(ArenaGUI.ARENA_KIT_TITLE)) {
             event.setCancelled(true);
         }
     }
@@ -206,15 +236,16 @@ public class GUIListener implements Listener {
         // Play click sound based on slot
         mainMenuGUI.playClickSound(player, slot);
 
-        // Close button
-        if (clicked.getType() == Material.BARRIER) {
+        // Close button — read slot from config
+        int closeSlot = mainMenuGUI.getItemSlot("close_button", 49);
+        if (slot == closeSlot) {
             player.closeInventory();
             return;
         }
 
         // Player Head - Open Stats
         int playerHeadSlot = mainMenuGUI.getItemSlot("player_head", 4);
-        if (slot == playerHeadSlot && clicked.getType() == Material.PLAYER_HEAD) {
+        if (slot == playerHeadSlot) {
             if (handleConfiguredAction(player, "player_head", null))
                 return;
             viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
@@ -224,8 +255,7 @@ public class GUIListener implements Listener {
 
         // President Info
         int presidentSlot = mainMenuGUI.getItemSlot("president_item", 10);
-        if (slot == presidentSlot
-                && (clicked.getType() == Material.GOLDEN_HELMET || clicked.getType() == Material.BARRIER)) {
+        if (slot == presidentSlot) {
             Government gov = plugin.getDataManager().getGovernment();
             String state = gov.hasPresident() ? "default" : "no_president";
             if (handleConfiguredAction(player, "president_item", state))
@@ -241,16 +271,16 @@ public class GUIListener implements Listener {
 
         // Cabinet
         int cabinetSlot = mainMenuGUI.getItemSlot("cabinet_item", 12);
-        if (slot == cabinetSlot && clicked.getType() == Material.LECTERN) {
+        if (slot == cabinetSlot) {
             if (handleConfiguredAction(player, "cabinet_item", null))
                 return;
-            governmentGUI.openCabinetMenu(player);
+            cabinetGUI.openCabinetMenu(player);
             return;
         }
 
         // Treasury
         int treasurySlot = mainMenuGUI.getItemSlot("treasury_item", 14);
-        if (slot == treasurySlot && clicked.getType() == Material.GOLD_BLOCK) {
+        if (slot == treasurySlot) {
             if (handleConfiguredAction(player, "treasury_item", null))
                 return;
             governmentGUI.openTreasuryMenu(player);
@@ -259,7 +289,7 @@ public class GUIListener implements Listener {
 
         // Active Effects
         int effectsSlot = mainMenuGUI.getItemSlot("active_effects_item", 16);
-        if (slot == effectsSlot && (clicked.getType() == Material.BEACON || clicked.getType() == Material.GLASS)) {
+        if (slot == effectsSlot) {
             int total = plugin.getExecutiveOrderManager().getActiveOrders().size() +
                     plugin.getDataManager().getActiveDecisions().size();
             String state = total > 0 ? "active" : "inactive";
@@ -272,7 +302,7 @@ public class GUIListener implements Listener {
 
         // Election
         int electionSlot = mainMenuGUI.getItemSlot("election_item", 19);
-        if (slot == electionSlot && clicked.getType() == Material.PAPER) {
+        if (slot == electionSlot) {
             if (handleConfiguredAction(player, "election_item", null))
                 return;
             votingGUI.openVotingMenu(player);
@@ -281,31 +311,38 @@ public class GUIListener implements Listener {
 
         // Executive Orders
         int ordersSlot = mainMenuGUI.getItemSlot("executive_orders_item", 21);
-        if (slot == ordersSlot && clicked.getType() == Material.WRITABLE_BOOK) {
+        if (slot == ordersSlot) {
             if (handleConfiguredAction(player, "executive_orders_item", null))
                 return;
             governmentGUI.openExecutiveOrdersMenu(player);
             return;
         }
 
+        // Tax
+        int taxSlot = mainMenuGUI.getItemSlot("tax_item", 22);
+        if (slot == taxSlot) {
+            if (handleConfiguredAction(player, "tax_item", null))
+                return;
+            taxGUI.openTaxMenu(player);
+            return;
+        }
+
         // Arena
         int arenaSlot = mainMenuGUI.getItemSlot("arena_item", 23);
-        if (slot == arenaSlot
-                && (clicked.getType() == Material.DIAMOND_SWORD || clicked.getType() == Material.IRON_SWORD)) {
+        if (slot == arenaSlot) {
             boolean isActive = plugin.getArenaManager().isArenaActive();
             String state = isActive ? "active" : "inactive";
             if (handleConfiguredAction(player, "arena_item", state))
                 return;
 
-            // Show arena info
-            showArenaInfo(player);
+            // Open the dedicated Arena Management GUI
+            arenaGUI.openArenaMenu(player);
             return;
         }
 
         // Recall
         int recallSlot = mainMenuGUI.getItemSlot("recall_item", 25);
-        if (slot == recallSlot
-                && (clicked.getType() == Material.REDSTONE_TORCH || clicked.getType() == Material.TORCH)) {
+        if (slot == recallSlot) {
             RecallPetition petition = plugin.getDataManager().getRecallPetition();
             boolean isActive = petition != null &&
                     petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
@@ -320,16 +357,16 @@ public class GUIListener implements Listener {
 
         // History
         int historySlot = mainMenuGUI.getItemSlot("history_item", 28);
-        if (slot == historySlot && clicked.getType() == Material.BOOK) {
+        if (slot == historySlot) {
             if (handleConfiguredAction(player, "history_item", null))
                 return;
-            governmentGUI.openHistoryMenu(player);
+            presidentHistoryGUI.openHistoryMenu(player);
             return;
         }
 
         // My Stats
         int statsSlot = mainMenuGUI.getItemSlot("my_stats_item", 30);
-        if (slot == statsSlot && clicked.getType() == Material.COMPASS) {
+        if (slot == statsSlot) {
             if (handleConfiguredAction(player, "my_stats_item", null))
                 return;
             viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
@@ -339,7 +376,7 @@ public class GUIListener implements Listener {
 
         // Leaderboard
         int leaderboardSlot = mainMenuGUI.getItemSlot("leaderboard_item", 32);
-        if (slot == leaderboardSlot && clicked.getType() == Material.GOLDEN_APPLE) {
+        if (slot == leaderboardSlot) {
             if (handleConfiguredAction(player, "leaderboard_item", null))
                 return;
             playerStatsGUI.openLeaderboard(player);
@@ -348,25 +385,16 @@ public class GUIListener implements Listener {
 
         // Help
         int helpSlot = mainMenuGUI.getItemSlot("help_item", 34);
-        if (slot == helpSlot && clicked.getType() == Material.KNOWLEDGE_BOOK) {
+        if (slot == helpSlot) {
             if (handleConfiguredAction(player, "help_item", null))
                 return;
             helpGUI.openHelpMenu(player);
             return;
         }
 
-        // Global Tax
-        int taxSlot = mainMenuGUI.getItemSlot("tax_item", 37);
-        if (slot == taxSlot && clicked.getType() == Material.SUNFLOWER) {
-            if (handleConfiguredAction(player, "tax_item", null))
-                return;
-            taxGUI.openTaxMenu(player);
-            return;
-        }
-
         // Quick Actions - Register
         int registerSlot = mainMenuGUI.getItemSlot("register_candidate", 38);
-        if (slot == registerSlot && clicked.getType() == Material.EMERALD) {
+        if (slot == registerSlot) {
             if (handleConfiguredAction(player, "register_candidate", null))
                 return;
             player.closeInventory();
@@ -376,7 +404,7 @@ public class GUIListener implements Listener {
 
         // Quick Actions - Vote
         int voteSlot = mainMenuGUI.getItemSlot("vote_now", 40);
-        if (slot == voteSlot && clicked.getType() == Material.LIME_CONCRETE) {
+        if (slot == voteSlot) {
             if (handleConfiguredAction(player, "vote_now", null))
                 return;
             votingGUI.openVotingMenu(player);
@@ -385,11 +413,117 @@ public class GUIListener implements Listener {
 
         // Quick Actions - Rate
         int rateSlot = mainMenuGUI.getItemSlot("rate_president", 42);
-        if (slot == rateSlot && clicked.getType() == Material.NETHER_STAR) {
+        if (slot == rateSlot) {
             if (handleConfiguredAction(player, "rate_president", null))
                 return;
             player.closeInventory();
             MessageUtils.send(player, "<yellow>Gunakan: <white>/dc rate <1-5> <gray>untuk memberi rating presiden");
+            return;
+        }
+
+        // ============================================================
+        // GENERIC CONFIG-DRIVEN ITEM HANDLER
+        // Handles any item added to gui.yml that is NOT in the hardcoded
+        // list. Reads on_click from config and dispatches accordingly.
+        // No Java code required for new custom items!
+        // ============================================================
+        String genericKey = mainMenuGUI.getGenericItemKeyForSlot(slot);
+        if (genericKey != null) {
+            // First, try ACTION_CONSOLE_COMMAND or other special actions
+            if (handleConfiguredAction(player, genericKey, null))
+                return;
+
+            // Otherwise dispatch the on_click action from gui.yml
+            GUIAction action = mainMenuGUI.getGUIAction(genericKey);
+            dispatchGUIAction(player, action);
+        }
+    }
+
+    // === GENERIC ACTION DISPATCHER ===
+
+    /**
+     * Dispatches a GUIAction to the appropriate GUI or command.
+     * Used by the generic config item handler so that on_click values
+     * in gui.yml work automatically without dedicated Java per item.
+     */
+    private void dispatchGUIAction(Player player, GUIAction action) {
+        if (action == null || action == GUIAction.UNKNOWN)
+            return;
+
+        switch (action) {
+            case OPEN_GUI_MAIN_MENU -> mainMenuGUI.openMainMenu(player);
+            case OPEN_GUI_PLAYER_STATS -> {
+                viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
+                playerStatsGUI.openPlayerStats(player, player.getUniqueId());
+            }
+            case OPEN_GUI_GOVERNMENT -> governmentGUI.openGovernmentMenu(player);
+            case OPEN_GUI_VOTING -> votingGUI.openVotingMenu(player);
+            case OPEN_GUI_CABINET -> cabinetGUI.openCabinetMenu(player);
+            case OPEN_GUI_TREASURY -> governmentGUI.openTreasuryMenu(player);
+            case OPEN_GUI_EXECUTIVE_ORDERS -> governmentGUI.openExecutiveOrdersMenu(player);
+            case OPEN_GUI_RECALL -> recallGUI.openRecallMenu(player);
+            case OPEN_GUI_HISTORY -> presidentHistoryGUI.openHistoryMenu(player);
+            case OPEN_GUI_LEADERBOARD -> playerStatsGUI.openLeaderboard(player);
+            case OPEN_GUI_HELP -> helpGUI.openHelpMenu(player);
+            case OPEN_GUI_TAX -> taxGUI.openTaxMenu(player);
+            case OPEN_GUI_ARENA -> arenaGUI.openArenaMenu(player);
+            case OPEN_GUI_ARENA_LEADERBOARD -> arenaGUI.openLeaderboard(player);
+            case OPEN_GUI_ARENA_KIT -> arenaGUI.openKitInfo(player);
+            case OPEN_GUI_CABINET_APPOINT -> {
+                Government gov = plugin.getDataManager().getGovernment();
+                boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+                boolean isAdmin = player.hasPermission("democracy.admin");
+                if (isPresident || isAdmin) {
+                    cabinetGUI.openCabinetMenu(player);
+                } else {
+                    MessageUtils.send(player, "<red>Only the President can access cabinet appointments.");
+                }
+            }
+            case ACTION_CLOSE_INVENTORY -> player.closeInventory();
+            case ACTION_REFRESH_GUI -> mainMenuGUI.openMainMenu(player);
+            case ACTION_RATE_PRESIDENT -> {
+                player.closeInventory();
+                MessageUtils.send(player, "<yellow>Use: <white>/dc rate <1-5> <gray>to rate the president");
+            }
+            case ACTION_DONATE_TREASURY -> {
+                player.closeInventory();
+                MessageUtils.send(player, "<yellow>Use: <white>/dc treasury donate <amount>");
+            }
+            case ACTION_JOIN_ARENA -> {
+                player.closeInventory();
+                plugin.getArenaManager().joinArena(player);
+            }
+            case ACTION_ARENA_START -> {
+                Government gov = plugin.getDataManager().getGovernment();
+                if (gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId())) {
+                    player.closeInventory();
+                    boolean started = plugin.getArenaManager().startArena(player.getUniqueId());
+                    if (!started) {
+                        MessageUtils.send(player, "<red>Cannot start arena at this time.");
+                    }
+                } else {
+                    MessageUtils.send(player, "<red>Only the President can start the arena.");
+                }
+            }
+            case ACTION_ARENA_END -> {
+                Government gov = plugin.getDataManager().getGovernment();
+                if (gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId())) {
+                    player.closeInventory();
+                    plugin.getArenaManager().endArena();
+                } else {
+                    MessageUtils.send(player, "<red>Only the President can end the arena.");
+                }
+            }
+            case ACTION_ARENA_LEAVE -> {
+                player.closeInventory();
+                plugin.getArenaManager().leaveArena(player.getUniqueId());
+            }
+            case ACTION_REGISTER_CANDIDATE -> {
+                player.closeInventory();
+                plugin.getElectionManager().registerCandidate(player, "");
+            }
+            default -> {
+                /* UNKNOWN / context-specific actions — do nothing */ }
         }
     }
 
@@ -445,7 +579,7 @@ public class GUIListener implements Listener {
 
         if (clicked.getType() == Material.LECTERN) {
             // Cabinet
-            governmentGUI.openCabinetMenu(player);
+            cabinetGUI.openCabinetMenu(player);
             return;
         }
 
@@ -469,7 +603,7 @@ public class GUIListener implements Listener {
 
         if (clicked.getType() == Material.BOOK) {
             // History
-            governmentGUI.openHistoryMenu(player);
+            presidentHistoryGUI.openHistoryMenu(player);
             return;
         }
 
@@ -482,6 +616,41 @@ public class GUIListener implements Listener {
         if (clicked.getType() == Material.EMERALD) {
             // Salary Claim
             governmentGUI.openSalaryMenu(player);
+            return;
+        }
+
+        if (clicked.getType() == Material.NETHER_STAR) {
+            // Presidential Game
+            Government gov = plugin.getDataManager().getGovernment();
+            if (gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId())) {
+                player.closeInventory();
+                boolean started = plugin.getArenaManager().startArena(player.getUniqueId());
+                if (!started) {
+                    MessageUtils.send(player,
+                            "<red>Cannot start Presidential Games at this time. (Check games limit or treasury balance)");
+                }
+            } else {
+                MessageUtils.send(player, "<red>Only the President can start the Arena Games.");
+            }
+            return;
+        }
+
+        if (clicked.getType() == Material.BELL) {
+            // Broadcast Message
+            Government gov = plugin.getDataManager().getGovernment();
+            if (gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId())) {
+                long cooldown = 8L * 60 * 60 * 1000;
+                long nextAvailable = gov.getLastBroadcastTime() + cooldown;
+                if (System.currentTimeMillis() >= nextAvailable) {
+                    player.closeInventory();
+                    id.democracycore.listeners.ChatListener.pendingBroadcasts.add(player.getUniqueId());
+                    MessageUtils.send(player, "government.broadcast_type_prompt");
+                } else {
+                    MessageUtils.send(player, "government.broadcast_cooldown");
+                }
+            } else {
+                MessageUtils.send(player, "government.broadcast_not_president");
+            }
             return;
         }
     }
@@ -526,45 +695,65 @@ public class GUIListener implements Listener {
 
     // === CABINET GUI ===
 
-    private void handleCabinetGUI(Player player, ItemStack clicked, int slot) {
+    private void handleCabinetGUI(Player player, ItemStack clicked, int slot, ClickType clickType) {
+        // Close
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
+        // Back to Government
         if (clicked.getType() == Material.ARROW) {
             governmentGUI.openGovernmentMenu(player);
             return;
         }
 
-        // Minister heads - map slots to positions
-        int[] ministerSlots = { 11, 12, 13, 14, 15 };
-        CabinetDecision.CabinetPosition[] positions = CabinetDecision.CabinetPosition.values();
+        Government gov = plugin.getDataManager().getGovernment();
+        boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+        boolean isAdmin = player.hasPermission("democracy.admin");
+        boolean canAppoint = isPresident || isAdmin;
 
-        for (int i = 0; i < ministerSlots.length && i < positions.length; i++) {
-            if (slot == ministerSlots[i]) {
-                viewingCabinetPosition.put(player.getUniqueId(), positions[i]);
-                governmentGUI.openCabinetDecisionsMenu(player, positions[i]);
+        // Minister position slots
+        Government.CabinetPosition posAtSlot = cabinetGUI.getPositionForSlot(slot);
+        if (posAtSlot != null) {
+            // Right-click or if position is vacant and player can appoint → open appoint
+            // menu
+            boolean isVacant = gov.getCabinetMember(posAtSlot) == null;
+            if (canAppoint && (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT || isVacant)) {
+                viewingAppointPosition.put(player.getUniqueId(), posAtSlot);
+                cabinetGUI.openAppointMenu(player, posAtSlot);
                 return;
             }
-        }
-
-        // My position button
-        if (clicked.getType() == Material.DIAMOND) {
-            Government gov = plugin.getDataManager().getGovernment();
-            for (CabinetDecision.CabinetPosition pos : positions) {
-                UUID minister = gov.getCabinetMember(Government.CabinetPosition.valueOf(pos.name()));
-                if (minister != null && minister.equals(player.getUniqueId())) {
-                    viewingCabinetPosition.put(player.getUniqueId(), pos);
-                    governmentGUI.openCabinetDecisionsMenu(player, pos);
-                    return;
-                }
+            // Left-click filled slot → open decisions
+            if (!isVacant) {
+                CabinetDecision.CabinetPosition decPos = CabinetDecision.CabinetPosition.valueOf(posAtSlot.name());
+                viewingCabinetPosition.put(player.getUniqueId(), decPos);
+                cabinetGUI.openCabinetDecisionsMenu(player, decPos);
             }
+            return;
         }
 
-        // Active decisions
-        if (clicked.getType() == Material.ENCHANTED_BOOK) {
-            // For now, just show the first position with active decisions
+        // Active decisions summary (Slot 29 - BEACON/GLASS)
+        if (slot == 29 && (clicked.getType() == Material.BEACON)) {
             java.util.List<CabinetDecision> activeDecisions = plugin.getDataManager().getActiveDecisions();
             if (!activeDecisions.isEmpty()) {
                 CabinetDecision first = activeDecisions.get(0);
                 viewingCabinetPosition.put(player.getUniqueId(), first.getMinisterPosition());
-                governmentGUI.openCabinetDecisionsMenu(player, first.getMinisterPosition());
+                cabinetGUI.openCabinetDecisionsMenu(player, first.getMinisterPosition());
+            }
+            return;
+        }
+
+        // "My position" button (Slot 33 - DIAMOND)
+        if (clicked.getType() == Material.DIAMOND) {
+            CabinetDecision.CabinetPosition[] positions = CabinetDecision.CabinetPosition.values();
+            for (CabinetDecision.CabinetPosition pos : positions) {
+                UUID minister = gov.getCabinetMember(Government.CabinetPosition.valueOf(pos.name()));
+                if (minister != null && minister.equals(player.getUniqueId())) {
+                    viewingCabinetPosition.put(player.getUniqueId(), pos);
+                    cabinetGUI.openCabinetDecisionsMenu(player, pos);
+                    return;
+                }
             }
         }
     }
@@ -572,8 +761,13 @@ public class GUIListener implements Listener {
     // === CABINET DECISIONS GUI ===
 
     private void handleCabinetDecisionsGUI(Player player, ItemStack clicked) {
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
         if (clicked.getType() == Material.ARROW) {
-            governmentGUI.openCabinetMenu(player);
+            cabinetGUI.openCabinetMenu(player);
             return;
         }
 
@@ -593,6 +787,77 @@ public class GUIListener implements Listener {
                     plugin.getCabinetManager().executeDecision(player.getUniqueId(), type);
                 }
             }
+        }
+    }
+
+    // === CABINET APPOINTMENT GUI ===
+
+    /**
+     * Handles clicks inside the "Appoint Minister" player-picker GUI.
+     * Only accessible by the President (or admin).
+     */
+    private void handleCabinetAppointGUI(Player player, ItemStack clicked, String title) {
+        // Close
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
+        // Back to cabinet
+        if (clicked.getType() == Material.ARROW) {
+            cabinetGUI.openCabinetMenu(player);
+            return;
+        }
+
+        // Recover which position we are appointing for
+        Government.CabinetPosition targetPos = viewingAppointPosition.get(player.getUniqueId());
+        if (targetPos == null) {
+            cabinetGUI.openCabinetMenu(player);
+            return;
+        }
+
+        Government gov = plugin.getDataManager().getGovernment();
+        boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+        boolean isAdmin = player.hasPermission("democracy.admin");
+
+        if (!isPresident && !isAdmin) {
+            MessageUtils.send(player, "<red>Only the President can appoint cabinet members!");
+            cabinetGUI.openCabinetMenu(player);
+            return;
+        }
+
+        // "Remove current minister" button (RED_CONCRETE at slot 45)
+        if (clicked.getType() == Material.RED_CONCRETE) {
+            plugin.getGovernmentManager().removeCabinetMember(targetPos);
+            MessageUtils.send(player,
+                    "<gold>The <yellow>" + targetPos.getDisplayName() + "<gold> position is now vacant.");
+            Bukkit.getScheduler().runTaskLater(plugin, () -> cabinetGUI.openCabinetMenu(player), 3L);
+            return;
+        }
+
+        // Player head click → appoint that player
+        if (clicked.getType() == Material.PLAYER_HEAD) {
+            SkullMeta meta = (SkullMeta) clicked.getItemMeta();
+            if (meta == null || meta.getOwningPlayer() == null)
+                return;
+
+            UUID targetUUID = meta.getOwningPlayer().getUniqueId();
+            UUID currentMinister = gov.getCabinetMember(targetPos);
+
+            if (targetUUID.equals(currentMinister)) {
+                // Clicking the current minister removes them
+                plugin.getGovernmentManager().removeCabinetMember(targetPos);
+                MessageUtils.send(player, "<gold>Removed <yellow>" + meta.getOwningPlayer().getName()
+                        + "<gold> from <yellow>" + targetPos.getDisplayName() + "<gold>.");
+            } else {
+                // Appoint the clicked player
+                plugin.getGovernmentManager().appointCabinetMember(targetPos, targetUUID);
+                MessageUtils.send(player, "<gold>Appointed <yellow>" + meta.getOwningPlayer().getName()
+                        + "<gold> as <yellow>" + targetPos.getDisplayName() + "<gold>!");
+            }
+
+            // Re-open cabinet menu after a tick so data is refreshed
+            Bukkit.getScheduler().runTaskLater(plugin, () -> cabinetGUI.openCabinetMenu(player), 3L);
         }
     }
 
@@ -622,9 +887,54 @@ public class GUIListener implements Listener {
 
     // === HISTORY GUI ===
 
-    private void handleHistoryGUI(Player player, ItemStack clicked) {
+    private void handleHistoryGUI(Player player, ItemStack clicked, int slot, boolean isDetailView) {
+        // ── Back / Close ──────────────────────────────────────────────────
         if (clicked.getType() == Material.ARROW) {
-            governmentGUI.openGovernmentMenu(player);
+            if (isDetailView) {
+                presidentHistoryGUI.openHistoryMenu(player);
+            } else {
+                governmentGUI.openGovernmentMenu(player);
+            }
+            return;
+        }
+
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
+        if (!isDetailView) {
+            // ── Main list: click a president head → open detail view ──────
+            if (clicked.getType() == Material.PLAYER_HEAD) {
+                SkullMeta meta = (SkullMeta) clicked.getItemMeta();
+                if (meta != null && meta.getOwningPlayer() != null) {
+                    UUID targetUUID = meta.getOwningPlayer().getUniqueId();
+                    java.util.List<id.democracycore.models.PresidentHistory.PresidentRecord> history = plugin
+                            .getDataManager().getAllPresidentHistory();
+                    for (int i = 0; i < history.size(); i++) {
+                        if (history.get(i).getPlayerId().equals(targetUUID)) {
+                            presidentHistoryGUI.openDetailMenu(player, i);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else {
+            // ── Detail view: Prev (slot 36) / Next (slot 44) nav heads ────
+            if (clicked.getType() == Material.PLAYER_HEAD) {
+                SkullMeta meta = (SkullMeta) clicked.getItemMeta();
+                if (meta != null && meta.getOwningPlayer() != null) {
+                    UUID targetUUID = meta.getOwningPlayer().getUniqueId();
+                    java.util.List<id.democracycore.models.PresidentHistory.PresidentRecord> history = plugin
+                            .getDataManager().getAllPresidentHistory();
+                    for (int i = 0; i < history.size(); i++) {
+                        if (history.get(i).getPlayerId().equals(targetUUID)) {
+                            presidentHistoryGUI.openDetailMenu(player, i);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -912,32 +1222,104 @@ public class GUIListener implements Listener {
         }
     }
 
+    // === ARENA GUI ===
+
+    private void handleArenaGUI(Player player, ItemStack clicked, int slot) {
+        // Close button (slot 53)
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        }
+
+        // Back to main menu (slot 45)
+        if (clicked.getType() == Material.ARROW) {
+            mainMenuGUI.openMainMenu(player);
+            return;
+        }
+
+        // Refresh (slot 49)
+        if (slot == 49 && clicked.getType() == Material.CLOCK) {
+            arenaGUI.openArenaMenu(player);
+            return;
+        }
+
+        // Full Leaderboard button (slot 40)
+        if (slot == 40 && clicked.getType() == Material.GOLD_BLOCK) {
+            arenaGUI.openLeaderboard(player);
+            return;
+        }
+
+        // Rewards info item (slot 16) — open leaderboard for context
+        if (slot == 16 && clicked.getType() == Material.NETHER_STAR) {
+            arenaGUI.openLeaderboard(player);
+            return;
+        }
+
+        // Kit info (slot 25)
+        if (slot == 25 && clicked.getType() == Material.IRON_CHESTPLATE) {
+            arenaGUI.openKitInfo(player);
+            return;
+        }
+
+        // Join Arena (slot 37) — green or red concrete
+        if (slot == 37) {
+            if (clicked.getType() == Material.LIME_CONCRETE) {
+                // Join
+                player.closeInventory();
+                plugin.getArenaManager().joinArena(player);
+            } else if (clicked.getType() == Material.RED_CONCRETE) {
+                // Leave
+                player.closeInventory();
+                if (!plugin.getArenaManager().leaveArena(player.getUniqueId())) {
+                    MessageUtils.send(player, "<red>You are not in the arena!");
+                }
+            }
+            return;
+        }
+
+        // President controls (slot 43)
+        if (slot == 43) {
+            if (clicked.getType() == Material.BEACON) {
+                // Start arena
+                if (!plugin.getArenaManager().startArena(player.getUniqueId())) {
+                    MessageUtils.send(player, "<red>Cannot start arena! Check requirements.");
+                } else {
+                    arenaGUI.openArenaMenu(player);
+                }
+            } else if (clicked.getType() == Material.TNT) {
+                // End arena
+                plugin.getArenaManager().endArena();
+                MessageUtils.send(player, "<gold>Arena ended. Final rewards distributed.");
+                arenaGUI.openArenaMenu(player);
+            }
+        }
+    }
+
+    private void handleArenaLeaderboardGUI(Player player, ItemStack clicked) {
+        if (clicked.getType() == Material.ARROW) {
+            arenaGUI.openArenaMenu(player);
+            return;
+        }
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+        }
+    }
+
+    private void handleArenaKitGUI(Player player, ItemStack clicked) {
+        if (clicked.getType() == Material.ARROW) {
+            arenaGUI.openArenaMenu(player);
+            return;
+        }
+        if (clicked.getType() == Material.BARRIER) {
+            player.closeInventory();
+        }
+    }
+
     // === HELPER METHODS ===
 
     private void showArenaInfo(Player player) {
-        player.closeInventory();
-
-        boolean isActive = plugin.getArenaManager().isArenaActive();
-
-        MessageUtils.send(player, "<gold>═══════════════════════════════════════");
-        MessageUtils.send(player, "<yellow>     ⚔ PRESIDENTIAL ARENA ⚔");
-        MessageUtils.send(player, "<gold>═══════════════════════════════════════");
-
-        if (isActive) {
-            MessageUtils.send(player, "<green>Sesi arena sedang AKTIF!");
-            MessageUtils.send(player, "<gray>Gunakan <white>/dc arena join <gray>untuk bergabung");
-        } else {
-            MessageUtils.send(player, "<red>Sesi arena tidak aktif.");
-            MessageUtils.send(player, "<gray>Menunggu Presiden memulai sesi baru");
-        }
-
-        MessageUtils.send(player, "");
-        MessageUtils.send(player, "<yellow>Commands:");
-        MessageUtils.send(player, "<white>/dc arena join <gray>- Gabung arena");
-        MessageUtils.send(player, "<white>/dc arena leave <gray>- Keluar arena");
-        MessageUtils.send(player, "<white>/dc arena stats <gray>- Lihat statistik");
-        MessageUtils.send(player, "<white>/dc arena leaderboard <gray>- Leaderboard");
-        MessageUtils.send(player, "<gold>═══════════════════════════════════════");
+        // Redirect to the full Arena GUI
+        arenaGUI.openArenaMenu(player);
     }
 
     private void showRecallInfo(Player player) {
@@ -1012,7 +1394,7 @@ public class GUIListener implements Listener {
     }
 
     public void openCabinetGUI(Player player) {
-        governmentGUI.openCabinetMenu(player);
+        cabinetGUI.openCabinetMenu(player);
     }
 
     public void openTreasuryGUI(Player player) {
@@ -1020,7 +1402,7 @@ public class GUIListener implements Listener {
     }
 
     public void openHistoryGUI(Player player) {
-        governmentGUI.openHistoryMenu(player);
+        presidentHistoryGUI.openHistoryMenu(player);
     }
 
     public void openPlayerStatsGUI(Player player, UUID targetUUID) {
@@ -1042,6 +1424,10 @@ public class GUIListener implements Listener {
 
     public void openTaxGUI(Player player) {
         taxGUI.openTaxMenu(player);
+    }
+
+    public void openArenaGUI(Player player) {
+        arenaGUI.openArenaMenu(player);
     }
 
     /**
@@ -1070,7 +1456,7 @@ public class GUIListener implements Listener {
                 votingGUI.openVotingMenu(player);
                 break;
             case OPEN_GUI_CABINET:
-                governmentGUI.openCabinetMenu(player);
+                cabinetGUI.openCabinetMenu(player);
                 break;
             case OPEN_GUI_TREASURY:
                 governmentGUI.openTreasuryMenu(player);
@@ -1082,7 +1468,7 @@ public class GUIListener implements Listener {
                 recallGUI.openRecallMenu(player);
                 break;
             case OPEN_GUI_HISTORY:
-                governmentGUI.openHistoryMenu(player);
+                presidentHistoryGUI.openHistoryMenu(player);
                 break;
             case OPEN_GUI_LEADERBOARD:
                 playerStatsGUI.openLeaderboard(player);
@@ -1092,6 +1478,20 @@ public class GUIListener implements Listener {
                 break;
             case OPEN_GUI_TAX:
                 taxGUI.openTaxMenu(player);
+                break;
+            case OPEN_GUI_ARENA:
+                arenaGUI.openArenaMenu(player);
+                break;
+            case OPEN_GUI_ARENA_LEADERBOARD:
+                arenaGUI.openLeaderboard(player);
+                break;
+            case OPEN_GUI_ARENA_KIT:
+                arenaGUI.openKitInfo(player);
+                break;
+            case OPEN_GUI_CABINET_APPOINT:
+                // Requires a position stored in viewingAppointPosition; falls back to cabinet
+                // menu
+                cabinetGUI.openCabinetMenu(player);
                 break;
 
             // Specific Actions
@@ -1121,6 +1521,25 @@ public class GUIListener implements Listener {
                 player.closeInventory();
                 plugin.getArenaManager().joinArena(player);
                 break;
+            case ACTION_ARENA_START:
+                player.closeInventory();
+                if (!plugin.getArenaManager().startArena(player.getUniqueId())) {
+                    MessageUtils.send(player, "<red>Cannot start arena! Check requirements.");
+                } else {
+                    arenaGUI.openArenaMenu(player);
+                }
+                break;
+            case ACTION_ARENA_END:
+                player.closeInventory();
+                plugin.getArenaManager().endArena();
+                MessageUtils.send(player, "<gold>Arena ended. Final rewards distributed.");
+                break;
+            case ACTION_ARENA_LEAVE:
+                player.closeInventory();
+                if (!plugin.getArenaManager().leaveArena(player.getUniqueId())) {
+                    MessageUtils.send(player, "<red>You are not in the arena!");
+                }
+                break;
 
             // New Actions
             case ACTION_REFRESH_GUI:
@@ -1134,7 +1553,7 @@ public class GUIListener implements Listener {
                     } else if (currentGUI.equals(GovernmentGUI.GOVERNMENT_GUI_TITLE)) {
                         governmentGUI.openGovernmentMenu(player);
                     } else if (currentGUI.equals(GovernmentGUI.CABINET_GUI_TITLE)) {
-                        governmentGUI.openCabinetMenu(player);
+                        cabinetGUI.openCabinetMenu(player);
                     } else if (currentGUI.equals(RecallGUI.RECALL_MENU_TITLE)) {
                         recallGUI.openRecallMenu(player);
                     } else if (currentGUI.equals(PlayerStatsGUI.STATS_GUI_TITLE)) {

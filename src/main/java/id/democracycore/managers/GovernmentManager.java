@@ -45,10 +45,31 @@ public class GovernmentManager {
 
     public void setPresident(UUID uuid, String name, boolean isNewTerm) {
         Government gov = getGovernment();
+        int maxTerms = plugin.getConfig().getInt("president.max-consecutive-terms", 2);
+        int cooldownTerms = plugin.getConfig().getInt("president.cooldown-after-max-terms", 1);
+
+        // Handle outgoing president - check if they reached max terms and set cooldown
+        if (gov.hasPresident() && isNewTerm) {
+            UUID outgoingPresident = gov.getPresidentUUID();
+            if (outgoingPresident != null && gov.getConsecutiveTerms() >= maxTerms) {
+                PlayerData outgoingData = plugin.getDataManager().getOrCreatePlayerData(outgoingPresident,
+                        gov.getPresidentName());
+                outgoingData.setPresidentCooldownTerms(cooldownTerms);
+            }
+        }
 
         // End previous president's term if exists
         if (gov.hasPresident()) {
             endPresidency("TERM_END");
+        }
+
+        // Decrease cooldown for all players with active cooldown (new term started)
+        if (isNewTerm) {
+            for (PlayerData data : plugin.getDataManager().getAllPlayerData()) {
+                if (data.getPresidentCooldownTerms() > 0) {
+                    data.decrementPresidentCooldown();
+                }
+            }
         }
 
         // Set new president
@@ -61,7 +82,7 @@ public class GovernmentManager {
         gov.getApprovalRatings().clear();
         gov.getCabinet().clear();
 
-        // Track consecutive terms
+        // Track consecutive terms for new president
         if (isNewTerm) {
             PresidentRecord lastRecord = plugin.getDataManager().getPresidentHistory().getLatestRecord();
             if (lastRecord != null && lastRecord.getUuid().equals(uuid)) {
@@ -399,6 +420,12 @@ public class GovernmentManager {
 
     public boolean canRunForPresident(UUID uuid) {
         Government gov = getGovernment();
+        PlayerData playerData = plugin.getDataManager().getPlayerData(uuid);
+
+        // Check if player has an active cooldown
+        if (playerData != null && playerData.getPresidentCooldownTerms() > 0) {
+            return false;
+        }
 
         // Check max consecutive terms
         int maxTerms = plugin.getConfig().getInt("president.max-consecutive-terms", 2);
@@ -408,6 +435,11 @@ public class GovernmentManager {
         }
 
         return true;
+    }
+
+    public int getRemainingCooldownTerms(UUID uuid) {
+        PlayerData playerData = plugin.getDataManager().getPlayerData(uuid);
+        return playerData != null ? playerData.getPresidentCooldownTerms() : 0;
     }
 
     public void rateApproval(UUID voterUUID, int rating) {

@@ -533,6 +533,8 @@
                 <li><a href="#player"><span class="nav-dot"></span>Player Stats</a></li>
                 <li><a href="#arena"><span class="nav-dot"></span>Arena PvP</a></li>
                 <li><a href="#tax"><span class="nav-dot"></span>Tax System</a></li>
+                <li><a href="#executive_orders"><span class="nav-dot"></span>Executive Orders</a></li>
+                <li><a href="#minister_orders"><span class="nav-dot"></span>Minister Orders</a></li>
                 <li><a href="#examples"><span class="nav-dot"></span>Examples</a></li>
                 <li><a href="#troubleshooting"><span class="nav-dot"></span>Troubleshooting</a></li>
             </ul>
@@ -637,6 +639,39 @@
                         <tr>
                             <td>%democracy_culture_minister%</td>
                             <td>Minister of Culture name</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Government Utility</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_president_uuid%</td>
+                            <td>UUID of the current president</td>
+                            <td>String / None</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_president_online%</td>
+                            <td>Is the president currently online?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_cabinet_count%</td>
+                            <td>Number of filled cabinet positions</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_cabinet_salary_total%</td>
+                            <td>Total salary paid to cabinet this term</td>
+                            <td>Decimal</td>
                         </tr>
                     </tbody>
                 </table>
@@ -979,6 +1014,315 @@
                         <code>DemocracyExpansion.java</code> as of v1.4.0. Test them with:<br><br>
                         <code>/papi parse me %democracy_tax_status%</code><br>
                         <code>/papi parse me %democracy_tax_total_collected%</code>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="executive_orders">
+                <div class="section-title">
+                    <h2>Executive Order Placeholders</h2>
+                    <span class="section-badge">v1.4.1</span>
+                </div>
+                <p>These placeholders expose the state of active <strong>Presidential Executive Orders</strong>.
+                    Use them in scoreboards, tab lists, or holograms to display real-time government decrees.</p>
+
+                <h3>General Status</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_order_active%</td>
+                            <td>Is any executive order currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_count%</td>
+                            <td>Number of currently active executive orders</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_name%</td>
+                            <td>Display name of the first active order</td>
+                            <td>String / None</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_time%</td>
+                            <td>Remaining time of the first active order</td>
+                            <td>Formatted String</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_effect%</td>
+                            <td>Effect description of the first active order</td>
+                            <td>String / None</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_cooldown%</td>
+                            <td>Time remaining before president can issue another order</td>
+                            <td>Formatted String / Ready</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Active Effect Getters</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_order_pvp_disabled%</td>
+                            <td>Is PvP disabled by State of Emergency?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_purge_active%</td>
+                            <td>Is Purge Protocol currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_xp_multiplier%</td>
+                            <td>Current XP multiplier from active orders</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_vault_multiplier%</td>
+                            <td>Current vault points multiplier from active orders</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_farming_multiplier%</td>
+                            <td>Drop rate multiplier for farming/fishing/breeding</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_pvp_damage_multiplier%</td>
+                            <td>PvP damage multiplier (War Economy)</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_shop_discount%</td>
+                            <td>Shop discount percentage from active orders</td>
+                            <td>Formatted % / 0%</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Per-Order Status Checkers</h3>
+                <p>You can check any specific order by its type name using the dynamic pattern below:</p>
+                <pre><code>%democracy_order_&lt;TYPE_NAME&gt;%       → Yes / No (is this order active?)
+%democracy_order_&lt;TYPE_NAME&gt;_time%  → Formatted time remaining</code></pre>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Order Name</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_order_golden_age%</td>
+                            <td>Golden Age Decree</td>
+                            <td>48h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_state_of_emergency%</td>
+                            <td>State of Emergency</td>
+                            <td>24h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_national_holiday%</td>
+                            <td>National Holiday</td>
+                            <td>24h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_war_economy%</td>
+                            <td>War Economy</td>
+                            <td>72h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_economic_recovery%</td>
+                            <td>Economic Recovery Plan</td>
+                            <td>36h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_infrastructure_initiative%</td>
+                            <td>Infrastructure Initiative</td>
+                            <td>72h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_environmental_protection%</td>
+                            <td>Environmental Protection Act</td>
+                            <td>48h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_education_advancement%</td>
+                            <td>Education Advancement</td>
+                            <td>48h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_purge_protocol%</td>
+                            <td>Purge Protocol</td>
+                            <td>6h</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_order_presidential_pardon%</td>
+                            <td>Presidential Pardon</td>
+                            <td>Instant</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <div class="info-box-title">⚡ New in v1.4.1</div>
+                    <div class="info-box-content">
+                        All executive order placeholders are implemented as of v1.4.1. Test with:<br><br>
+                        <code>/papi parse me %democracy_order_active%</code><br>
+                        <code>/papi parse me %democracy_order_golden_age%</code><br>
+                        <code>/papi parse me %democracy_order_xp_multiplier%</code>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="minister_orders">
+                <div class="section-title">
+                    <h2>Minister Order Placeholders</h2>
+                    <span class="section-badge">v1.4.1</span>
+                </div>
+                <p>These placeholders expose the state of active <strong>Cabinet Minister Decisions</strong>.
+                    Ministers (Defense, Treasury, Commerce, Infrastructure, Culture) can each issue their own policy
+                    decisions.</p>
+
+                <h3>Global Minister Decision Status</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                            <th>Return Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_minister_order_active%</td>
+                            <td>Is any minister decision currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_count%</td>
+                            <td>Number of currently active minister decisions</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_drop_multiplier%</td>
+                            <td>Global drop rate multiplier from active decisions</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_xp_multiplier%</td>
+                            <td>Global XP multiplier from active decisions</td>
+                            <td>Decimal</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_tax_holiday%</td>
+                            <td>Is Tax Holiday (Treasury) currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_trade_fair%</td>
+                            <td>Is Trade Fair (Commerce) currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_resource_boom%</td>
+                            <td>Is Resource Boom (Commerce) currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_construction_boom%</td>
+                            <td>Is Construction Boom (Infrastructure) currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_order_festival%</td>
+                            <td>Is Festival Week (Culture) currently active?</td>
+                            <td>Yes / No</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Per-Minister Active Decision</h3>
+                <p>Check the active decision name and remaining time per cabinet position:</p>
+                <pre><code>%democracy_minister_&lt;POSITION&gt;_order%       → Active decision name / None
+%democracy_minister_&lt;POSITION&gt;_order_time%  → Remaining time as formatted string</code></pre>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>%democracy_minister_defense_order%</td>
+                            <td>Active decision of Minister of Defense</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_defense_order_time%</td>
+                            <td>Remaining time of Defense decision</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_treasury_order%</td>
+                            <td>Active decision of Minister of Treasury</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_treasury_order_time%</td>
+                            <td>Remaining time of Treasury decision</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_commerce_order%</td>
+                            <td>Active decision of Minister of Commerce</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_commerce_order_time%</td>
+                            <td>Remaining time of Commerce decision</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_infrastructure_order%</td>
+                            <td>Active decision of Minister of Infrastructure</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_infrastructure_order_time%</td>
+                            <td>Remaining time of Infrastructure decision</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_culture_order%</td>
+                            <td>Active decision of Minister of Culture</td>
+                        </tr>
+                        <tr>
+                            <td>%democracy_minister_culture_order_time%</td>
+                            <td>Remaining time of Culture decision</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <div class="info-box-title">⚡ New in v1.4.1</div>
+                    <div class="info-box-content">
+                        All minister order placeholders are implemented as of v1.4.1. Test with:<br><br>
+                        <code>/papi parse me %democracy_minister_order_active%</code><br>
+                        <code>/papi parse me %democracy_minister_defense_order%</code><br>
+                        <code>/papi parse me %democracy_minister_order_tax_holiday%</code>
                     </div>
                 </div>
             </section>
