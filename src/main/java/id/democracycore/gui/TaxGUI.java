@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import id.democracycore.DemocracyCore;
+import id.democracycore.models.ExecutiveOrder.ExecutiveOrderType;
 import id.democracycore.models.PlayerData;
 import id.democracycore.models.TaxRecord;
 import id.democracycore.models.TaxRecord.PlayerTaxData;
@@ -63,6 +64,12 @@ public class TaxGUI {
         // Collection Stats (Slot 16)
         ItemStack statsItem = createCollectionStatsItem(record);
         inv.setItem(16, statsItem);
+
+        // === ROW 4: Executive Order Status ===
+
+        // Executive Order Tax Banner (Slot 28)
+        ItemStack eoItem = createExecutiveOrderTaxItem();
+        inv.setItem(28, eoItem);
 
         // === ROW 3: Player Tax Info ===
 
@@ -288,16 +295,35 @@ public class TaxGUI {
 
     private ItemStack createStatusItem(TaxRecord record) {
         boolean enabled = plugin.getTaxManager().isEnabled();
+        boolean suspended = plugin.getExecutiveOrderManager().isTaxSuspended();
+        boolean surge = plugin.getExecutiveOrderManager().isOrderActive(ExecutiveOrderType.TAX_SURGE);
 
-        ItemStack item = new ItemStack(enabled ? Material.BEACON : Material.BEDROCK);
+        Material mat;
+        String title;
+        if (suspended) {
+            mat = Material.LIGHT_BLUE_CONCRETE;
+            title = "\u00a7b\u00a7l\u26a1 TAX SYSTEM - SUSPENDED";
+        } else if (surge) {
+            mat = Material.ORANGE_CONCRETE;
+            title = "\u00a76\u00a7l\u26a1 TAX SYSTEM - SURGE ACTIVE";
+        } else {
+            mat = enabled ? Material.BEACON : Material.BEDROCK;
+            title = enabled ? "\u00a7a\u00a7l\u2714 TAX SYSTEM ACTIVE" : "\u00a7c\u00a7l\u2716 TAX SYSTEM DISABLED";
+        }
+
+        ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(
-                enabled ? "\u00a7a\u00a7l\u2714 TAX SYSTEM ACTIVE" : "\u00a7c\u00a7l\u2716 TAX SYSTEM DISABLED");
+        meta.setDisplayName(title);
 
         List<String> lore = new ArrayList<>();
         lore.add(
                 "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
         lore.add("\u00a77Status: " + (enabled ? "\u00a7aEnabled" : "\u00a7cDisabled"));
+        if (suspended) {
+            lore.add("\u00a7b\u00a7lExecutive Order: TAX SUSPENDED");
+        } else if (surge) {
+            lore.add("\u00a76\u00a7lExecutive Order: TAX SURGE (5x)");
+        }
         lore.add("\u00a77Collection Cycles: \u00a7f" + record.getTotalCollectionCycles());
         lore.add("\u00a77Total Tax Collected: \u00a7a$" + MessageUtils.formatNumber(record.getTotalTaxCollected()));
         lore.add("\u00a77Total Penalties: \u00a7c$" + MessageUtils.formatNumber(record.getTotalPenaltiesCollected()));
@@ -306,17 +332,23 @@ public class TaxGUI {
         meta.setLore(lore);
         item.setItemMeta(meta);
 
-        if (enabled)
+        if (enabled || suspended || surge)
             addGlow(item);
         return item;
     }
 
     private ItemStack createTaxRateItem() {
-        ItemStack item = new ItemStack(Material.GOLD_NUGGET);
+        boolean suspended = plugin.getExecutiveOrderManager().isTaxSuspended();
+        boolean surge = plugin.getExecutiveOrderManager().isOrderActive(ExecutiveOrderType.TAX_SURGE);
+        double multiplier = plugin.getExecutiveOrderManager().getTaxMultiplier();
+
+        ItemStack item = new ItemStack(suspended ? Material.LIGHT_BLUE_STAINED_GLASS
+                : (surge ? Material.ORANGE_STAINED_GLASS : Material.GOLD_NUGGET));
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("\u00a7e\u00a7l\ud83d\udcb2 TAX RATE");
 
-        double amount = plugin.getTaxManager().getTaxAmount();
+        double baseAmount = plugin.getTaxManager().getTaxAmount();
+        double effectiveAmount = suspended ? 0 : baseAmount * multiplier;
         long intervalHours = plugin.getConfig().getLong("global-tax.collection-interval-hours", 24);
         double penaltyRate = plugin.getTaxManager().getLatePenaltyRate();
         int inactiveDays = (int) plugin.getTaxManager().getInactiveDaysThreshold();
@@ -324,7 +356,14 @@ public class TaxGUI {
         List<String> lore = new ArrayList<>();
         lore.add(
                 "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
-        lore.add("\u00a77Tax Amount: \u00a76$" + MessageUtils.formatNumber(amount));
+        lore.add("\u00a77Base Tax Amount: \u00a76$" + MessageUtils.formatNumber(baseAmount));
+        if (suspended) {
+            lore.add("\u00a7b\u00a7lEffective Rate: $0 (SUSPENDED)");
+        } else if (surge) {
+            lore.add("\u00a76\u00a7lEffective Rate: $" + MessageUtils.formatNumber(effectiveAmount) + " (5x SURGE)");
+        } else {
+            lore.add("\u00a77Effective Rate: \u00a7f$" + MessageUtils.formatNumber(effectiveAmount));
+        }
         lore.add("\u00a77Collection Interval: \u00a7f" + intervalHours + " hours");
         lore.add("\u00a77Late Penalty: \u00a7c" + String.format("%.0f", penaltyRate * 100) + "% of debt");
         lore.add("\u00a77Inactive Exempt: \u00a7f" + inactiveDays + "+ days offline");
@@ -333,6 +372,79 @@ public class TaxGUI {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private ItemStack createExecutiveOrderTaxItem() {
+        boolean suspended = plugin.getExecutiveOrderManager().isTaxSuspended();
+        boolean surge = plugin.getExecutiveOrderManager().isOrderActive(ExecutiveOrderType.TAX_SURGE);
+
+        if (suspended) {
+            // Tax Suspension active
+            id.democracycore.models.ExecutiveOrder suspensionOrder = plugin.getExecutiveOrderManager()
+                    .getActiveOrder(ExecutiveOrderType.TAX_SUSPENSION);
+
+            ItemStack item = new ItemStack(Material.LIGHT_BLUE_CONCRETE);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName("\u00a7b\u00a7l\u26a1 EXECUTIVE ORDER: TAX SUSPENSION");
+
+            List<String> lore = new ArrayList<>();
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add("\u00a77\u00a7lStatus: \u00a7b\u00a7lACTIVE");
+            lore.add("");
+            lore.add("\u00a77All tax collection has been");
+            lore.add("\u00a77halted by presidential decree.");
+            lore.add("");
+            if (suspensionOrder != null) {
+                lore.add(
+                        "\u00a77Time Remaining: \u00a7f" + MessageUtils.formatTime(suspensionOrder.getRemainingTime()));
+            }
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+            addGlow(item);
+            return item;
+
+        } else if (surge) {
+            // Tax Surge active
+            id.democracycore.models.ExecutiveOrder surgeOrder = plugin.getExecutiveOrderManager()
+                    .getActiveOrder(ExecutiveOrderType.TAX_SURGE);
+            double baseAmount = plugin.getTaxManager().getTaxAmount();
+
+            ItemStack item = new ItemStack(Material.ORANGE_CONCRETE);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName("\u00a76\u00a7l\u26a1 EXECUTIVE ORDER: TAX SURGE");
+
+            List<String> lore = new ArrayList<>();
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            lore.add("\u00a77\u00a7lStatus: \u00a76\u00a7lACTIVE");
+            lore.add("");
+            lore.add("\u00a77Tax rates have been raised to");
+            lore.add("\u00a765x\u00a77 the base rate by presidential decree.");
+            lore.add("");
+            lore.add("\u00a77Base Rate: \u00a7f$" + MessageUtils.formatNumber(baseAmount));
+            lore.add("\u00a76Surge Rate: \u00a76$" + MessageUtils.formatNumber(baseAmount * 5));
+            lore.add("");
+            if (surgeOrder != null) {
+                lore.add("\u00a77Time Remaining: \u00a7f" + MessageUtils.formatTime(surgeOrder.getRemainingTime()));
+            }
+            lore.add(
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+            addGlow(item);
+            return item;
+
+        } else {
+            // No active tax executive orders
+            return createItem(Material.PAPER, "\u00a77\u00a7lNo Active Tax Executive Orders",
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac",
+                    "\u00a77No presidential executive orders",
+                    "\u00a77are currently affecting the tax system.",
+                    "\u00a78\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
+        }
     }
 
     private ItemStack createTreasuryIncomeItem(TaxRecord record) {

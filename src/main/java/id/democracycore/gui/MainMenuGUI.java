@@ -109,81 +109,104 @@ public class MainMenuGUI {
         // === ROW 1: Header Info ===
 
         // Player Head (Info Player)
-        ItemStack playerHead = createPlayerHead(player, playerData);
-        int playerHeadSlot = getGUISlot("gui.main_menu.items.player_head.gui_slot", 4);
-        setItemSafe.accept(playerHeadSlot, playerHead);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.player_head")) {
+            ItemStack playerHead = createPlayerHead(player, playerData);
+            getGUISlots("gui.main_menu.items.player_head.gui_slot", 4).forEach(s -> setItemSafe.accept(s, playerHead));
+        }
 
         // === ROW 2: Government Status ===
 
         // President Info
-        ItemStack presidentItem = createPresidentItem(gov, player);
-        int presidentSlot = getGUISlot("gui.main_menu.items.president_item.gui_slot", 10);
-        setItemSafe.accept(presidentSlot, presidentItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.president_item")) {
+            ItemStack presidentItem = createPresidentItem(gov, player);
+            getGUISlots("gui.main_menu.items.president_item.gui_slot", 10)
+                    .forEach(s -> setItemSafe.accept(s, presidentItem));
+        }
 
         // Cabinet Info
-        ItemStack cabinetItem = createCabinetItem(gov, player);
-        int cabinetSlot = getGUISlot("gui.main_menu.items.cabinet_item.gui_slot", 12);
-        setItemSafe.accept(cabinetSlot, cabinetItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.cabinet_item")) {
+            ItemStack cabinetItem = createCabinetItem(gov, player);
+            getGUISlots("gui.main_menu.items.cabinet_item.gui_slot", 12)
+                    .forEach(s -> setItemSafe.accept(s, cabinetItem));
+        }
 
         // Treasury Info
-        ItemStack treasuryItem = createTreasuryItem(treasury, player);
-        int treasurySlot = getGUISlot("gui.main_menu.items.treasury_item.gui_slot", 14);
-        setItemSafe.accept(treasurySlot, treasuryItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.treasury_item")) {
+            ItemStack treasuryItem = createTreasuryItem(treasury, player);
+            getGUISlots("gui.main_menu.items.treasury_item.gui_slot", 14)
+                    .forEach(s -> setItemSafe.accept(s, treasuryItem));
+        }
 
         // Active Effects
-        ItemStack effectsItem = createActiveEffectsItem(player);
-        int effectsSlot = getGUISlot("gui.main_menu.items.active_effects_item.gui_slot", 16);
-        setItemSafe.accept(effectsSlot, effectsItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.active_effects_item")) {
+            ItemStack effectsItem = createActiveEffectsItem(player);
+            getGUISlots("gui.main_menu.items.active_effects_item.gui_slot", 16)
+                    .forEach(s -> setItemSafe.accept(s, effectsItem));
+        }
 
         // === ROW 3: Main Features ===
 
         // Election
-        ItemStack electionItem = createElectionItem(election, player);
-        int electionSlot = getGUISlot("gui.main_menu.items.election_item.gui_slot", 19);
-        setItemSafe.accept(electionSlot, electionItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.election_item")) {
+            ItemStack electionItem = createElectionItem(election, player);
+            getGUISlots("gui.main_menu.items.election_item.gui_slot", 19)
+                    .forEach(s -> setItemSafe.accept(s, electionItem));
+        }
 
         // Executive Orders
-        ItemStack ordersItem = createExecutiveOrdersItem(gov, player);
-        int ordersSlot = getGUISlot("gui.main_menu.items.executive_orders_item.gui_slot", 21);
-        setItemSafe.accept(ordersSlot, ordersItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.executive_orders_item")) {
+            ItemStack ordersItem = createExecutiveOrdersItem(gov, player);
+            getGUISlots("gui.main_menu.items.executive_orders_item.gui_slot", 21)
+                    .forEach(s -> setItemSafe.accept(s, ordersItem));
+        }
 
         // Presidential Arena
-        ItemStack arenaItem = createArenaItem(playerData, player);
-        int arenaSlot = getGUISlot("gui.main_menu.items.arena_item.gui_slot", 23);
-        setItemSafe.accept(arenaSlot, arenaItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.arena_item")) {
+            ItemStack arenaItem = createArenaItem(playerData, player);
+            getGUISlots("gui.main_menu.items.arena_item.gui_slot", 23).forEach(s -> setItemSafe.accept(s, arenaItem));
+        }
 
         // Recall System
-        ItemStack recallItem = createRecallItem(player);
-        int recallSlot = getGUISlot("gui.main_menu.items.recall_item.gui_slot", 25);
-        setItemSafe.accept(recallSlot, recallItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.recall_item")) {
+            ItemStack recallItem = createRecallItem(player);
+            getGUISlots("gui.main_menu.items.recall_item.gui_slot", 25).forEach(s -> setItemSafe.accept(s, recallItem));
+        }
 
         // === ROW 4: Info & Statistics ===
 
         // President History
-        ItemStack historyItem = createHistoryItem(player);
-        int historySlot = getGUISlot("gui.main_menu.items.history_item.gui_slot", 28);
-        setItemSafe.accept(historySlot, historyItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.history_item")) {
+            ItemStack historyItem = createHistoryItem(player);
+            getGUISlots("gui.main_menu.items.history_item.gui_slot", 28)
+                    .forEach(s -> setItemSafe.accept(s, historyItem));
+        }
 
         // My Stats
-        ItemStack statsItem = createMyStatsItem(playerData, player);
-        int statsSlot = getGUISlot("gui.main_menu.items.my_stats_item.gui_slot", 30);
-        setItemSafe.accept(statsSlot, statsItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.my_stats_item")) {
+            ItemStack statsItem = createMyStatsItem(playerData, player);
+            getGUISlots("gui.main_menu.items.my_stats_item.gui_slot", 30)
+                    .forEach(s -> setItemSafe.accept(s, statsItem));
+        }
 
         // Leaderboard
-        ItemStack leaderboardItem = createLeaderboardItem(player);
-        int leaderboardSlot = getGUISlot("gui.main_menu.items.leaderboard_item.gui_slot", 32);
-        setItemSafe.accept(leaderboardSlot, leaderboardItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.leaderboard_item")) {
+            ItemStack leaderboardItem = createLeaderboardItem(player);
+            getGUISlots("gui.main_menu.items.leaderboard_item.gui_slot", 32)
+                    .forEach(s -> setItemSafe.accept(s, leaderboardItem));
+        }
 
         // Guide/Help
-        ItemStack helpItem = createHelpItem(player);
-        int helpSlot = getGUISlot("gui.main_menu.items.help_item.gui_slot", 34);
-        setItemSafe.accept(helpSlot, helpItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.help_item")) {
+            ItemStack helpItem = createHelpItem(player);
+            getGUISlots("gui.main_menu.items.help_item.gui_slot", 34).forEach(s -> setItemSafe.accept(s, helpItem));
+        }
 
         // === ROW 5: Quick Actions (if eligible) ===
 
         // Register Candidate (if registration phase)
         if (election.getPhase() == Election.ElectionPhase.REGISTRATION) {
-            if (!election.getCandidates().containsKey(player.getUniqueId())) {
+            String path = "gui.main_menu.items.register_candidate";
+            if (!election.getCandidates().containsKey(player.getUniqueId()) && plugin.getGUIConfig().contains(path)) {
 
                 int minLevel = plugin.getConfig().getInt("president.requirements.min-level", 100);
                 double minPlaytime = plugin.getConfig().getDouble("president.requirements.min-playtime-hours", 100);
@@ -206,7 +229,6 @@ public class MainMenuGUI {
                         MessageUtils.formatNumber(minBalance), balStatus);
 
                 // Create Item from Config
-                String path = "gui.main_menu.items.register_candidate";
                 Material material = getGUIMaterial(path + ".material");
                 ItemStack registerItem = new ItemStack(material);
                 ItemMeta meta = registerItem.getItemMeta();
@@ -223,15 +245,14 @@ public class MainMenuGUI {
                 applyConfigAttributes(meta, path);
                 registerItem.setItemMeta(meta);
 
-                int registerSlot = getGUISlot(path + ".gui_slot", 38);
-                setItemSafe.accept(registerSlot, registerItem);
+                getGUISlots(path + ".gui_slot", 38).forEach(s -> setItemSafe.accept(s, registerItem));
             }
         }
 
         // Vote (if voting phase and haven't voted)
         if (election.getPhase() == Election.ElectionPhase.VOTING) {
-            if (!election.hasVoted(player.getUniqueId())) {
-                String path = "gui.main_menu.items.vote_now";
+            String path = "gui.main_menu.items.vote_now";
+            if (!election.hasVoted(player.getUniqueId()) && plugin.getGUIConfig().contains(path)) {
                 Material material = getGUIMaterial(path + ".material");
                 ItemStack voteItem = new ItemStack(material);
                 ItemMeta meta = voteItem.getItemMeta();
@@ -243,42 +264,59 @@ public class MainMenuGUI {
                 voteItem.setItemMeta(meta);
                 addGlow(voteItem);
 
-                int voteSlot = getGUISlot(path + ".gui_slot", 40);
-                setItemSafe.accept(voteSlot, voteItem);
+                getGUISlots(path + ".gui_slot", 40).forEach(s -> setItemSafe.accept(s, voteItem));
             }
         }
 
         // Rate President (if there is a president)
         if (gov.hasPresident() && !gov.getPresidentUUID().equals(player.getUniqueId())) {
             String path = "gui.main_menu.items.rate_president";
-            Material material = getGUIMaterial(path + ".material");
-            ItemStack rateItem = new ItemStack(material);
-            ItemMeta meta = rateItem.getItemMeta();
+            if (plugin.getGUIConfig().contains(path)) {
+                Material material = getGUIMaterial(path + ".material");
+                ItemStack rateItem = new ItemStack(material);
+                ItemMeta meta = rateItem.getItemMeta();
 
-            meta.setDisplayName(getGUIString(player, path + ".display_name"));
+                meta.setDisplayName(getGUIString(player, path + ".display_name"));
 
-            List<String> lore = getGUILore(player, path + ".lore",
-                    "current_rating", String.format("%.1f", gov.getApprovalRating()));
+                List<String> lore = getGUILore(player, path + ".lore",
+                        "current_rating", String.format("%.1f", gov.getApprovalRating()));
 
-            meta.setLore(lore);
-            applyConfigAttributes(meta, path);
-            rateItem.setItemMeta(meta);
+                meta.setLore(lore);
+                applyConfigAttributes(meta, path);
+                rateItem.setItemMeta(meta);
 
-            int rateSlot = getGUISlot(path + ".gui_slot", 42);
-            setItemSafe.accept(rateSlot, rateItem);
+                getGUISlots(path + ".gui_slot", 42).forEach(s -> setItemSafe.accept(s, rateItem));
+            }
         }
 
         // === Global Tax (Row 5) ===
-        ItemStack taxItem = createTaxItem(player);
-        int taxSlot = getGUISlot("gui.main_menu.items.tax_item.gui_slot", 37);
-        setItemSafe.accept(taxSlot, taxItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.tax_item")) {
+            ItemStack taxItem = createTaxItem(player);
+            getGUISlots("gui.main_menu.items.tax_item.gui_slot", 37).forEach(s -> setItemSafe.accept(s, taxItem));
+        }
 
         // === ROW 6: Footer ===
 
         // Close Button
-        ItemStack closeItem = createItem(Material.BARRIER, "§c§lClose Menu", "§7Click to close");
-        int closeSlot = getGUISlot("gui.main_menu.items.close_button.gui_slot", 49);
-        setItemSafe.accept(closeSlot, closeItem);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.close_button")) {
+            String path = "gui.main_menu.items.close_button";
+            Material closeMat = getGUIMaterial(path + ".material");
+            if (closeMat == Material.STONE && !plugin.getGUIConfig().contains(path + ".material")) {
+                closeMat = Material.BARRIER;
+            }
+            String closeName = getGUIString(player, path + ".display_name");
+            if (closeName.isEmpty())
+                closeName = "§c§lClose Menu";
+
+            List<String> closeLore = getGUILore(player, path + ".lore");
+            if (closeLore.isEmpty()) {
+                closeLore = new ArrayList<>();
+                closeLore.add("§7Click to close");
+            }
+
+            ItemStack closeItem = createConfiguredItem(closeMat, closeName, path, closeLore.toArray(new String[0]));
+            getGUISlots(path + ".gui_slot", 49).forEach(s -> setItemSafe.accept(s, closeItem));
+        }
 
         // === GENERIC CONFIG ITEMS ===
         // Any extra item added to gui.yml under gui.main_menu.items that is NOT in
@@ -286,19 +324,23 @@ public class MainMenuGUI {
         loadGenericConfigItems(inv, player, size);
 
         // Fill empty slots with glass
-        fillGlass(inv, player);
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.glass_pane")) {
+            fillGlass(inv, player);
+        }
 
         // Decorative corners
-        Material cornerMat = getGUIMaterial("gui.main_menu.items.corner_decoration.material");
+        if (plugin.getGUIConfig().contains("gui.main_menu.items.corner_decoration")) {
+            Material cornerMat = getGUIMaterial("gui.main_menu.items.corner_decoration.material");
 
-        // Only set corners if not AIR
-        if (cornerMat != Material.AIR) {
-            String cornerName = getGUIString(player, "gui.main_menu.items.corner_decoration.display_name");
-            ItemStack corner = createConfiguredItem(cornerMat, cornerName, "gui.main_menu.items.corner_decoration");
+            // Only set corners if not AIR
+            if (cornerMat != Material.AIR) {
+                String cornerName = getGUIString(player, "gui.main_menu.items.corner_decoration.display_name");
+                ItemStack corner = createConfiguredItem(cornerMat, cornerName, "gui.main_menu.items.corner_decoration");
 
-            int[] corners = { 0, 8, size - 9, size - 1 };
-            for (int c : corners) {
-                setItemSafe.accept(c, corner);
+                int[] corners = { 0, 8, size - 9, size - 1 };
+                for (int c : corners) {
+                    setItemSafe.accept(c, corner);
+                }
             }
         }
 
@@ -329,6 +371,48 @@ public class MainMenuGUI {
                 String replacement = String.valueOf(args[i + 1]);
                 line = line.replace(placeholder, replacement);
             }
+
+            // Global List Expansion
+            if (line.contains("{cabinet_members}")) {
+                Government gov = plugin.getDataManager().getGovernment();
+                for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
+                    UUID minister = gov.getCabinetMember(pos.toGovernmentPosition());
+                    if (minister != null) {
+                        processed.add(
+                                "§7" + pos.getDisplayName() + ": §f" + Bukkit.getOfflinePlayer(minister).getName());
+                    } else {
+                        processed.add("§7" + pos.getDisplayName() + ": §8Empty");
+                    }
+                }
+                continue;
+            }
+            if (line.contains("{executive_orders}")) {
+                var activeOrders = plugin.getExecutiveOrderManager().getActiveOrders();
+                for (ExecutiveOrder order : activeOrders) {
+                    processed.add("§7- " + order.getType().getDisplayName());
+                    processed.add("  §8(" + MessageUtils.formatTime(order.getRemainingTime()) + ")");
+                }
+                continue;
+            }
+            if (line.contains("{cabinet_decisions}")) {
+                var activeDecisions = plugin.getDataManager().getActiveDecisions();
+                for (var decision : activeDecisions) {
+                    processed.add("§7- " + decision.getType().getDisplayName());
+                    processed.add("  §8(" + MessageUtils.formatTime(decision.getRemainingTime()) + ")");
+                }
+                continue;
+            }
+            if (line.contains("{recent_presidents}")) {
+                var history = plugin.getDataManager().getAllPresidentHistory();
+                int show = Math.min(3, history.size());
+                for (int i = 0; i < show; i++) {
+                    var record = history.get(i);
+                    String name = Bukkit.getOfflinePlayer(record.getPlayerId()).getName();
+                    processed.add("§7- " + name + " §8(⭐" + String.format("%.1f", record.getApproval()) + ")");
+                }
+                continue;
+            }
+
             if (player != null) {
                 line = processPlaceholders(line, player);
             }
@@ -351,7 +435,40 @@ public class MainMenuGUI {
     }
 
     private int getGUISlot(String path, int defaultSlot) {
-        return plugin.getGUIConfig().getInt(path, defaultSlot);
+        List<Integer> slots = getGUISlots(path, defaultSlot);
+        return slots.isEmpty() ? defaultSlot : slots.get(0);
+    }
+
+    private List<Integer> getGUISlots(String path, int defaultSlot) {
+        List<Integer> slots = new ArrayList<>();
+        if (plugin.getGUIConfig().isList(path)) {
+            for (String s : plugin.getGUIConfig().getStringList(path)) {
+                try {
+                    slots.add(Integer.parseInt(s.trim()));
+                } catch (Exception ignored) {
+                }
+            }
+        } else if (plugin.getGUIConfig().isString(path)) {
+            String val = plugin.getGUIConfig().getString(path);
+            if (val != null) {
+                for (String s : val.split(",")) {
+                    try {
+                        slots.add(Integer.parseInt(s.trim()));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        } else if (plugin.getGUIConfig().isInt(path)) {
+            slots.add(plugin.getGUIConfig().getInt(path));
+        }
+        if (slots.isEmpty() && defaultSlot >= 0) {
+            slots.add(defaultSlot);
+        }
+        return slots;
+    }
+
+    public boolean isItemSlot(String itemKey, int slot, int defaultSlot) {
+        return getGUISlots("gui.main_menu.items." + itemKey + ".gui_slot", defaultSlot).contains(slot);
     }
 
     private Sound getGUISound(String path) {
@@ -541,20 +658,32 @@ public class MainMenuGUI {
     private ItemStack createTreasuryItem(Treasury treasury, Player player) {
         String path = "gui.main_menu.items.treasury_item";
         Material material = getGUIMaterial(path + ".material");
-        if (material == Material.STONE)
+        if (material == Material.STONE && !plugin.getGUIConfig().contains(path + ".material"))
             material = Material.GOLD_BLOCK;
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        meta.setDisplayName(getGUIString(player, path + ".display_name"));
+        String displayName = getGUIString(player, path + ".display_name");
+        if (displayName.isEmpty())
+            displayName = "§6§l💰 TREASURY";
+        meta.setDisplayName(displayName);
 
-        List<String> lore = new ArrayList<>();
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§7Balance: §6" + MessageUtils.formatNumber(treasury.getBalance()));
-        lore.add("§7Income: §a+" + MessageUtils.formatNumber(treasury.getTotalIncome()));
-        lore.add("§7Expenses: §c-" + MessageUtils.formatNumber(treasury.getTotalExpenses()));
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§aClick for treasury details");
+        List<String> configLore = plugin.getGUIConfig().getStringList(path + ".lore");
+        List<String> lore;
+        if (!configLore.isEmpty()) {
+            lore = getGUILore(player, path + ".lore",
+                    "balance", MessageUtils.formatNumber(treasury.getBalance()),
+                    "income", MessageUtils.formatNumber(treasury.getTotalIncome()),
+                    "expenses", MessageUtils.formatNumber(treasury.getTotalExpenses()));
+        } else {
+            lore = new ArrayList<>();
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§7Balance: §6" + MessageUtils.formatNumber(treasury.getBalance()));
+            lore.add("§7Income: §a+" + MessageUtils.formatNumber(treasury.getTotalIncome()));
+            lore.add("§7Expenses: §c-" + MessageUtils.formatNumber(treasury.getTotalExpenses()));
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§aClick for treasury details");
+        }
 
         meta.setLore(lore);
         applyConfigAttributes(meta, path);
@@ -741,23 +870,33 @@ public class MainMenuGUI {
 
         applyConfigAttributes(meta, path);
 
+        List<String> configLore = plugin.getGUIConfig().getStringList(path + ".lore");
         List<String> lore = new ArrayList<>();
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 
-        if (isActive) {
-            lore.add("§a§lACTIVE SESSION!");
-            lore.add("§7Players in arena: §f" + plugin.getArenaManager().getArenaPlayers().size());
+        if (!configLore.isEmpty()) {
+            lore = getGUILore(player, path + ".lore",
+                    "kills", data.getArenaKills(),
+                    "deaths", data.getArenaDeaths(),
+                    "streak", data.getBestKillstreak(),
+                    "players", plugin.getArenaManager().getArenaPlayers().size());
         } else {
-            lore.add("§7Status: §cInactive");
-        }
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 
-        lore.add("");
-        lore.add("§7§lYour Statistics:");
-        lore.add("§7Kills: §a" + data.getArenaKills());
-        lore.add("§7Deaths: §c" + data.getArenaDeaths());
-        lore.add("§7Best Streak: §6" + data.getBestKillstreak());
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§aClick for arena info");
+            if (isActive) {
+                lore.add("§a§lACTIVE SESSION!");
+                lore.add("§7Players in arena: §f" + plugin.getArenaManager().getArenaPlayers().size());
+            } else {
+                lore.add("§7Status: §cInactive");
+            }
+
+            lore.add("");
+            lore.add("§7§lYour Statistics:");
+            lore.add("§7Kills: §a" + data.getArenaKills());
+            lore.add("§7Deaths: §c" + data.getArenaDeaths());
+            lore.add("§7Best Streak: §6" + data.getBestKillstreak());
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§aClick for arena info");
+        }
 
         meta.setLore(lore);
         item.setItemMeta(meta);
@@ -774,39 +913,79 @@ public class MainMenuGUI {
                 petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
                 petition.getPhase() != RecallPetition.RecallPhase.FAILED;
 
-        Material mat = isActive ? Material.REDSTONE_TORCH : Material.TORCH;
-        ItemStack item = createItem(mat, "§c§l⚠ RECALL SYSTEM");
-        ItemMeta meta = item.getItemMeta();
+        String statePath = isActive ? "active" : "inactive";
+        String path = "gui.main_menu.items.recall_item." + statePath;
 
-        List<String> lore = new ArrayList<>();
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-
-        if (isActive) {
-            lore.add("§c§lACTIVE PETITION!");
-            lore.add("§7Phase: §f" + petition.getPhase().name());
-            lore.add("§7Signatures: §f" + petition.getSignatureCount());
-
-            if (petition.getPhase() == RecallPetition.RecallPhase.VOTING) {
-                lore.add("§7Vote Remove: §c" + petition.getRemoveVotes());
-                lore.add("§7Vote Keep: §a" + petition.getKeepVotes());
-            }
-        } else {
-            lore.add("§7No active petition");
-            lore.add("");
-            lore.add("§7Start petition to");
-            lore.add("§7recall president");
+        Material mat = getGUIMaterial(path + ".material");
+        // Fallback if config missing
+        if (mat == Material.STONE && !plugin.getGUIConfig().contains(path + ".material")) {
+            mat = isActive ? Material.REDSTONE_TORCH : Material.TORCH;
         }
 
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§7Deposit: §650,000");
-        lore.add("§7Threshold: §f30% online");
-        lore.add("");
-        lore.add("§eClick for recall info");
+        ItemStack item = new ItemStack(mat);
+        ItemMeta meta = item.getItemMeta();
+
+        String displayName = getGUIString(player, path + ".display_name");
+        if (displayName.isEmpty())
+            displayName = "§c§l⚠ RECALL SYSTEM";
+        meta.setDisplayName(displayName);
+
+        double dep = plugin.getConfig().getDouble("recall.deposit-amount", 50000);
+        double threshOnline = plugin.getConfig().getDouble("recall.signatures.threshold", 0.3);
+        String depositStr = MessageUtils.formatNumber(dep);
+        String thresholdStr = Math.round(threshOnline * 100) + "% online";
+
+        List<String> configLore = plugin.getGUIConfig().getStringList(path + ".lore");
+        List<String> lore = new ArrayList<>();
+
+        if (!configLore.isEmpty()) {
+            for (String line : configLore) {
+                line = line.replace("{deposit}", depositStr);
+                line = line.replace("{threshold}", thresholdStr);
+                if (isActive) {
+                    line = line.replace("{phase}", petition.getPhase().name());
+                    line = line.replace("{signatures}", String.valueOf(petition.getSignatureCount()));
+
+                    if (line.contains("{voting_details}")) {
+                        if (petition.getPhase() == RecallPetition.RecallPhase.VOTING) {
+                            lore.add("§7Vote Remove: §c" + petition.getRemoveVotes());
+                            lore.add("§7Vote Keep: §a" + petition.getKeepVotes());
+                        }
+                        continue;
+                    }
+                }
+                if (player != null) {
+                    line = processPlaceholders(line, player);
+                }
+                lore.add(line);
+            }
+        } else {
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            if (isActive) {
+                lore.add("§c§lACTIVE PETITION!");
+                lore.add("§7Phase: §f" + petition.getPhase().name());
+                lore.add("§7Signatures: §f" + petition.getSignatureCount());
+
+                if (petition.getPhase() == RecallPetition.RecallPhase.VOTING) {
+                    lore.add("§7Vote Remove: §c" + petition.getRemoveVotes());
+                    lore.add("§7Vote Keep: §a" + petition.getKeepVotes());
+                }
+            } else {
+                lore.add("§7No active petition");
+                lore.add("");
+                lore.add("§7Start petition to");
+                lore.add("§7recall president");
+            }
+
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§7Deposit: §6" + depositStr);
+            lore.add("§7Threshold: §f" + thresholdStr);
+            lore.add("");
+            lore.add("§eClick for recall info");
+        }
 
         meta.setLore(lore);
-
-        String statePath = isActive ? "active" : "inactive";
-        applyConfigAttributes(meta, "gui.main_menu.items.recall_item." + statePath);
+        applyConfigAttributes(meta, path);
 
         item.setItemMeta(meta);
 
@@ -882,21 +1061,30 @@ public class MainMenuGUI {
     private ItemStack createLeaderboardItem(Player player) {
         String path = "gui.main_menu.items.leaderboard_item";
         Material material = getGUIMaterial(path + ".material");
-        if (material == Material.STONE)
+        if (material == Material.STONE && !plugin.getGUIConfig().contains(path + ".material"))
             material = Material.GOLDEN_APPLE;
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        meta.setDisplayName(getGUIString(player, path + ".display_name"));
+        String displayName = getGUIString(player, path + ".display_name");
+        if (displayName.isEmpty())
+            displayName = "§6§l🏆 LEADERBOARD";
+        meta.setDisplayName(displayName);
 
-        List<String> lore = new ArrayList<>();
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§7View top players:");
-        lore.add("§7- Arena Kills");
-        lore.add("§7- Playtime");
-        lore.add("§7- Best President");
-        lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        lore.add("§aClick to view leaderboard");
+        List<String> configLore = plugin.getGUIConfig().getStringList(path + ".lore");
+        List<String> lore;
+        if (!configLore.isEmpty()) {
+            lore = getGUILore(player, path + ".lore");
+        } else {
+            lore = new ArrayList<>();
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§7View top players:");
+            lore.add("§7- Arena Kills");
+            lore.add("§7- Playtime");
+            lore.add("§7- Best President");
+            lore.add("§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            lore.add("§aClick to view leaderboard");
+        }
 
         meta.setLore(lore);
         applyConfigAttributes(meta, path);
@@ -1007,19 +1195,21 @@ public class MainMenuGUI {
             if (!plugin.getGUIConfig().contains(basePath + ".gui_slot"))
                 continue;
 
-            int slot = plugin.getGUIConfig().getInt(basePath + ".gui_slot", -1);
-            if (slot < 0 || slot >= inventorySize)
-                continue;
+            List<Integer> slots = getGUISlots(basePath + ".gui_slot", -1);
+            for (int slot : slots) {
+                if (slot < 0 || slot >= inventorySize)
+                    continue;
 
-            // Don't overwrite slots already filled by hardcoded items
-            ItemStack existing = inv.getItem(slot);
-            if (existing != null && existing.getType() != Material.AIR)
-                continue;
+                // Don't overwrite slots already filled by hardcoded items
+                ItemStack existing = inv.getItem(slot);
+                if (existing != null && existing.getType() != Material.AIR)
+                    continue;
 
-            // Build the item purely from config
-            ItemStack item = buildItemFromConfig(player, basePath);
-            if (item != null) {
-                inv.setItem(slot, item);
+                // Build the item purely from config
+                ItemStack item = buildItemFromConfig(player, basePath);
+                if (item != null) {
+                    inv.setItem(slot, item);
+                }
             }
         }
     }
@@ -1088,8 +1278,7 @@ public class MainMenuGUI {
             String basePath = "gui.main_menu.items." + key;
             if (!plugin.getGUIConfig().contains(basePath + ".gui_slot"))
                 continue;
-            int configSlot = plugin.getGUIConfig().getInt(basePath + ".gui_slot", -1);
-            if (configSlot == slot)
+            if (getGUISlots(basePath + ".gui_slot", -1).contains(slot))
                 return key;
         }
         return null;
@@ -1193,6 +1382,16 @@ public class MainMenuGUI {
     }
 
     /**
+     * Check if an item is defined in the configuration.
+     * 
+     * @param itemKey The item key in gui.yml
+     * @return true if defined, false otherwise
+     */
+    public boolean hasItem(String itemKey) {
+        return plugin.getGUIConfig().contains("gui.main_menu.items." + itemKey);
+    }
+
+    /**
      * Play click sound for specific GUI slot based on gui.yml configuration.
      * Slot-to-sound mapping is built dynamically from the config, so custom
      * gui_slot and click_sound values are always respected.
@@ -1231,6 +1430,10 @@ public class MainMenuGUI {
             // The slot key may have a sub-state (e.g. "president_item.default")
             // Strip the sub-state for the gui_slot lookup (gui_slot is on the parent key)
             String slotKey = itemKey.contains(".") ? itemKey.substring(0, itemKey.indexOf('.')) : itemKey;
+
+            if (!hasItem(slotKey))
+                continue;
+
             int configuredSlot = getGUISlot("gui.main_menu.items." + slotKey + ".gui_slot", defaultSlot);
 
             if (slot == configuredSlot) {
@@ -1332,11 +1535,104 @@ public class MainMenuGUI {
         command = command.replace("%player%", player.getName());
         command = command.replace("%player_uuid%", player.getUniqueId().toString());
 
+        command = replaceGlobalPlaceholders(command, player);
+
         // PlaceholderAPI support (if available)
         if (plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             command = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, command);
         }
 
         return command;
+    }
+
+    private String replaceGlobalPlaceholders(String text, Player player) {
+        if (text == null || text.isEmpty())
+            return text;
+
+        if (text.contains("{player_name}"))
+            text = text.replace("{player_name}", player.getName());
+
+        if (text.contains("{level}") || text.contains("{playtime}") || text.contains("{kills}")
+                || text.contains("{deaths}") || text.contains("{streak}") || text.contains("{votes_cast}")
+                || text.contains("{endorsements}") || text.contains("{president_times}")
+                || text.contains("{minister_times}")) {
+            PlayerData data = plugin.getDataManager().getOrCreatePlayerData(player.getUniqueId(), player.getName());
+            if (text.contains("{level}"))
+                text = text.replace("{level}", String.valueOf(calculateLevel(data)));
+            if (text.contains("{playtime}"))
+                text = text.replace("{playtime}", MessageUtils.formatTime(data.getTotalPlaytime()));
+            if (text.contains("{kills}"))
+                text = text.replace("{kills}", String.valueOf(data.getArenaKills()));
+            if (text.contains("{deaths}"))
+                text = text.replace("{deaths}", String.valueOf(data.getArenaDeaths()));
+            if (text.contains("{streak}"))
+                text = text.replace("{streak}", String.valueOf(data.getBestKillstreak()));
+            if (text.contains("{votes_cast}"))
+                text = text.replace("{votes_cast}", String.valueOf(data.getTotalVotesCast()));
+            if (text.contains("{endorsements}"))
+                text = text.replace("{endorsements}", String.valueOf(data.getEndorsementsGiven()));
+            if (text.contains("{president_times}"))
+                text = text.replace("{president_times}", String.valueOf(data.getTimesServedAsPresident()));
+            if (text.contains("{minister_times}"))
+                text = text.replace("{minister_times}", String.valueOf(data.getTimesServedAsCabinet()));
+        }
+
+        if (text.contains("{balance}")) {
+            text = text.replace("{balance}",
+                    MessageUtils.formatNumber(plugin.getVaultHook().getBalance(player.getUniqueId())));
+        }
+        if (text.contains("{status_lines}") && player != null) {
+            text = text.replace("{status_lines}", getStatusLines(player));
+        }
+
+        Government gov = plugin.getDataManager().getGovernment();
+        if (text.contains("{president_name}")) {
+            String pName = gov.hasPresident() ? Bukkit.getOfflinePlayer(gov.getPresidentUUID()).getName()
+                    : "No President";
+            text = text.replace("{president_name}", pName != null ? pName : "No President");
+        }
+        if (text.contains("{term}"))
+            text = text.replace("{term}", String.valueOf(gov.getCurrentTerm()));
+        if (text.contains("{remaining_time}")) {
+            String rt = gov.hasPresident() ? MessageUtils.formatTime(gov.getTermEndTime() - System.currentTimeMillis())
+                    : "0s";
+            text = text.replace("{remaining_time}", rt);
+        }
+        if (text.contains("{rating}") || text.contains("{current_rating}")) {
+            String rtStr = gov.hasPresident() ? String.format("%.1f", gov.getApprovalRating()) : "0.0";
+            text = text.replace("{rating}", rtStr).replace("{current_rating}", rtStr);
+        }
+        if (text.contains("{filled}")) {
+            int filled = 0;
+            for (CabinetDecision.CabinetPosition pos : CabinetDecision.CabinetPosition.values()) {
+                if (gov.getCabinetMember(pos.toGovernmentPosition()) != null)
+                    filled++;
+            }
+            text = text.replace("{filled}", String.valueOf(filled));
+        }
+
+        Election election = plugin.getDataManager().getElection();
+        if (text.contains("{phase}"))
+            text = text.replace("{phase}", election.getPhase().getDisplayName());
+        if (text.contains("{candidates}"))
+            text = text.replace("{candidates}", String.valueOf(election.getCandidates().size()));
+        if (text.contains("{votes}"))
+            text = text.replace("{votes}", String.valueOf(election.getTotalVotes()));
+
+        if (text.contains("{income}"))
+            text = text.replace("{income}",
+                    MessageUtils.formatNumber(plugin.getDataManager().getTreasury().getTotalIncome()));
+        if (text.contains("{expenses}"))
+            text = text.replace("{expenses}",
+                    MessageUtils.formatNumber(plugin.getDataManager().getTreasury().getTotalExpenses()));
+
+        if (text.contains("{players}"))
+            text = text.replace("{players}", String.valueOf(plugin.getArenaManager().getArenaPlayers().size()));
+
+        RecallPetition petition = plugin.getDataManager().getRecallPetition();
+        if (text.contains("{signatures}"))
+            text = text.replace("{signatures}", String.valueOf(petition != null ? petition.getSignatureCount() : 0));
+
+        return text;
     }
 }

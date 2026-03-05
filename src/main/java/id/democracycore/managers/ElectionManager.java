@@ -557,6 +557,12 @@ public class ElectionManager {
         startElection();
     }
 
+    public void forceNextPhase() {
+        if (!isElectionActive())
+            return;
+        advancePhase();
+    }
+
     // Additional method for DemocracyCommand
     public void endElection() {
         getElection().endElection();

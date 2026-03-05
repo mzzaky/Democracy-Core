@@ -25,7 +25,8 @@ public class GovernmentGUI {
 
     public static final String GOVERNMENT_GUI_TITLE = "§6§lGOVERNMENT";
     public static final String ORDERS_GUI_TITLE = "§c§lEXECUTIVE ORDERS";
-    // Cabinet title constants kept as references — cabinet logic moved to CabinetGUI
+    // Cabinet title constants kept as references — cabinet logic moved to
+    // CabinetGUI
     public static final String CABINET_GUI_TITLE = CabinetGUI.CABINET_GUI_TITLE;
     public static final String CABINET_DECISIONS_TITLE = CabinetGUI.CABINET_DECISIONS_TITLE;
     public static final String CABINET_APPOINT_TITLE = CabinetGUI.CABINET_APPOINT_TITLE;
@@ -38,9 +39,19 @@ public class GovernmentGUI {
         this.salaryMenu = new GovernmentSalaryMenu(plugin);
     }
 
+    @SuppressWarnings("deprecation")
     public void openGovernmentMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 45, GOVERNMENT_GUI_TITLE);
         Government gov = plugin.getDataManager().getGovernment();
+
+        boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+        boolean isMinister = gov.getCabinetMemberByUUID(player.getUniqueId()) != null;
+
+        if (!isPresident && !isMinister) {
+            MessageUtils.send(player, "§cOnly the President and Ministers can open the Government GUI.");
+            return;
+        }
+
+        Inventory inv = Bukkit.createInventory(null, 45, GOVERNMENT_GUI_TITLE);
 
         if (gov.hasPresident()) {
             inv.setItem(13, createPresidentHead(gov));
@@ -142,6 +153,7 @@ public class GovernmentGUI {
         salaryMenu.open(player);
     }
 
+    @SuppressWarnings("deprecation")
     private ItemStack createPresidentHead(Government gov) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();

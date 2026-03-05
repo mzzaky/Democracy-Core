@@ -7,7 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import id.democracycore.models.PlayerData;
 
 import id.democracycore.commands.DemocracyCommand;
 import id.democracycore.gui.GUIListener;
@@ -197,6 +200,17 @@ public class DemocracyCore extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             dataManager.saveAll();
         }, 20L * 60 * 5, 20L * 60 * 5);
+
+        // Accumulate playtime for all online players every minute
+        // This acts as a crash-safe fallback in addition to onPlayerQuit tracking
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                PlayerData data = dataManager.getPlayerData(onlinePlayer.getUniqueId());
+                if (data != null) {
+                    data.addPlaytime(60_000L); // +1 minute
+                }
+            }
+        }, 20L * 60, 20L * 60); // every 60 seconds
 
         // Start global tax collection scheduler
         taxManager.startTaxScheduler();

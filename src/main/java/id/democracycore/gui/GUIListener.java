@@ -61,6 +61,7 @@ public class GUIListener implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player))
             return;
@@ -165,6 +166,7 @@ public class GUIListener implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onInventoryDrag(InventoryDragEvent event) {
         String title = event.getView().getTitle();
 
@@ -237,188 +239,206 @@ public class GUIListener implements Listener {
         mainMenuGUI.playClickSound(player, slot);
 
         // Close button — read slot from config
-        int closeSlot = mainMenuGUI.getItemSlot("close_button", 49);
-        if (slot == closeSlot) {
-            player.closeInventory();
-            return;
+        if (mainMenuGUI.hasItem("close_button")) {
+            if (mainMenuGUI.isItemSlot("close_button", slot, 49)) {
+                player.closeInventory();
+                return;
+            }
         }
 
         // Player Head - Open Stats
-        int playerHeadSlot = mainMenuGUI.getItemSlot("player_head", 4);
-        if (slot == playerHeadSlot) {
-            if (handleConfiguredAction(player, "player_head", null))
+        if (mainMenuGUI.hasItem("player_head")) {
+            if (mainMenuGUI.isItemSlot("player_head", slot, 4)) {
+                if (handleConfiguredAction(player, "player_head", null))
+                    return;
+                viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
+                playerStatsGUI.openPlayerStats(player, player.getUniqueId());
                 return;
-            viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
-            playerStatsGUI.openPlayerStats(player, player.getUniqueId());
-            return;
+            }
         }
 
         // President Info
-        int presidentSlot = mainMenuGUI.getItemSlot("president_item", 10);
-        if (slot == presidentSlot) {
-            Government gov = plugin.getDataManager().getGovernment();
-            String state = gov.hasPresident() ? "default" : "no_president";
-            if (handleConfiguredAction(player, "president_item", state))
-                return;
+        if (mainMenuGUI.hasItem("president_item")) {
+            if (mainMenuGUI.isItemSlot("president_item", slot, 10)) {
+                Government gov = plugin.getDataManager().getGovernment();
+                String state = gov.hasPresident() ? "default" : "no_president";
+                if (handleConfiguredAction(player, "president_item", state))
+                    return;
 
-            if (gov.hasPresident()) {
-                governmentGUI.openGovernmentMenu(player);
-            } else {
-                votingGUI.openVotingMenu(player);
+                if (gov.hasPresident()) {
+                    governmentGUI.openGovernmentMenu(player);
+                } else {
+                    votingGUI.openVotingMenu(player);
+                }
+                return;
             }
-            return;
         }
 
         // Cabinet
-        int cabinetSlot = mainMenuGUI.getItemSlot("cabinet_item", 12);
-        if (slot == cabinetSlot) {
-            if (handleConfiguredAction(player, "cabinet_item", null))
+        if (mainMenuGUI.hasItem("cabinet_item")) {
+            if (mainMenuGUI.isItemSlot("cabinet_item", slot, 12)) {
+                if (handleConfiguredAction(player, "cabinet_item", null))
+                    return;
+                cabinetGUI.openCabinetMenu(player);
                 return;
-            cabinetGUI.openCabinetMenu(player);
-            return;
+            }
         }
 
         // Treasury
-        int treasurySlot = mainMenuGUI.getItemSlot("treasury_item", 14);
-        if (slot == treasurySlot) {
-            if (handleConfiguredAction(player, "treasury_item", null))
+        if (mainMenuGUI.hasItem("treasury_item")) {
+            if (mainMenuGUI.isItemSlot("treasury_item", slot, 14)) {
+                if (handleConfiguredAction(player, "treasury_item", null))
+                    return;
+                governmentGUI.openTreasuryMenu(player);
                 return;
-            governmentGUI.openTreasuryMenu(player);
-            return;
+            }
         }
 
         // Active Effects
-        int effectsSlot = mainMenuGUI.getItemSlot("active_effects_item", 16);
-        if (slot == effectsSlot) {
-            int total = plugin.getExecutiveOrderManager().getActiveOrders().size() +
-                    plugin.getDataManager().getActiveDecisions().size();
-            String state = total > 0 ? "active" : "inactive";
-            if (handleConfiguredAction(player, "active_effects_item", state))
-                return;
+        if (mainMenuGUI.hasItem("active_effects_item")) {
+            if (mainMenuGUI.isItemSlot("active_effects_item", slot, 16)) {
+                int total = plugin.getExecutiveOrderManager().getActiveOrders().size() +
+                        plugin.getDataManager().getActiveDecisions().size();
+                String state = total > 0 ? "active" : "inactive";
+                if (handleConfiguredAction(player, "active_effects_item", state))
+                    return;
 
-            governmentGUI.openExecutiveOrdersMenu(player);
-            return;
+                governmentGUI.openExecutiveOrdersMenu(player);
+                return;
+            }
         }
 
         // Election
-        int electionSlot = mainMenuGUI.getItemSlot("election_item", 19);
-        if (slot == electionSlot) {
-            if (handleConfiguredAction(player, "election_item", null))
+        if (mainMenuGUI.hasItem("election_item")) {
+            if (mainMenuGUI.isItemSlot("election_item", slot, 19)) {
+                if (handleConfiguredAction(player, "election_item", null))
+                    return;
+                votingGUI.openVotingMenu(player);
                 return;
-            votingGUI.openVotingMenu(player);
-            return;
+            }
         }
 
         // Executive Orders
-        int ordersSlot = mainMenuGUI.getItemSlot("executive_orders_item", 21);
-        if (slot == ordersSlot) {
-            if (handleConfiguredAction(player, "executive_orders_item", null))
+        if (mainMenuGUI.hasItem("executive_orders_item")) {
+            if (mainMenuGUI.isItemSlot("executive_orders_item", slot, 21)) {
+                if (handleConfiguredAction(player, "executive_orders_item", null))
+                    return;
+                governmentGUI.openExecutiveOrdersMenu(player);
                 return;
-            governmentGUI.openExecutiveOrdersMenu(player);
-            return;
+            }
         }
 
         // Tax
-        int taxSlot = mainMenuGUI.getItemSlot("tax_item", 22);
-        if (slot == taxSlot) {
-            if (handleConfiguredAction(player, "tax_item", null))
+        if (mainMenuGUI.hasItem("tax_item")) {
+            if (mainMenuGUI.isItemSlot("tax_item", slot, 22)) {
+                if (handleConfiguredAction(player, "tax_item", null))
+                    return;
+                taxGUI.openTaxMenu(player);
                 return;
-            taxGUI.openTaxMenu(player);
-            return;
+            }
         }
 
         // Arena
-        int arenaSlot = mainMenuGUI.getItemSlot("arena_item", 23);
-        if (slot == arenaSlot) {
-            boolean isActive = plugin.getArenaManager().isArenaActive();
-            String state = isActive ? "active" : "inactive";
-            if (handleConfiguredAction(player, "arena_item", state))
-                return;
+        if (mainMenuGUI.hasItem("arena_item")) {
+            if (mainMenuGUI.isItemSlot("arena_item", slot, 23)) {
+                boolean isActive = plugin.getArenaManager().isArenaActive();
+                String state = isActive ? "active" : "inactive";
+                if (handleConfiguredAction(player, "arena_item", state))
+                    return;
 
-            // Open the dedicated Arena Management GUI
-            arenaGUI.openArenaMenu(player);
-            return;
+                // Open the dedicated Arena Management GUI
+                arenaGUI.openArenaMenu(player);
+                return;
+            }
         }
 
         // Recall
-        int recallSlot = mainMenuGUI.getItemSlot("recall_item", 25);
-        if (slot == recallSlot) {
-            RecallPetition petition = plugin.getDataManager().getRecallPetition();
-            boolean isActive = petition != null &&
-                    petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
-                    petition.getPhase() != RecallPetition.RecallPhase.FAILED;
-            String state = isActive ? "active" : "inactive";
-            if (handleConfiguredAction(player, "recall_item", state))
-                return;
+        if (mainMenuGUI.hasItem("recall_item")) {
+            if (mainMenuGUI.isItemSlot("recall_item", slot, 25)) {
+                RecallPetition petition = plugin.getDataManager().getRecallPetition();
+                boolean isActive = petition != null &&
+                        petition.getPhase() != RecallPetition.RecallPhase.COMPLETED &&
+                        petition.getPhase() != RecallPetition.RecallPhase.FAILED;
+                String state = isActive ? "active" : "inactive";
+                if (handleConfiguredAction(player, "recall_item", state))
+                    return;
 
-            recallGUI.openRecallMenu(player);
-            return;
+                recallGUI.openRecallMenu(player);
+                return;
+            }
         }
 
         // History
-        int historySlot = mainMenuGUI.getItemSlot("history_item", 28);
-        if (slot == historySlot) {
-            if (handleConfiguredAction(player, "history_item", null))
+        if (mainMenuGUI.hasItem("history_item")) {
+            if (mainMenuGUI.isItemSlot("history_item", slot, 28)) {
+                if (handleConfiguredAction(player, "history_item", null))
+                    return;
+                presidentHistoryGUI.openHistoryMenu(player);
                 return;
-            presidentHistoryGUI.openHistoryMenu(player);
-            return;
+            }
         }
 
         // My Stats
-        int statsSlot = mainMenuGUI.getItemSlot("my_stats_item", 30);
-        if (slot == statsSlot) {
-            if (handleConfiguredAction(player, "my_stats_item", null))
+        if (mainMenuGUI.hasItem("my_stats_item")) {
+            if (mainMenuGUI.isItemSlot("my_stats_item", slot, 30)) {
+                if (handleConfiguredAction(player, "my_stats_item", null))
+                    return;
+                viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
+                playerStatsGUI.openPlayerStats(player, player.getUniqueId());
                 return;
-            viewingPlayerStats.put(player.getUniqueId(), player.getUniqueId());
-            playerStatsGUI.openPlayerStats(player, player.getUniqueId());
-            return;
+            }
         }
 
         // Leaderboard
-        int leaderboardSlot = mainMenuGUI.getItemSlot("leaderboard_item", 32);
-        if (slot == leaderboardSlot) {
-            if (handleConfiguredAction(player, "leaderboard_item", null))
+        if (mainMenuGUI.hasItem("leaderboard_item")) {
+            if (mainMenuGUI.isItemSlot("leaderboard_item", slot, 32)) {
+                if (handleConfiguredAction(player, "leaderboard_item", null))
+                    return;
+                playerStatsGUI.openLeaderboard(player);
                 return;
-            playerStatsGUI.openLeaderboard(player);
-            return;
+            }
         }
 
         // Help
-        int helpSlot = mainMenuGUI.getItemSlot("help_item", 34);
-        if (slot == helpSlot) {
-            if (handleConfiguredAction(player, "help_item", null))
+        if (mainMenuGUI.hasItem("help_item")) {
+            if (mainMenuGUI.isItemSlot("help_item", slot, 34)) {
+                if (handleConfiguredAction(player, "help_item", null))
+                    return;
+                helpGUI.openHelpMenu(player);
                 return;
-            helpGUI.openHelpMenu(player);
-            return;
+            }
         }
 
         // Quick Actions - Register
-        int registerSlot = mainMenuGUI.getItemSlot("register_candidate", 38);
-        if (slot == registerSlot) {
-            if (handleConfiguredAction(player, "register_candidate", null))
+        if (mainMenuGUI.hasItem("register_candidate")) {
+            if (mainMenuGUI.isItemSlot("register_candidate", slot, 38)) {
+                if (handleConfiguredAction(player, "register_candidate", null))
+                    return;
+                player.closeInventory();
+                plugin.getElectionManager().registerCandidate(player, "");
                 return;
-            player.closeInventory();
-            plugin.getElectionManager().registerCandidate(player, "");
-            return;
+            }
         }
 
         // Quick Actions - Vote
-        int voteSlot = mainMenuGUI.getItemSlot("vote_now", 40);
-        if (slot == voteSlot) {
-            if (handleConfiguredAction(player, "vote_now", null))
+        if (mainMenuGUI.hasItem("vote_now")) {
+            if (mainMenuGUI.isItemSlot("vote_now", slot, 40)) {
+                if (handleConfiguredAction(player, "vote_now", null))
+                    return;
+                votingGUI.openVotingMenu(player);
                 return;
-            votingGUI.openVotingMenu(player);
-            return;
+            }
         }
 
         // Quick Actions - Rate
-        int rateSlot = mainMenuGUI.getItemSlot("rate_president", 42);
-        if (slot == rateSlot) {
-            if (handleConfiguredAction(player, "rate_president", null))
+        if (mainMenuGUI.hasItem("rate_president")) {
+            if (mainMenuGUI.isItemSlot("rate_president", slot, 42)) {
+                if (handleConfiguredAction(player, "rate_president", null))
+                    return;
+                player.closeInventory();
+                MessageUtils.send(player, "<yellow>Use: <white>/dc rate <1-5> <gray>to rate the president");
                 return;
-            player.closeInventory();
-            MessageUtils.send(player, "<yellow>Gunakan: <white>/dc rate <1-5> <gray>untuk memberi rating presiden");
-            return;
+            }
         }
 
         // ============================================================
@@ -545,9 +565,9 @@ public class GUIListener implements Listener {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void handleCandidateGUI(Player player, ItemStack clicked, String title) {
         // Extract candidate name from title
-        String candidateName = title.replace(VotingGUI.CANDIDATE_GUI_TITLE, "");
         UUID candidateUUID = viewingCandidate.get(player.getUniqueId());
 
         if (clicked.getType() == Material.ARROW) {
@@ -673,6 +693,7 @@ public class GUIListener implements Listener {
 
     // === ORDERS GUI ===
 
+    @SuppressWarnings("deprecation")
     private void handleOrdersGUI(Player player, ItemStack clicked) {
         if (clicked.getType() == Material.ARROW) {
             governmentGUI.openGovernmentMenu(player);
@@ -760,6 +781,7 @@ public class GUIListener implements Listener {
 
     // === CABINET DECISIONS GUI ===
 
+    @SuppressWarnings("deprecation")
     private void handleCabinetDecisionsGUI(Player player, ItemStack clicked) {
         if (clicked.getType() == Material.BARRIER) {
             player.closeInventory();
@@ -865,13 +887,22 @@ public class GUIListener implements Listener {
 
     private void handleTreasuryGUI(Player player, ItemStack clicked) {
         if (clicked.getType() == Material.ARROW) {
-            governmentGUI.openGovernmentMenu(player);
+            Government gov = plugin.getDataManager().getGovernment();
+            boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+            boolean isMinister = gov.getCabinetMemberByUUID(player.getUniqueId()) != null;
+            boolean isAdmin = player.hasPermission("democracy.admin");
+
+            if (isPresident || isMinister || isAdmin) {
+                governmentGUI.openGovernmentMenu(player);
+            } else {
+                mainMenuGUI.openMainMenu(player);
+            }
             return;
         }
 
         if (clicked.getType() == Material.HOPPER) {
             player.closeInventory();
-            MessageUtils.send(player, "<yellow>Gunakan: <white>/dc treasury donate <jumlah>");
+            MessageUtils.send(player, "<yellow>Use: <white>/dc treasury donate <value>");
         }
 
         if (clicked.getType() == Material.BOOK) {
@@ -893,7 +924,16 @@ public class GUIListener implements Listener {
             if (isDetailView) {
                 presidentHistoryGUI.openHistoryMenu(player);
             } else {
-                governmentGUI.openGovernmentMenu(player);
+                Government gov = plugin.getDataManager().getGovernment();
+                boolean isPresident = gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId());
+                boolean isMinister = gov.getCabinetMemberByUUID(player.getUniqueId()) != null;
+                boolean isAdmin = player.hasPermission("democracy.admin");
+
+                if (isPresident || isMinister || isAdmin) {
+                    governmentGUI.openGovernmentMenu(player);
+                } else {
+                    mainMenuGUI.openMainMenu(player);
+                }
             }
             return;
         }
@@ -1331,47 +1371,47 @@ public class GUIListener implements Listener {
                 petition.getPhase() != id.democracycore.models.RecallPetition.RecallPhase.FAILED;
 
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
-        MessageUtils.send(player, "<yellow>     ⚠ SISTEM RECALL ⚠");
+        MessageUtils.send(player, "<yellow>     ⚠ RECALL SYSTEM ⚠");
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
 
         if (isActive) {
-            MessageUtils.send(player, "<red>Petisi recall sedang AKTIF!");
-            MessageUtils.send(player, "<gray>Fase: <white>" + petition.getPhase().name());
-            MessageUtils.send(player, "<gray>Tanda tangan: <white>" + petition.getSignatureCount());
+            MessageUtils.send(player, "<red>Recall petition is ACTIVE!");
+            MessageUtils.send(player, "<gray>Phase: <white>" + petition.getPhase().name());
+            MessageUtils.send(player, "<gray>Signatures: <white>" + petition.getSignatureCount());
         } else {
-            MessageUtils.send(player, "<gray>Tidak ada petisi recall aktif.");
+            MessageUtils.send(player, "<gray>No active recall petition.");
         }
 
         MessageUtils.send(player, "");
         MessageUtils.send(player, "<yellow>Commands:");
-        MessageUtils.send(player, "<white>/dc recall start <gray>- Mulai petisi (50k deposit)");
-        MessageUtils.send(player, "<white>/dc recall sign <gray>- Tanda tangani petisi");
+        MessageUtils.send(player, "<white>/dc recall start <gray>- Start petition (50k deposit)");
+        MessageUtils.send(player, "<white>/dc recall sign <gray>- Sign petition");
         MessageUtils.send(player, "<white>/dc recall vote <yes/no> <gray>- Vote recall");
-        MessageUtils.send(player, "<white>/dc recall status <gray>- Lihat status");
+        MessageUtils.send(player, "<white>/dc recall status <gray>- View status");
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
     }
 
     private void showCommandList(Player player) {
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
-        MessageUtils.send(player, "<yellow>     💻 DAFTAR COMMAND 💻");
+        MessageUtils.send(player, "<yellow>     💻 COMMAND LIST 💻");
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
         MessageUtils.send(player, "<aqua>Menu & Info:");
-        MessageUtils.send(player, "<white>/dc menu <gray>- Buka menu utama");
-        MessageUtils.send(player, "<white>/dc info <gray>- Info pemerintahan");
-        MessageUtils.send(player, "<white>/dc help <gray>- Bantuan command");
+        MessageUtils.send(player, "<white>/dc menu <gray>- Open main menu");
+        MessageUtils.send(player, "<white>/dc info <gray>- Government info");
+        MessageUtils.send(player, "<white>/dc help <gray>- Command help");
         MessageUtils.send(player, "");
-        MessageUtils.send(player, "<aqua>Pemilu:");
-        MessageUtils.send(player, "<white>/dc election <gray>- Status pemilu");
-        MessageUtils.send(player, "<white>/dc candidates <gray>- Daftar kandidat");
-        MessageUtils.send(player, "<white>/dc vote <player> <gray>- Vote kandidat");
-        MessageUtils.send(player, "<white>/dc register <gray>- Daftar kandidat");
-        MessageUtils.send(player, "<white>/dc endorse <player> <gray>- Endorse kandidat");
+        MessageUtils.send(player, "<aqua>Election:");
+        MessageUtils.send(player, "<white>/dc election <gray>- Election status");
+        MessageUtils.send(player, "<white>/dc candidates <gray>- Candidate list");
+        MessageUtils.send(player, "<white>/dc vote <player> <gray>- Vote for a candidate");
+        MessageUtils.send(player, "<white>/dc register <gray>- Candidate list");
+        MessageUtils.send(player, "<white>/dc endorse <player> <gray>- Endorse a candidate");
         MessageUtils.send(player, "");
-        MessageUtils.send(player, "<aqua>Lainnya:");
-        MessageUtils.send(player, "<white>/dc treasury <gray>- Info treasury");
-        MessageUtils.send(player, "<white>/dc rate <1-5> <gray>- Rate presiden");
-        MessageUtils.send(player, "<white>/dc stats [player] <gray>- Statistik");
-        MessageUtils.send(player, "<white>/dc history <gray>- Sejarah presiden");
+        MessageUtils.send(player, "<aqua>Others:");
+        MessageUtils.send(player, "<white>/dc treasury <gray>- Treasury info");
+        MessageUtils.send(player, "<white>/dc rate <1-5> <gray>- Rate president");
+        MessageUtils.send(player, "<white>/dc stats [player] <gray>- Statistics");
+        MessageUtils.send(player, "<white>/dc history <gray>- History of presidents");
         MessageUtils.send(player, "<gold>═══════════════════════════════════════");
     }
 
@@ -1501,7 +1541,7 @@ public class GUIListener implements Listener {
                 break;
             case ACTION_RATE_PRESIDENT:
                 player.closeInventory();
-                MessageUtils.send(player, "<yellow>Gunakan: <white>/dc rate <1-5> <gray>untuk memberi rating presiden");
+                MessageUtils.send(player, "<yellow>Use: <white>/dc rate <1-5> <gray>to give rating for president");
                 break;
             case ACTION_CLOSE_INVENTORY:
                 player.closeInventory();
@@ -1511,11 +1551,11 @@ public class GUIListener implements Listener {
                 break;
             case ACTION_ENDORSE_CANDIDATE:
                 player.closeInventory();
-                MessageUtils.send(player, "<yellow>Gunakan: <white>/dc endorse <nama_kandidat>");
+                MessageUtils.send(player, "<yellow>Use: <white>/dc endorse <candidate_name>");
                 break;
             case ACTION_DONATE_TREASURY:
                 player.closeInventory();
-                MessageUtils.send(player, "<yellow>Gunakan: <white>/dc treasury donate <jumlah>");
+                MessageUtils.send(player, "<yellow>Use: <white>/dc treasury donate <value>");
                 break;
             case ACTION_JOIN_ARENA:
                 player.closeInventory();

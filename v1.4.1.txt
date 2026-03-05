@@ -1,9 +1,0 @@
-DemocracyCore v1.4.1 - Catatan Perubahan
-
-- Refactor konfigurasi GUI: file utama dipindahkan dari gui.yml ke custom_gui/main_gui.yml.
-- Konfigurasi President History GUI dipisahkan ke custom_gui/history_gui.yml.
-- Konfigurasi Cabinet GUI dipisahkan ke custom_gui/cabinet_gui.yml.
-- Loader GUI di DemocracyCore diubah agar memuat main_gui.yml lalu merge history_gui.yml + cabinet_gui.yml
-  ke satu runtime config (tetap kompatibel dengan pemanggilan getGUIConfig()).
-- reloadGUI() kini ikut memuat ulang ketiga file GUI terpisah.
-- Disertakan fallback legacy: jika custom_gui/main_gui.yml tidak ada, sistem tetap bisa membaca gui.yml lama.

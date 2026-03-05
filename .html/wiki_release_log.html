@@ -731,7 +731,7 @@
     <div class="page-header">
         <h1>Release Log</h1>
         <p>Track all updates and features for Democracy Core Plugin</p>
-        <span>Latest Version: v1.3.0</span>
+        <span>Latest Version: v1.4.2</span>
     </div>
 
     <div class="breadcrumb">
@@ -744,7 +744,9 @@
         <nav class="side-nav">
             <div class="nav-title">Version History</div>
             <ul class="nav-list">
-                <li><a href="#v1-3-0" class="active">v1.3.0 <span class="version-badge">Custom GUI</span></a></li>
+                <li><a href="#v1-4-2" class="active">v1.4.2 <span class="version-badge">Hotfix & Expansion</span></a></li>
+                <li><a href="#v1-4-1">v1.4.1 <span class="version-badge">Arena & Refactor</span></a></li>
+                <li><a href="#v1-3-0">v1.3.0 <span class="version-badge">Custom GUI</span></a></li>
                 <li><a href="#v1-2-0">v1.2.0 <span class="version-badge">Treasury</span></a></li>
                 <li><a href="#v1-1-0">v1.1.0 <span class="version-badge">GUI Update</span></a></li>
                 <li><a href="#v1-0-0">v1.0.0 <span class="version-badge">Initial</span></a></li>
@@ -752,8 +754,295 @@
         </nav>
 
         <main class="main-content">
-            <!-- Version 1.3.0 (Latest - Open by default) -->
-            <section class="version-section" id="v1-3-0">
+            <!-- Version 1.4.2 (Latest - Open by default) -->
+            <section class="version-section" id="v1-4-2">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.4.2</h2>
+                            <span class="version-type update">Hotfix & Expansion</span>
+                        </div>
+                        <div class="release-date">March 5, 2026</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            This update brings crucial bug fixes to playtime calculation and government mechanics, introduces new executive orders for tax control, adds admin commands for testing elections, and significantly improves the customization of the Custom GUI system.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">4+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Fixes Built</div>
+                                <div class="stat-value">12+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Update</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW FEATURES -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - New Features</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Admin Command: Skip Election</strong>
+                                <div class="sub-item">Added new command: <code>/dc admin skipelection</code> to accelerate transition to the next Election phase. Useful for skipping normal durations during testing.</div>
+                            </li>
+                            <li class="change-item"><strong>Admin Command: End Arena</strong>
+                                <div class="sub-item">Added new command: <code>/dc admin endarena</code> to forcefully stop the entire "Presidential Games" event manually.</div>
+                            </li>
+                            <li class="change-item"><strong>New Executive Order: Tax Suspension</strong>
+                                <div class="sub-item">Disables all tax collection for 48 hours. Accessible by the President via the Government Executive Orders menu.</div>
+                            </li>
+                            <li class="change-item"><strong>New Executive Order: Tax Surge</strong>
+                                <div class="sub-item">Increases the tax rate to 5x the base rate for 24 hours. Accessible by the President via the Government Executive Orders menu.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- IMPROVEMENTS -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">^</div>
+                            <div class="category-title">Improved - Enhancements & Updates</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Custom GUI System</strong>
+                                <div class="sub-item">Supports full customization for MainMenuGUI and GUIListener according to the YAML configuration.</div>
+                                <div class="sub-item">Added multi-tag configuration support for the <code>gui_slot</code> property in <code>main_gui.yml</code>. Formats like <code>"gui_slot: 4, 5, 6"</code> are allowed to display the same item simultaneously in multiple locations.</div>
+                            </li>
+                            <li class="change-item"><strong>Restricted GUI Navigation</strong>
+                                <div class="sub-item">Government GUI access is now restricted; it can only be opened by the President and Cabinet members (Ministers).</div>
+                                <div class="sub-item">The back button on the Treasury log menu and History menu will now redirect the player to the Main Menu with adaptive lore if they are not part of the government.</div>
+                            </li>
+                            <li class="change-item"><strong>Playtime Tracker Safety Net</strong>
+                                <div class="sub-item">Added a periodic playtime tick in scheduled tasks — every minute, all online players get an additional 1 minute to their <code>totalPlaytime</code> to serve as a crash-resistant fallback.</div>
+                            </li>
+                            <li class="change-item"><strong>Tax GUI Refactor</strong>
+                                <div class="sub-item">Updated the Tax System GUI (<code>TaxGUI</code>) to display tax-related Executive Order statuses (Tax Suspension & Tax Surge) in real-time, including visual status items, effective rate adjustments, and a special info banner.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- BUG FIXES -->
+                    <div class="change-category">
+                        <div class="category-header fixed">
+                            <div class="category-icon fixed">!</div>
+                            <div class="category-title">Fixed - Bug Fixes</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Playtime accumulation critical fix</strong>
+                                <div class="sub-item">Fixed a critical bug where players' <code>totalPlaytime</code> was never accumulated (remained 0) because <code>addPlaytime()</code> was never called.</div>
+                                <div class="sub-item">Added session duration calculation on <code>PlayerListener.onPlayerQuit()</code> with a 24-jour maximum limit applied as a safeguard.</div>
+                                <div class="sub-item">This fixes the minimum playtime requirements, the playtime-based level system, playtime-based vote weight bonus, and top playtime leaderboards/placeholders.</div>
+                            </li>
+                            <li class="change-item"><strong>GUI Config Parsing and Defaults</strong>
+                                <div class="sub-item">Default items in Main Menu can now be completely removed without leaving icons, click functions, or sound effects.</div>
+                                <div class="sub-item">Global support for all default DemocracyCore placeholders and extended lore lists to work globally on all custom items.</div>
+                                <div class="sub-item">Fixed hardcoded materials and values for <code>recall_item</code>, <code>treasury_item</code>, <code>arena_item</code>, and <code>leaderboard_item</code> previously uneditable in <code>main_gui.yml</code>.</div>
+                            </li>
+                            <li class="change-item"><strong>Configuration Keys & Presidential Effects</strong>
+                                <div class="sub-item">Fixed a configuration key mismatch for multipliers in <code>config.yml</code> (now reads the <code>-multiplier</code> suffix).</div>
+                                <div class="sub-item">Fixed incorrect path reading for Minister buffs (e.g. <code>cabinet.&lt;position&gt;</code>).</div>
+                                <div class="sub-item">Corrected the mapping key <code>treasury-minister</code> in <code>config.yml</code>.</div>
+                                <div class="sub-item">Potion effects (<code>night-vision</code> and <code>hunger-immunity</code>) for the President now depend on configuration logic and are no longer hardcoded.</div>
+                                <div class="sub-item">Fixed a duration calculation bug for "Presidential Games" due to duplicate day multiplication and fixed the config key to <code>presidential-games</code>.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Version 1.4.1 (Previous) -->
+            <section class="version-section collapsed" id="v1-4-1">
+                <div class="version-header">
+                    <div class="version-header-left">
+                        <div class="version-title">
+                            <h2>Version 1.4.1</h2>
+                            <span class="version-type feature">Arena & Refactor</span>
+                        </div>
+                        <div class="release-date">March 3, 2026</div>
+                    </div>
+                    <div class="version-toggle">
+                        <span class="version-toggle-icon">▼</span>
+                        <span class="version-toggle-text">Minimize</span>
+                    </div>
+                </div>
+
+                <div class="version-content">
+                    <div class="overview-box">
+                        <div class="overview-title">Release Overview</div>
+                        <p style="color: #d1d5db; margin-bottom: 20px;">
+                            This massive update introduces the Presidential Arena GUI, global broadcast features, a
+                            comprehensive GUI config refactor, limit terms for
+                            Presidents, new PlaceholderAPI additions, and multiple important bug fixes.
+                        </p>
+                        <div class="overview-grid">
+                            <div class="overview-stat">
+                                <div class="stat-label">Features Added</div>
+                                <div class="stat-value">25+</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">System</div>
+                                <div class="stat-value">GUI / Game Mode</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="stat-label">Type</div>
+                                <div class="stat-value">Major Update</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REFACTOR CONFIGURATION -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">R</div>
+                            <div class="category-title">Refactor - GUI Configuration</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>File Reorganization</strong>
+                                <div class="sub-item">Refactored GUI configuration: main file moved from
+                                    <code>gui.yml</code> to <code>custom_gui/main_gui.yml</code>.</div>
+                                <div class="sub-item">President History GUI configuration separated into
+                                    <code>custom_gui/history_gui.yml</code>.</div>
+                                <div class="sub-item">Cabinet GUI configuration separated into
+                                    <code>custom_gui/cabinet_gui.yml</code>.</div>
+                            </li>
+                            <li class="change-item"><strong>Functionality</strong>
+                                <div class="sub-item">Modified GUI loader to load <code>main_gui.yml</code> then merge
+                                    with <code>history_gui.yml</code> and <code>cabinet_gui.yml</code> into a single
+                                    runtime config.</div>
+                                <div class="sub-item"><code>reloadGUI()</code> now reloads all three distinct GUI files.
+                                </div>
+                                <div class="sub-item">Included legacy fallback to support reading the old
+                                    <code>gui.yml</code>.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- NEW FEATURES -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - New Features & Commands</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Admin Command: GUI Action Executor</strong>
+                                <div class="sub-item">Added new admin command:
+                                    <code>/dc admin action &lt;action_id&gt; &lt;player&gt;</code>.</div>
+                                <div class="sub-item">Allows executing any GUI action (open_gui_* and action_*) on a
+                                    target from console, RCON, or in-game.</div>
+                            </li>
+                            <li class="change-item"><strong>Tab Completion</strong>
+                                <div class="sub-item">Arg 3: Autocomplete for all available Action IDs from
+                                    <code>gui.yml</code>.</div>
+                                <div class="sub-item">Arg 4: Autocomplete for online players.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- BUG FIXES -->
+                    <div class="change-category">
+                        <div class="category-header fixed">
+                            <div class="category-icon fixed">!</div>
+                            <div class="category-title">Fixed - Bug Fixes</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Set President Command</strong>
+                                <div class="sub-item">Fixed bug where
+                                    <code>/dc admin set president &lt;player&gt;</code> would always fail on Bukkit
+                                    1.20+.</div>
+                            </li>
+                            <li class="change-item"><strong>Custom Material & Slot Config</strong>
+                                <div class="sub-item">GUI Materials are no longer hardcoded.</div>
+                                <div class="sub-item">GUIListener now checks item slots instead of item types.</div>
+                                <div class="sub-item">Dynamic click sound effects based on real-time configuration.
+                                </div>
+                            </li>
+                            <li class="change-item"><strong>Salary GUI</strong>
+                                <div class="sub-item">Fixed title naming error that allowed items to be dragged into
+                                    inventory.</div>
+                                <div class="sub-item">Dynamic visualization of reward info in lore.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- NEW PLACEHOLDERS -->
+                    <div class="change-category">
+                        <div class="category-header added">
+                            <div class="category-icon added">+</div>
+                            <div class="category-title">Added - 26 New Placeholders</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Executive Orders Placeholders (15x)</strong>
+                                <div class="sub-item"><code>%democracy_order_active%</code>,
+                                    <code>%democracy_order_count%</code>, etc.</div>
+                            </li>
+                            <li class="change-item"><strong>Minister Orders Placeholders (11x)</strong>
+                                <div class="sub-item"><code>%democracy_minister_order_active%</code>, multiplier
+                                    effects, etc.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ARENA GUI -->
+                    <div class="change-category">
+                        <div class="category-header enhanced">
+                            <div class="category-icon enhanced">A</div>
+                            <div class="category-title">Enhanced - Presidential Arena Games</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Arena Menu Custom GUI (54-slots)</strong>
+                                <div class="sub-item">Realtime Active/Inactive session status.</div>
+                                <div class="sub-item">Reward overview and Top 5 leaderboard preview.</div>
+                                <div class="sub-item">Dynamic join, leave, start, and end navigation buttons.</div>
+                            </li>
+                            <li class="change-item"><strong>Leaderboards & Kit Info GUIs</strong>
+                                <div class="sub-item">Top 10 leaderboard with player heads.</div>
+                                <div class="sub-item">Kit info GUI and milestone upgrade view (27-slot).</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- GOVERNMENT GUI -->
+                    <div class="change-category">
+                        <div class="category-header improved">
+                            <div class="category-icon improved">^</div>
+                            <div class="category-title">Improved - Government Menu & Term Limits</div>
+                        </div>
+                        <ul class="change-list">
+                            <li class="change-item"><strong>Government GUI Refactoring</strong>
+                                <div class="sub-item">Asymmetrical slot arrangement for better visual structure.</div>
+                                <div class="sub-item">New Presidential Games Shortcut.</div>
+                                <div class="sub-item">Shortcut for Global Broadcast Message (8-hour cooldown).</div>
+                            </li>
+                            <li class="change-item"><strong>President Term Limits System</strong>
+                                <div class="sub-item">Added <code>president.max-consecutive-terms: 2</code> to config.
+                                </div>
+                                <div class="sub-item">Cooldown deduction for players upon each new President
+                                    inauguration.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Version 1.3.0 -->
+            <section class="version-section collapsed" id="v1-3-0">
                 <div class="version-header">
                     <div class="version-header-left">
                         <div class="version-title">
@@ -822,7 +1111,8 @@
                                     <code>%democracy_killstreak%</code>, etc.
                                 </div>
                                 <div class="sub-item">Candidate: <code>%democracy_candidate_votes%</code>,
-                                    <code>%democracy_candidate_slogan%</code></div>
+                                    <code>%democracy_candidate_slogan%</code>
+                                </div>
                             </li>
                             <li class="change-item">
                                 <strong>Expanded Compatibility</strong>
@@ -1432,13 +1722,43 @@
             });
         });
 
-        // Handle initial hash
+        // Handle side-nav clicks efficiently for iframes & Google Sites
+        document.querySelectorAll('.nav-list a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // Active state styling
+                document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+
+                // Get target element
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    // Always expand the target section
+                    targetElement.classList.remove('collapsed');
+                    const toggleText = targetElement.querySelector('.version-toggle-text');
+                    if (toggleText) toggleText.textContent = 'Minimize';
+
+                    // Smooth scroll without altering href
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Handle initial hash if accessed directly via URL fragment
         if (window.location.hash) {
             const id = window.location.hash.substring(1);
             const section = document.getElementById(id);
             if (section) {
                 section.classList.remove('collapsed');
-                section.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             }
         }
     </script>

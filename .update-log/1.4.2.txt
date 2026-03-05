@@ -1,0 +1,26 @@
+- [FIX] Item bawaan di Main Menu (main_gui.yml) sekarang bisa dihapus sepenuhnya tanpa meninggalkan ikon, fungsi klik, atau efek suara.
+- [UPDATE] Mendukung kustomisasi penuh untuk MainMenuGUI dan GUIListener sesuai dengan konfigurasi YAML.
+- [FIX] Dukungan global untuk seluruh placeholder bawaan DemocracyCore dan perluasan list lore supaya bisa digunakan pada semua item kustom baru di dalam `main_gui.yml`.
+- [UPDATE] Government GUI sekarang dibatasi pengaksesannya, hanya dapat dibuka oleh Presiden serta anggota Kabinet (Menteri).
+- [UPDATE] Menambahkan dukungan konfigurasi multi tag (multiple slot) untuk properti `gui_slot` di `main_gui.yml`. Format angka ganda dipisahkan dengan koma seperti `"gui_slot: 4, 5, 6"` sekarang diizinkan untuk menampilkan item yang sama sekaligus di beberapa letak yang berbeda.
+- [UPDATE] Tombol kembali pada menu Treasury log sekarang akan mengarahkan pemain ke Main Menu jika pemain tersebut bukan merupakan bagian dari pemerintahan (Presiden/Menteri/Admin).
+- [UPDATE] Tombol kembali (Back) pada menu History sekarang juga akan mengarahkan pemain ke Main Menu dengan lore/deskripsi yang menyesuaikan ketika pemain tersebut bukan merupakan bagian dari pemerintahan.
+- [FIX] Memperbaiki "material", "display_name", dan "lore" pada opsi `recall_item` dari file konfigurasi `main_gui.yml` yang sebelumnya ter-hardcode ke sistem dan tak dapat dimodifikasi oleh pemain.
+- [FIX] Memperbaiki "material", "display_name", dan "lore" untuk opsi `treasury_item`, `arena_item`, serta `leaderboard_item` yang sebelumnya ter-hardcode pada Main Menu dan kini akan membaca modifikasi secara mandiri dari file YAML.
+- [FIX] Memperbaiki bug kritis di mana statistik `totalPlaytime` pemain tidak pernah terakumulasi — `addPlaytime()` tidak pernah dipanggil di mana pun, menyebabkan playtime selalu bernilai 0 untuk semua pemain.
+- [FIX] Menambahkan kalkulasi durasi sesi bermain di `PlayerListener.onPlayerQuit()` — ketika pemain keluar, durasi sesi (selisih antara waktu join dan waktu quit) kini dihitung dan ditambahkan ke `totalPlaytime`. Batas maksimum 24 jam per sesi diterapkan sebagai safeguard.
+- [UPDATE] Menambahkan periodic playtime tick di scheduled tasks pada `DemocracyCore` — setiap menit, semua pemain yang sedang online mendapatkan tambahan 1 menit ke `totalPlaytime` mereka. Ini berfungsi sebagai fallback tahan-crash jika server berhenti sebelum `onPlayerQuit` sempat terpanggil.
+- [FIX] Syarat playtime minimum untuk mencalonkan diri sebagai presiden (`president.requirements.min-playtime-hours`) sekarang berfungsi dengan benar.
+- [FIX] Sistem level pemain yang dihitung berdasarkan playtime (1 level per 10 jam) kini bekerja dengan benar.
+- [FIX] Bonus bobot suara berbasis playtime (`election.vote-weights.playtime-bonus`) pada saat pemilihan presiden kini berfungsi dengan benar.
+- [FIX] Leaderboard Top Playtime, tampilan playtime di Player Stats GUI, dan placeholder `%democracy_playtime_hours%` kini menampilkan data yang akurat.
+- [FIX] Memperbaiki ketidakcocokan kunci konfigurasi untuk buff (multiplier) di `config.yml`. Plugin sekarang secara dinamis membaca akhiran `-multiplier` seperti `damage-multiplier` dan menghitungnya dengan benar.
+- [FIX] Efek potion `night-vision` dan `hunger-immunity` untuk Presiden kini bergantung pada konfigurasi boolean di `config.yml` dan tidak lagi ter-hardcode.
+- [FIX] Memperbaiki kesalahan pembacaan path (direktori) buff/multiplier untuk para Menteri yang sebelumnya tidak sesuai (misalnya plugin membaca `cabinet.<posisi>.buffs` sedangkan pada `config.yml` adalah `cabinet.<posisi>`).
+- [FIX] Mengoreksi mapping key `treasury-minister` pada `config.yml` untuk dibaca dengan benar oleh sistem tanpa menghasilkan nilai bawaan 0.
+- [NEW] Menambahkan perintah `/dc admin skipelection` untuk mempercepat perpindahan ke fase Election selanjutnya (contoh: Registration -> Campaign). Berguna saat Anda ingin melakukan testing tanpa perlu menunggu durasi normal.
+- [FIX] Memperbaiki bug pada kalkulasi durasi "Presidential Games" di mana durasi menjadi sangat panjang akibat duplikasi perkalian hari dan membenahi letak config key yang tidak sesuai menjadi `presidential-games`.
+- [NEW] Menambahkan perintah `/dc admin endarena` untuk menghentikan keseluruhan event "Presidential Games" secara manual dan paksa bagi admin.
+- [NEW] Menambahkan Executive Order "Tax Suspension" — menonaktifkan seluruh pemungutan pajak selama 48 jam. Tersedia bagi Presiden melalui menu Government Executive Orders.
+- [NEW] Menambahkan Executive Order "Tax Surge" — meningkatkan tarif pajak menjadi 5x lipat dari tarif dasar selama 24 jam. Tersedia bagi Presiden melalui menu Government Executive Orders.
+- [UPDATE] Memperbarui GUI Sistem Pajak (`TaxGUI`) untuk menampilkan status Executive Order terkait pajak (Tax Suspension & Tax Surge) secara real-time, termasuk perubahan visual pada item status, penyesuaian tarif efektif, dan penambahan banner informasi khusus di slot 28.

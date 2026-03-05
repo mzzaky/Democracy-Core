@@ -18,20 +18,20 @@ import id.democracycore.models.Treasury.TransactionType;
 import id.democracycore.utils.MessageUtils;
 
 public class ExecutiveOrderManager {
-    
+
     private final DemocracyCore plugin;
-    
+
     public ExecutiveOrderManager(DemocracyCore plugin) {
         this.plugin = plugin;
     }
-    
+
     public List<ExecutiveOrder> getActiveOrders() {
         return plugin.getDataManager().getActiveOrders();
     }
-    
+
     public boolean isOrderActive(ExecutiveOrderType type) {
         return getActiveOrders().stream()
-            .anyMatch(o -> o.getType() == type && o.isActive() && !o.isExpired());
+                .anyMatch(o -> o.getType() == type && o.isActive() && !o.isExpired());
     }
 
     public boolean isOrderOnCooldown(ExecutiveOrderType type) {
@@ -48,81 +48,82 @@ public class ExecutiveOrderManager {
         long elapsed = System.currentTimeMillis() - lastOrderTime;
         return Math.max(0, cooldownMillis - elapsed);
     }
-    
+
     public ExecutiveOrder getActiveOrder(ExecutiveOrderType type) {
         return getActiveOrders().stream()
-            .filter(o -> o.getType() == type && o.isActive() && !o.isExpired())
-            .findFirst()
-            .orElse(null);
+                .filter(o -> o.getType() == type && o.isActive() && !o.isExpired())
+                .findFirst()
+                .orElse(null);
     }
-    
+
     public boolean issueOrder(Player president, ExecutiveOrderType type) {
         UUID uuid = president.getUniqueId();
-        
+
         // Check if president
         if (!plugin.getGovernmentManager().isPresident(uuid)) {
             MessageUtils.send(president, "executive_orders.only_president");
             return false;
         }
-        
+
         // Check cooldown
         long cooldownDays = plugin.getConfig().getLong("executive-orders.cooldown-days", 7);
         long cooldownMillis = cooldownDays * 24 * 60 * 60 * 1000;
         long lastOrderTime = plugin.getDataManager().getLastExecutiveOrderTime();
-        
+
         if (System.currentTimeMillis() - lastOrderTime < cooldownMillis) {
             long remaining = cooldownMillis - (System.currentTimeMillis() - lastOrderTime);
             MessageUtils.send(president, "executive_orders.cooldown", "time", MessageUtils.formatTime(remaining));
             return false;
         }
-        
+
         // Check if order already active
         if (isOrderActive(type)) {
             MessageUtils.send(president, "executive_orders.already_active");
             return false;
         }
-        
+
         // Check treasury
         double cost = plugin.getConfig().getDouble("executive-orders.cost", 1000000);
         if (!plugin.getTreasuryManager().canAfford(cost)) {
-            MessageUtils.send(president, "executive_orders.insufficient_funds", "amount", plugin.getVaultHook().format(cost));
+            MessageUtils.send(president, "executive_orders.insufficient_funds", "amount",
+                    plugin.getVaultHook().format(cost));
             return false;
         }
-        
+
         // Withdraw from treasury
         plugin.getTreasuryManager().withdraw(TransactionType.EXECUTIVE_ORDER, cost,
-            "Executive Order: " + type.getDisplayName(), uuid);
-        
+                "Executive Order: " + type.getDisplayName(), uuid);
+
         // Create and activate order
         ExecutiveOrder order = new ExecutiveOrder(type, uuid, type.getDefaultDuration());
         getActiveOrders().add(order);
         plugin.getDataManager().setLastExecutiveOrderTime(System.currentTimeMillis());
-        
+
         // Update history record
         PresidentRecord record = plugin.getDataManager().getPresidentHistory().getLatestRecord();
         if (record != null) {
             record.setExecutiveOrdersIssued(record.getExecutiveOrdersIssued() + 1);
         }
-        
+
         // Apply effects
         applyOrderEffects(order);
-        
+
         // Broadcast
         MessageUtils.broadcastAnnouncement("EXECUTIVE ORDER: " + type.getDisplayName(),
-            "<italic><yellow>\"" + type.getFlavorText() + "\"</yellow></italic>\n\n" +
-            "<gray>Effect: " + type.getEffectDescription() + "</gray>\n" +
-            "<gray>Duration: " + MessageUtils.formatTimeShort(type.getDefaultDuration()) + "</gray>");
-        
-        MessageUtils.broadcastTitle("<gold>⚡ EXECUTIVE ORDER ⚡</gold>", 
-            "<yellow>" + type.getDisplayName() + "</yellow>", 20, 100, 20);
+                "<italic><yellow>\"" + type.getFlavorText() + "\"</yellow></italic>\n\n" +
+                        "<gray>Effect: " + type.getEffectDescription() + "</gray>\n" +
+                        "<gray>Duration: " + MessageUtils.formatTimeShort(type.getDefaultDuration()) + "</gray>");
+
+        MessageUtils.broadcastTitle("<gold>⚡ EXECUTIVE ORDER ⚡</gold>",
+                "<yellow>" + type.getDisplayName() + "</yellow>", 20, 100, 20);
         MessageUtils.broadcastSound(Sound.ENTITY_ENDER_DRAGON_GROWL);
-        
+
         // Spawn lightning effect at president's location for dramatic effect
         president.getWorld().strikeLightningEffect(president.getLocation());
-        
+
         return true;
     }
-    
+
     private void applyOrderEffects(ExecutiveOrder order) {
         switch (order.getType()) {
             case GOLDEN_AGE -> {
@@ -142,11 +143,12 @@ public class ExecutiveOrderManager {
                 double stimulus = 50000;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     PlayerData data = plugin.getDataManager().getOrCreatePlayerData(
-                        player.getUniqueId(), player.getName());
+                            player.getUniqueId(), player.getName());
                     if (!data.isClaimedStimulus()) {
                         plugin.getVaultHook().deposit(player.getUniqueId(), stimulus);
                         data.setClaimedStimulus(true);
-                        MessageUtils.send(player, "managers.executive_order.stimulus_received", "amount", plugin.getVaultHook().format(stimulus));
+                        MessageUtils.send(player, "managers.executive_order.stimulus_received", "amount",
+                                plugin.getVaultHook().format(stimulus));
                     }
                 }
             }
@@ -154,7 +156,7 @@ public class ExecutiveOrderManager {
                 // Apply Haste II to all players
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.addPotionEffect(new PotionEffect(
-                        PotionEffectType.HASTE, Integer.MAX_VALUE, 1, false, false));
+                            PotionEffectType.HASTE, Integer.MAX_VALUE, 1, false, false));
                 }
             }
             case ENVIRONMENTAL_PROTECTION -> {
@@ -164,8 +166,8 @@ public class ExecutiveOrderManager {
                 // Multipliers handled in listeners
             }
             case PURGE_PROTOCOL -> {
-                MessageUtils.broadcastTitle("<dark_red>⚠️ PURGE ACTIVE ⚠️</dark_red>", 
-                    "<red>Full PvP enabled everywhere!</red>", 20, 100, 20);
+                MessageUtils.broadcastTitle("<dark_red>⚠️ PURGE ACTIVE ⚠️</dark_red>",
+                        "<red>Full PvP enabled everywhere!</red>", 20, 100, 20);
                 MessageUtils.broadcastSound(Sound.ENTITY_WITHER_SPAWN);
             }
             case PRESIDENTIAL_PARDON -> {
@@ -178,9 +180,16 @@ public class ExecutiveOrderManager {
                     }
                 }
             }
+            case TAX_SUSPENSION -> {
+                MessageUtils
+                        .broadcast("<green>Tax Suspension is now active! All tax collection has been halted!</green>");
+            }
+            case TAX_SURGE -> {
+                MessageUtils.broadcast("<red>Tax Surge is now active! Tax rates are raised to 5x the base rate!</red>");
+            }
         }
     }
-    
+
     public void checkExpirations() {
         List<ExecutiveOrder> orders = getActiveOrders();
         orders.removeIf(order -> {
@@ -192,11 +201,11 @@ public class ExecutiveOrderManager {
             return false;
         });
     }
-    
+
     private void expireOrder(ExecutiveOrder order) {
-        MessageUtils.broadcast("<gray>Executive Order <yellow>" + order.getType().getDisplayName() + 
-            "</yellow> has expired.</gray>");
-        
+        MessageUtils.broadcast("<gray>Executive Order <yellow>" + order.getType().getDisplayName() +
+                "</yellow> has expired.</gray>");
+
         // Remove effects
         switch (order.getType()) {
             case INFRASTRUCTURE_INITIATIVE -> {
@@ -207,10 +216,17 @@ public class ExecutiveOrderManager {
             case PURGE_PROTOCOL -> {
                 MessageUtils.broadcast("<green>The Purge has ended. Normal rules restored.</green>");
             }
-            default -> {}
+            case TAX_SUSPENSION -> {
+                MessageUtils.broadcast("<yellow>Tax Suspension has ended. Normal tax collection has resumed.</yellow>");
+            }
+            case TAX_SURGE -> {
+                MessageUtils.broadcast("<yellow>Tax Surge has ended. Tax rates have returned to normal.</yellow>");
+            }
+            default -> {
+            }
         }
     }
-    
+
     // Effect getters for listeners
     public double getXPMultiplier() {
         double multiplier = 1.0;
@@ -222,7 +238,7 @@ public class ExecutiveOrderManager {
         }
         return multiplier;
     }
-    
+
     public double getVaultMultiplier() {
         double multiplier = 1.0;
         if (isOrderActive(ExecutiveOrderType.GOLDEN_AGE)) {
@@ -230,7 +246,7 @@ public class ExecutiveOrderManager {
         }
         return multiplier;
     }
-    
+
     public double getRareDropMultiplier() {
         double multiplier = 1.0;
         if (isOrderActive(ExecutiveOrderType.GOLDEN_AGE)) {
@@ -238,34 +254,57 @@ public class ExecutiveOrderManager {
         }
         return multiplier;
     }
-    
+
     public double getFarmingMultiplier() {
         if (isOrderActive(ExecutiveOrderType.ENVIRONMENTAL_PROTECTION)) {
             return 3.0;
         }
         return 1.0;
     }
-    
+
     public boolean isPvPDisabled() {
         return isOrderActive(ExecutiveOrderType.STATE_OF_EMERGENCY);
     }
-    
+
     public boolean isPurgeActive() {
         return isOrderActive(ExecutiveOrderType.PURGE_PROTOCOL);
     }
-    
+
     public double getPvPDamageMultiplier() {
         if (isOrderActive(ExecutiveOrderType.WAR_ECONOMY)) {
             return 1.5;
         }
         return 1.0;
     }
-    
+
     public double getShopDiscount() {
         if (isOrderActive(ExecutiveOrderType.ECONOMIC_RECOVERY)) {
             return 0.25; // 25% discount
         }
         return 0.0;
+    }
+
+    /**
+     * Returns true if the Tax Suspension executive order is currently active,
+     * meaning all tax collection should be skipped.
+     */
+    public boolean isTaxSuspended() {
+        return isOrderActive(ExecutiveOrderType.TAX_SUSPENSION);
+    }
+
+    /**
+     * Returns the current tax multiplier based on active orders.
+     * Returns 0.0 if taxes are suspended, 5.0 if Tax Surge is active,
+     * or 1.0 under normal conditions.
+     */
+    public double getTaxMultiplier() {
+        if (isOrderActive(ExecutiveOrderType.TAX_SUSPENSION)) {
+            return 0.0; // Tax fully suspended
+        }
+        if (isOrderActive(ExecutiveOrderType.TAX_SURGE)) {
+            return 5.0; // 5x base tax rate
+        }
+        return 1.0;
     }
 
     public boolean stopOrder(ExecutiveOrderType type) {

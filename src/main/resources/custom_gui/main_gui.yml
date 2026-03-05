@@ -4,7 +4,7 @@
 #
 # This file controls the appearance and behavior of GUI elements
 # Each item supports the following properties:
-#   - gui_slot: Position in inventory (0-53 for 54-slot GUI)
+#   - gui_slot: Position in inventory (0-53 for 54-slot GUI). Supports multiple slots (e.g. "4, 5, 6")
 #   - material: Minecraft material name
 #   - display_name: Item display name (supports color codes with §)
 #   - lore: List of lore lines
@@ -134,7 +134,12 @@
 #                                  Example:
 #                                    on_click: "<action_console_command>"
 #                                    value: "give %player_name% diamond 1"
-#
+# 
+# 
+# You can use multiple slots by separating them with a comma (e.g. gui_slot: "4, 5, 6")
+# gui_slot:
+#  - 11
+#  - 22
 # ========================================
 
 
@@ -439,7 +444,6 @@ gui:
         on_click: "<open_gui_help>"
 
       # Quick Actions
-      # Quick Actions
       register_candidate:
         gui_slot: 38
         material: EMERALD
@@ -573,251 +577,3 @@ gui:
       #   on_click: "<action_console_command>"
       #   value: "say Hello {player_name}!"
       # ========================================
-
-
-  arena_menu:
-    title: "§4§l⚔ PRESIDENTIAL ARENA ⚔"
-    inventory_slot: 54
-    items:
-      # Session Status Header (Slot 4)
-      session_status:
-        gui_slot: 4
-        # When inactive
-        inactive:
-          material: GRAY_CONCRETE
-          custom_model_data: 0
-          display_name: "§8§l⚔ ARENA STATUS: §c§lINACTIVE"
-          lore:
-            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-            - "§7No presidential arena games"
-            - "§7are currently running."
-            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-            - "§7The President can start a new"
-            - "§7session from this menu."
-        # When active
-        active:
-          material: LIME_CONCRETE
-          custom_model_data: 0
-          display_name: "§a§l⚔ ARENA STATUS: §2§lACTIVE"
-          lore:
-            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-            - "§aSession is currently live!"
-            - "§7Players in Arena: §f{players}"
-            - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-            - "§aJoin now for rewards!"
-
-      # Info Panel: Session Info (Slot 10)
-      session_info:
-        gui_slot: 10
-        material: CAMPFIRE
-        custom_model_data: 0
-        display_name: "§e§l📋 Session Information"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7See active session details"
-          - "§7including start time and"
-          - "§7time remaining."
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-
-      # Info Panel: Economy (Slot 12)
-      economy_info:
-        gui_slot: 12
-        material: GOLD_INGOT
-        custom_model_data: 0
-        display_name: "§6§l💰 Economy"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Per Kill:  §a+$5,000"
-          - "§7Per Death: §c-$5,000"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Rewards go directly to"
-          - "§7your personal vault balance."
-
-      # Info Panel: Killstreak Bonuses (Slot 14)
-      killstreak_info:
-        gui_slot: 14
-        material: BLAZE_ROD
-        custom_model_data: 0
-        display_name: "§c§l🔥 Killstreak Bonuses"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§75  Kill Streak: §6+$10,000"
-          - "§710 Kill Streak: §6+$25,000"
-          - "§725 Kill Streak: §6+$50,000"
-          - "§750 Kill Streak: §6+$100,000"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Streaks also unlock combat"
-          - "§7gear upgrades!"
-          - "§cResets on death."
-
-      # Info Panel: Prize Pool (Slot 16) - clickable to leaderboard
-      prize_pool:
-        gui_slot: 16
-        material: NETHER_STAR
-        custom_model_data: 0
-        display_name: "§e§l🏆 Prize Pool"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§f§lDaily Rewards (Top 10):"
-          - "§7🥇 1st: §6$100,000 §7+ §f3 Netherite"
-          - "§7🥈 2nd: §6$75,000 §7+ §f2 Netherite"
-          - "§7🥉 3rd: §6$60,000 §7+ §f2 Netherite"
-          - "§7#4-10: §6$25k-$50k §7+ §f1 Netherite"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§f§lGrand Prize (Winner):"
-          - "§7👑 Champion: §6$1,000,000"
-          - "§7     + §fArena Champion Trophy"
-          - "§7     + §fChampion's Chestplate"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§aClick to view leaderboard."
-        click_sound: "entity.player.levelup"
-        on_click: "<open_gui_arena_leaderboard>"
-
-      # My Stats (Slot 19)
-      my_stats:
-        gui_slot: 19
-        material: PLAYER_HEAD
-        custom_model_data: 0
-        display_name: "§b§l📊 My Arena Stats"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Kills: §a{kills}"
-          - "§7Deaths: §c{deaths}"
-          - "§7Best Streak: §6{streak}"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-
-      # Top Players Short Preview (Slot 22) - clickable to leaderboard
-      top_players:
-        gui_slot: 22
-        material: PLAYER_HEAD
-        custom_model_data: 0
-        display_name: "§e§l🏆 Top Players"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Live kill leaderboard"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§aClick to view full leaderboard."
-        click_sound: "entity.player.levelup"
-        on_click: "<open_gui_arena_leaderboard>"
-
-      # Kit Info (Slot 25) - clickable
-      kit_info:
-        gui_slot: 25
-        material: IRON_CHESTPLATE
-        custom_model_data: 0
-        hide_attributes: ATTRIBUTES
-        display_name: "§6§l🗡 Arena Kit"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7Full Iron Armor"
-          - "§7Arena Sword (Iron)"
-          - "§7Bow + 32 Arrows"
-          - "§7Golden Apple x3"
-          - "§7Cooked Beef x16"
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§aClick to view kit details."
-        click_sound: "item.armor.equip_iron"
-        on_click: "<open_gui_arena_kit>"
-
-      # Join/Leave Arena button (Slot 37) - handled dynamically in code
-      # Leaderboard button (Slot 40)
-      leaderboard_button:
-        gui_slot: 40
-        material: GOLD_BLOCK
-        custom_model_data: 0
-        display_name: "§6§l🏆 Full Leaderboard"
-        lore:
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§7View all participants"
-          - "§7and their live kill counts."
-          - "§8▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-          - "§aClick to open."
-        click_sound: "entity.player.levelup"
-        on_click: "<open_gui_arena_leaderboard>"
-
-      # Back Button (Slot 45)
-      back_button:
-        gui_slot: 45
-        material: ARROW
-        custom_model_data: 0
-        display_name: "§7§l← Back to Menu"
-        lore:
-          - "§7Return to main menu"
-        click_sound: "ui.button.click"
-        on_click: "<open_gui_main_menu>"
-
-      # Refresh Button (Slot 49)
-      refresh_button:
-        gui_slot: 49
-        material: CLOCK
-        custom_model_data: 0
-        display_name: "§7§l↻ Refresh"
-        lore:
-          - "§7Click to refresh this GUI"
-          - "§7with the latest data."
-        click_sound: "ui.button.click"
-        on_click: "<action_refresh_gui>"
-
-      # Close Button (Slot 53)
-      close_button:
-        gui_slot: 53
-        material: BARRIER
-        custom_model_data: 0
-        display_name: "§c§lClose"
-        lore:
-          - "§7Click to close"
-        click_sound: "block.chest.close"
-        on_click: "<action_close_inventory>"
-
-
-# ========================================
-# ADMIN COMMANDS
-# ========================================
-# These configurations document admin-accessible GUI shortcuts.
-# Use /dc gui <action> (requires democracy.admin permission) to open
-# any GUI directly, bypassing normal navigation.
-#
-# Format:  /dc gui <action_key>
-#
-# Available GUI actions (action_key values):
-#   open_gui_main_menu        - Main Menu
-#   open_gui_government       - Government Menu
-#   open_gui_history          - President History
-#   open_gui_voting           - Voting / Election
-#   open_gui_cabinet          - Cabinet Menu                 ← Also updated
-#   open_gui_cabinet_appoint  - Cabinet Appointment Picker   ← New
-#   open_gui_treasury         - Treasury
-#   open_gui_executive_orders - Executive Orders
-#   open_gui_recall           - Recall System
-#   open_gui_leaderboard      - Leaderboard
-#   open_gui_player_stats     - Player Statistics
-#   open_gui_help             - Guide & Help
-#   open_gui_tax              - Tax System
-#   open_gui_arena            - Presidential Arena Manager  ← New
-#   open_gui_arena_leaderboard- Arena Leaderboard           ← New
-#   open_gui_arena_kit        - Arena Kit Info              ← New
-# ========================================
-admin_commands:
-  # Admin shortcut: Open President History GUI for any player
-  history:
-    permission: "democracy.admin"
-    description: "Opens the President History GUI. Usage: /dc gui open_gui_history"
-    on_click: "<open_gui_history>"
-
-  # Admin shortcut: Open Cabinet GUI
-  cabinet:
-    permission: "democracy.admin"
-    description: "Opens the Cabinet GUI. Usage: /dc gui open_gui_cabinet"
-    on_click: "<open_gui_cabinet>"
-
-  # Admin shortcut: Open Arena Manager GUI
-  arena:
-    permission: "democracy.admin"
-    description: "Opens the Arena Management GUI. Usage: /dc gui open_gui_arena"
-    on_click: "<open_gui_arena>"
-
-  # Admin shortcut: Open Arena Leaderboard GUI
-  arena_leaderboard:
-    permission: "democracy.admin"
-    description: "Opens the Arena Leaderboard GUI. Usage: /dc gui open_gui_arena_leaderboard"
-    on_click: "<open_gui_arena_leaderboard>"

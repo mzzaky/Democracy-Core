@@ -996,6 +996,14 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
             case "endElection":
                 handleAdminEndElection(sender);
                 break;
+            case "skipelection":
+            case "skipElection":
+                handleAdminSkipElection(sender);
+                break;
+            case "endarena":
+            case "endArena":
+                handleAdminEndArena(sender);
+                break;
             case "addtreasury":
                 handleAdminAddTreasury(sender, args);
                 break;
@@ -1023,6 +1031,8 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "admin.help_removepresident");
         MessageUtils.send(sender, "admin.help_startelection");
         MessageUtils.send(sender, "admin.help_endelection");
+        MessageUtils.send(sender, "<gold>/dc admin skipelection <gray>- Force skip to the next election phase");
+        MessageUtils.send(sender, "<gold>/dc admin endarena <gray>- Force end active arena games");
         MessageUtils.send(sender, "admin.help_addtreasury");
         MessageUtils.send(sender, "admin.help_reload");
         MessageUtils.send(sender, "admin.help_reset");
@@ -1178,6 +1188,24 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
         MessageUtils.send(sender, "admin.endelection_success");
     }
 
+    private void handleAdminSkipElection(CommandSender sender) {
+        if (!plugin.getElectionManager().isElectionActive()) {
+            MessageUtils.send(sender, "<red>There is no active election to skip.</red>");
+            return;
+        }
+        plugin.getElectionManager().forceNextPhase();
+        MessageUtils.send(sender, "<green>Election skipped to the next phase.</green>");
+    }
+
+    private void handleAdminEndArena(CommandSender sender) {
+        if (!plugin.getArenaManager().isArenaActive()) {
+            MessageUtils.send(sender, "<red>There are no active Arena Games to end.</red>");
+            return;
+        }
+        plugin.getArenaManager().endArena();
+        MessageUtils.send(sender, "<green>Arena games force-ended.</green>");
+    }
+
     private void handleAdminAddTreasury(CommandSender sender, String[] args) {
         if (args.length < 3) {
             MessageUtils.send(sender, "admin.addtreasury_usage");
@@ -1309,7 +1337,7 @@ public class DemocracyCommand implements CommandExecutor, TabCompleter {
                 case "admin":
                     if (sender.hasPermission("democracy.admin")) {
                         completions.addAll(Arrays.asList(
-                                "set", "remove", "startelection",
+                                "set", "remove", "startelection", "skipelection", "endarena",
                                 "endelection", "addtreasury", "reload", "reset", "stoporder", "confirm", "action"));
                     }
                     break;

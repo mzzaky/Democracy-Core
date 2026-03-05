@@ -115,9 +115,14 @@ public class PresidentHistoryGUI {
         placeHallOfFame(inv, history);
 
         // ── Navigation ────────────────────────────────────────────────────
+        id.democracycore.models.Government gov = plugin.getDataManager().getGovernment();
+        boolean isGov = (gov.hasPresident() && gov.getPresidentUUID().equals(player.getUniqueId()))
+                || (gov.getCabinetMemberByUUID(player.getUniqueId()) != null)
+                || player.hasPermission("democracy.admin");
+
         inv.setItem(45, createItem(Material.ARROW,
                 "§7§l← Back",
-                "§7Return to Government Menu"));
+                isGov ? "§7Return to Government Menu" : "§7Return to Main Menu"));
         inv.setItem(53, createItem(Material.BARRIER,
                 "§c§lClose",
                 "§7Click to close"));

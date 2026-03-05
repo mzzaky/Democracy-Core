@@ -6,13 +6,13 @@ general:
   prefix: "&6[DemocracyCore]&r"
   language: "en"
 
-# President Settings
+# President Settings Fixed
 president:
   term-length-days: 30
   max-consecutive-terms: 2
   cooldown-after-max-terms: 1 # terms to wait before running again
   
-  # Requirements to run
+  # Requirements to run Fixed
   requirements:
     min-level: 100
     min-playtime-hours: 100
@@ -20,7 +20,7 @@ president:
     min-endorsements: 10
     no-punishment-days: 30
   
-  # Buffs
+  # Buffs Fixed
   buffs:
     damage-multiplier: 1.15 # +15%
     defense-multiplier: 1.12 # +12%
@@ -30,7 +30,7 @@ president:
     hunger-immunity: true
     night-vision: true
   
-  # Daily Rewards
+  # Daily Rewards Fixed
   daily-rewards:
     vault-points: 50000
     diamond-blocks: 5
@@ -123,7 +123,7 @@ executive-orders:
   cooldown-days: 7
   cost: 1000000
 
-# Presidential Games
+# Presidential Games Fixed
 presidential-games:
   cost: 100000
   max-per-term: 2
